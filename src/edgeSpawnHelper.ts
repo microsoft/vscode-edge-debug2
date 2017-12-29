@@ -4,14 +4,14 @@
 
 import * as cp from 'child_process';
 
-const chromePath = process.argv[2];
-const chromeArgs = process.argv.slice(3);
+const edgePath = process.argv[2];
+const edgeArgs = process.argv.slice(3);
 
-console.log(`spawn('${chromePath}', ${JSON.stringify(chromeArgs) })`);
-const chromeProc = cp.spawn(chromePath, chromeArgs, {
+console.log(`spawn('${edgePath}', ${JSON.stringify(edgeArgs) })`);
+const edgeProc = cp.spawn(edgePath, edgeArgs, {
     stdio: 'ignore',
     detached: true
 });
 
-chromeProc.unref();
-process.send(chromeProc.pid);
+edgeProc.unref();
+process.send(edgeProc.pid);

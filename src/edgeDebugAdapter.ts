@@ -30,13 +30,11 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
     private static PAGE_PAUSE_MESSAGE = 'Paused in Visual Studio Code';
 
     private _edgeProc: ChildProcess;
-    private _overlayHelper: utils.DebounceHelper;
     private _edgePID: number;
     private _breakOnLoadActive = false;
     private _userRequestedUrl: string;
 
     public initialize(args: DebugProtocol.InitializeRequestArguments): DebugProtocol.Capabilities {
-        this._overlayHelper = new utils.DebounceHelper(/*timeoutMs=*/200);
         const capabilities = super.initialize(args);
         capabilities.supportsRestartRequest = true;
 
@@ -153,12 +151,6 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
     }
 
     protected async onPaused(notification: Crdp.Debugger.PausedEvent, expectingStopReason = this._expectingStopReason): Promise<void> {
-        this._overlayHelper.doAndCancel(() => {
-            return this._domains.has('Overlay') ?
-                this.chrome.Overlay.setPausedInDebuggerMessage({ message: EdgeDebugAdapter.PAGE_PAUSE_MESSAGE }).catch(() => { }) :
-                (<any>this.chrome).Page.configureOverlay({ message: EdgeDebugAdapter.PAGE_PAUSE_MESSAGE }).catch(() => { });
-        });
-
         return super.onPaused(notification, expectingStopReason);
     }
 
@@ -167,11 +159,6 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
     }
 
     protected onResumed(): void {
-        this._overlayHelper.wait(() => {
-            return this._domains.has('Overlay') ?
-                this.chrome.Overlay.setPausedInDebuggerMessage({ }).catch(() => { }) :
-                (<any>this.chrome).Page.configureOverlay({ }).catch(() => { });
-        });
         super.onResumed();
     }
 

@@ -89,7 +89,9 @@ export function getMockEdgeConnectionApi(): IMockEdgeConnectionAPI {
     mockDebugger.callBase = true;
     mockDebugger
         .setup(x => x.enable())
-        .returns(() => Promise.resolve());
+        .returns(() => Promise.resolve({
+            debuggerId: ""
+        }));
 
     const mockNetwork = Mock.ofInstance<Crdp.NetworkClient>(<any>getNetworkStubs());
     mockNetwork.callBase = true;

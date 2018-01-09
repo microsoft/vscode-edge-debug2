@@ -165,24 +165,27 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
     public disconnect(args: DebugProtocol.DisconnectArguments): void {
         const hadTerminated = this._hasTerminated;
 
-        // Disconnect before killing Chrome, because running "taskkill" when it's paused sometimes doesn't kill it
+        // Disconnect before killing Edge
         super.disconnect(args);
 
         if (this._edgeProc && !hadTerminated) {
             // Only kill Chrome if the 'disconnect' originated from vscode. If we previously terminated
             // due to Chrome shutting down, or devtools taking over, don't kill Chrome.
+            // (This might not be true for Edge)
             if (coreUtils.getPlatform() === coreUtils.Platform.Windows && this._edgePID) {
-                // Run synchronously because this process may be killed before exec() would run
-                const taskkillCmd = `taskkill /F /T /PID ${this._edgePID}`;
-                logger.log(`Killing Chrome process by pid: ${taskkillCmd}`);
-                try {
-                    execSync(taskkillCmd);
-                } catch (e) {
-                    // Can fail if Chrome was already open, and the process with _chromePID is gone.
-                    // Or if it already shut down for some reason.
+                if (doesProcessExist(this._edgePID)) {
+                    // Run synchronously because this process may be killed before exec() would run
+                    const taskkillCmd = `taskkill /F /T /PID ${this._edgePID}`;
+                    logger.log(`Killing Edge process by pid: ${taskkillCmd}`);
+                    try {
+                        execSync(taskkillCmd);
+                    } catch (e) {
+                        // Can fail if Edge was already open, and the process with _EdgePID is gone.
+                        // Or if it already shut down for some reason.
+                    }
                 }
             } else {
-                logger.log('Killing Chrome process');
+                logger.log('Killing Edge process');
                 this._edgeProc.kill('SIGINT');
             }
         }
@@ -319,4 +322,17 @@ function findExecutable(program: string): string | undefined {
     }
 
     return undefined;
+}
+
+function doesProcessExist(pid: number) {
+    try {
+        process.kill(pid, 0);
+    } catch (e) {
+        if (e.code == 'ESRCH') {
+            return false;
+        }
+        throw e;
+    }
+
+    return true;
 }

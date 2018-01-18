@@ -8,7 +8,7 @@ import * as path from 'path';
 
 import {ChromeDebugAdapter as CoreDebugAdapter, logger, utils as coreUtils, ISourceMapPathOverrides} from 'vscode-chrome-debug-core';
 import {spawn, ChildProcess, fork, execSync} from 'child_process';
-import {Crdp} from 'vscode-chrome-debug-core';
+import {Crdp, chromeConnection, utils as chromecoreutil} from 'vscode-chrome-debug-core';
 import {DebugProtocol} from 'vscode-debugprotocol';
 
 import {ILaunchRequestArgs, IAttachRequestArgs, ICommonRequestArgs} from './edgeDebugInterfaces';
@@ -33,6 +33,8 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
     private _edgePID: number;
     private _breakOnLoadActive = false;
     private _userRequestedUrl: string;
+    private _debuggerId: string;
+    private _debugProxyPort: number;
 
     public initialize(args: DebugProtocol.InitializeRequestArguments): DebugProtocol.Capabilities {
         const capabilities = super.initialize(args);
@@ -65,7 +67,8 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
             const edgeWorkingDir: string = args.cwd || null;
 
             if (!args.noDebug) {
-                edgeArgs.push('--devtools-server-port ' + port);
+                edgeArgs.push('--devtools-server-port');
+                edgeArgs.push(port.toString());
             }
 
             let launchUrl: string;
@@ -95,7 +98,16 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
             });
 
             return args.noDebug ? undefined :
-                this.doAttach(port, launchUrl || args.urlFilter, args.address, args.timeout, undefined, args.extraCRDPChannelPort);
+                this.doAttach(port, launchUrl || args.urlFilter, args.address, args.timeout, undefined, args.extraCRDPChannelPort)
+                .then(() => {
+                    this._debugProxyPort = port;
+
+                    if (!this._chromeConnection.isAttached || !this._chromeConnection.attachedTarget) {
+                        throw coreUtils.errP(localize("edge.debug.error.notattached", "Debugging connection is not attached after the attaching process."));
+                    }
+
+                    this._debuggerId = this._chromeConnection.attachedTarget.id;
+                });
         });
     }
 
@@ -162,35 +174,25 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
         super.onResumed();
     }
 
-    public disconnect(args: DebugProtocol.DisconnectArguments): void {
+    public disconnect(args: DebugProtocol.DisconnectArguments): Promise<void> {
         const hadTerminated = this._hasTerminated;
 
         // Disconnect before killing Edge
         super.disconnect(args);
 
-        if (this._edgeProc && !hadTerminated) {
-            // Only kill Chrome if the 'disconnect' originated from vscode. If we previously terminated
-            // due to Chrome shutting down, or devtools taking over, don't kill Chrome.
-            // (This might not be true for Edge)
-            if (coreUtils.getPlatform() === coreUtils.Platform.Windows && this._edgePID) {
-                if (doesProcessExist(this._edgePID)) {
-                    // Run synchronously because this process may be killed before exec() would run
-                    const taskkillCmd = `taskkill /F /T /PID ${this._edgePID}`;
-                    logger.log(`Killing Edge process by pid: ${taskkillCmd}`);
-                    try {
-                        execSync(taskkillCmd);
-                    } catch (e) {
-                        // Can fail if Edge was already open, and the process with _EdgePID is gone.
-                        // Or if it already shut down for some reason.
-                    }
-                }
-            } else {
-                logger.log('Killing Edge process');
-                this._edgeProc.kill('SIGINT');
+        if (!hadTerminated) {
+            if (!this._debuggerId) {
+                throw coreUtils.errP(localize("edge.debug.error.nodebuggerID", "Cannot find a debugger id."));
             }
-        }
 
-        this._edgeProc = null;
+            const closeTabApiUrl = `http://127.0.0.1:${this._debugProxyPort}/json/close/${this._debuggerId}`;
+            logger.log(`closeTabApiUrl ${closeTabApiUrl}`);
+            return chromecoreutil.getURL(closeTabApiUrl).then(() => {
+                this._edgeProc = null;
+            }, (e) => {
+                logger.log(`Cannot call close API, ${require('util').inspect(e)}`);
+            });
+        }
     }
 
     /**

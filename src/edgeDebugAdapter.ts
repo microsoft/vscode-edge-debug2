@@ -8,7 +8,7 @@ import * as path from 'path';
 
 import {ChromeDebugAdapter as CoreDebugAdapter, logger, utils as coreUtils, ISourceMapPathOverrides} from 'vscode-chrome-debug-core';
 import {spawn, ChildProcess, fork, execSync} from 'child_process';
-import {Crdp} from 'vscode-chrome-debug-core';
+import {Crdp, LoadedSourceEventReason} from 'vscode-chrome-debug-core';
 import {DebugProtocol} from 'vscode-debugprotocol';
 
 import {ILaunchRequestArgs, IAttachRequestArgs, ICommonRequestArgs} from './edgeDebugInterfaces';
@@ -33,6 +33,7 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
     private _edgePID: number;
     private _breakOnLoadActive = false;
     private _userRequestedUrl: string;
+    private _scriptParsedEventBookKeeping = {};
 
     public initialize(args: DebugProtocol.InitializeRequestArguments): DebugProtocol.Capabilities {
         const capabilities = super.initialize(args);
@@ -95,7 +96,10 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
             });
 
             return args.noDebug ? undefined :
-                this.doAttach(port, launchUrl || args.urlFilter, args.address, args.timeout, undefined, args.extraCRDPChannelPort);
+                this.doAttach(port, launchUrl || args.urlFilter, args.address, args.timeout, undefined, args.extraCRDPChannelPort)
+                .then(() => {
+                    this._scriptParsedEventBookKeeping = {};
+                });
         });
     }
 
@@ -200,6 +204,22 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
         return this.chrome ?
             this.chrome.Page.reload({ ignoreCache: true }) :
             Promise.resolve();
+    }
+
+    protected clearTargetContext(): void {
+        super.clearTargetContext();
+        this._scriptParsedEventBookKeeping = {};
+    }
+
+    protected async sendLoadedSourceEvent(script: Crdp.Debugger.ScriptParsedEvent): Promise<void> {
+        let loadedSourceReason: LoadedSourceEventReason;
+        if (!this._scriptParsedEventBookKeeping[script.scriptId]) {
+            this._scriptParsedEventBookKeeping[script.scriptId] = true;
+            loadedSourceReason = 'new';
+        } else {
+            loadedSourceReason = 'changed';
+        }
+        return super.sendLoadedSourceEvent(script, loadedSourceReason);
     }
 
     private spawnEdge(edgePath: string, edgeArgs: string[], env: {[key: string]: string}, cwd: string, usingRuntimeExecutable: boolean): ChildProcess {

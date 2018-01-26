@@ -10,7 +10,8 @@ const edgeArgs = process.argv.slice(3);
 console.log(`spawn('${edgePath}', ${JSON.stringify(edgeArgs) })`);
 const edgeProc = cp.spawn(edgePath, edgeArgs, {
     stdio: 'ignore',
-    detached: true
+    detached: true,
+    shell: true
 });
 
 edgeProc.unref();

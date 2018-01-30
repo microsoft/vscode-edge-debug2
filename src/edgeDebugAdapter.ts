@@ -78,18 +78,21 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
             } else if (args.url) {
                 launchUrl = args.url;
             }
-            edgeArgs.push(launchUrl);
-            /*if (launchUrl) {
-                if (args.breakOnLoadStrategy !== 'none') {
-                    // We store the launch file/url provided and temporarily launch and attach to about:blank page. Once we receive configurationDone() event, we redirect the page to this file/url
+            if (launchUrl) {
+                if (args.breakOnLoadStrategy !== 'off') {
+                    // We store the launch file/url provided and temporarily launch and attach to a custom landing page using file url.
+                    // Once we receive configurationDone() event, we redirect the page to the user file/url
                     // This is done to facilitate hitting breakpoints on load
                     this._userRequestedUrl = launchUrl;
-                    launchUrl = "about:blank";
+                    // The compiled file lives in root/out/src while the landingPage will live in root/
+                    let landingPagePathArray = __dirname.split(path.sep).slice(0,-2);
+                    let landingPagePath = landingPagePathArray.join(path.sep);
+                    launchUrl = "file:///" + landingPagePath + "/landingPage.html";
                     this._breakOnLoadActive = true;
                 }
 
                 edgeArgs.push(launchUrl);
-            }*/
+            }
 
             this._edgeProc = this.spawnEdge(runtimeExecutable, edgeArgs, edgeEnv, edgeWorkingDir, !!args.runtimeExecutable);
             this._edgeProc.on('error', (err) => {

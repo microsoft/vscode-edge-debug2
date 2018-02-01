@@ -86,10 +86,9 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
                     this._userRequestedUrl = launchUrl;
                     // The compiled file lives in root/out/src while the landingPage will live in root/
                     /* So when this script is getting executed from the %programdata% directory under EdgeAdapter/out/src, we need to find the
-                    landingPage under EdgeAdapter/ hence we slice the path array below to the executing script by 2 */
-                    let landingPagePathArray = __dirname.split(path.sep).slice(0,-2);
-                    let landingPagePath = landingPagePathArray.join(path.sep);
-                    launchUrl = "file:///" + landingPagePath + "/landingPage.html";
+                    landingPage under EdgeAdapter/ hence we need to go 2 directories up */
+                    let landingPagePath = path.dirname(path.dirname(__dirname));
+                    launchUrl = encodeURI("file:///" + landingPagePath + "/landingPage.html");
                     this._breakOnLoadActive = true;
                 }
 

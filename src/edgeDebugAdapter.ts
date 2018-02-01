@@ -80,11 +80,13 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
             }
             if (launchUrl) {
                 if (args.breakOnLoadStrategy !== 'off') {
-                    // We store the launch file/url provided and temporarily launch and attach to a custom landing page using file url.
+                    // We store the launch file/url provided by the user and temporarily launch and attach to a custom landing page using file url.
                     // Once we receive configurationDone() event, we redirect the page to the user file/url
                     // This is done to facilitate hitting breakpoints on load
                     this._userRequestedUrl = launchUrl;
                     // The compiled file lives in root/out/src while the landingPage will live in root/
+                    /* So when this script is getting executed from the %programdata% directory under EdgeAdapter/out/src, we need to find the
+                    landingPage under EdgeAdapter/ hence we slice the path array below to the executing script by 2 */
                     let landingPagePathArray = __dirname.split(path.sep).slice(0,-2);
                     let landingPagePath = landingPagePathArray.join(path.sep);
                     launchUrl = "file:///" + landingPagePath + "/landingPage.html";

@@ -261,6 +261,19 @@
                 "type": "boolean",
                 "description": "%edge.showAsyncStacks.description%",
                 "default": true
+              },
+              "breakOnLoadStrategy": {
+                "type": "enum",
+                "enum": [
+                  "regex",
+                  "off"
+                ],
+                "enumDescriptions": [
+                  "%edge.breakOnLoadStrategy.regex.description%",
+                  "%edge.breakOnLoadStrategy.off.description%"
+                ],
+                "description": "%edge.breakOnLoadStrategy.description",
+                "default": "off"
               }
             }
           },

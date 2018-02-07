@@ -8,15 +8,21 @@ import * as path from 'path';
 
 import {ChromeDebugAdapter as CoreDebugAdapter, logger, utils as coreUtils, ISourceMapPathOverrides} from 'vscode-chrome-debug-core';
 import {spawn, ChildProcess, fork, execSync} from 'child_process';
-import {Crdp, LoadedSourceEventReason, chromeConnection, utils as chromecoreutil} from 'vscode-chrome-debug-core';
+import {Crdp, LoadedSourceEventReason, chromeConnection, chromeUtils, variables} from 'vscode-chrome-debug-core';
 import {DebugProtocol} from 'vscode-debugprotocol';
 
 import {ILaunchRequestArgs, IAttachRequestArgs, ICommonRequestArgs} from './edgeDebugInterfaces';
+import {ExtendedDebugProtocolVariable, MSPropertyContainer} from './edgeVariablesContainer';
 import * as utils from './utils';
 import * as errors from './errors';
 
 import * as nls from 'vscode-nls';
-const localize = nls.config(process.env.VSCODE_NLS_CONFIG)();
+
+export const localize = nls.config(process.env.VSCODE_NLS_CONFIG)();
+
+interface ExtendedEdgeRemoteObject extends Crdp.Runtime.RemoteObject{
+    msDebuggerPropertyId: string;
+}
 
 const DefaultWebSourceMapPathOverrides: ISourceMapPathOverrides = {
     'webpack:///./~/*': '${webRoot}/node_modules/*',
@@ -192,7 +198,7 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
             }
 
             const closeTabApiUrl = `http://127.0.0.1:${this._debugProxyPort}/json/close/${this._debuggerId}`;
-            return chromecoreutil.getURL(closeTabApiUrl).then(() => {
+            return coreUtils.getURL(closeTabApiUrl).then(() => {
                 this._edgeProc = null;
             }, (e) => {
                 logger.log(`Cannot call close API, ${require('util').inspect(e)}`);
@@ -282,6 +288,22 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
             edgeProc.unref();
             return edgeProc;
         }
+    }
+
+    public createPrimitiveVariable(name: string, object: Crdp.Runtime.RemoteObject, parentEvaluateName?: string, stringify?: boolean): DebugProtocol.Variable {
+        let variable: ExtendedDebugProtocolVariable = super.createPrimitiveVariable(name, object, parentEvaluateName);
+        const edgeRemoteObject = object as ExtendedEdgeRemoteObject;
+        if (edgeRemoteObject.msDebuggerPropertyId) {
+            variable.msDebuggerPropertyId = edgeRemoteObject.msDebuggerPropertyId;
+        } else {
+            throw coreUtils.errP(localize("edge.debug.error.notAssociatedMsDebuggerPropertyId", "Cannot find msDebuggerPropertyId from returned Variable data."));
+        }
+
+        return variable;
+    }
+
+    protected createPropertyContainer(object: Crdp.Runtime.RemoteObject, evaluateName: string): variables.IVariableContainer {
+        return new MSPropertyContainer(object.objectId, evaluateName);
     }
 }
 

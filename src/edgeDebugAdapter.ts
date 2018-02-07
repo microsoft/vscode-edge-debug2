@@ -6,7 +6,8 @@ import * as os from 'os';
 import * as fs from 'fs';
 import * as path from 'path';
 
-import {ChromeDebugAdapter as CoreDebugAdapter, logger, utils as coreUtils, ISourceMapPathOverrides} from 'vscode-chrome-debug-core';
+import {ChromeDebugAdapter as CoreDebugAdapter, logger, utils as coreUtils, ISourceMapPathOverrides,
+        IVariablesResponseBody} from 'vscode-chrome-debug-core';
 import {spawn, ChildProcess, fork, execSync} from 'child_process';
 import {Crdp, LoadedSourceEventReason, chromeConnection, chromeUtils, variables} from 'vscode-chrome-debug-core';
 import {DebugProtocol} from 'vscode-debugprotocol';
@@ -213,6 +214,26 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
         return this.chrome ?
             this.chrome.Page.reload({ ignoreCache: true }) :
             Promise.resolve();
+    }
+
+    public async variables(args: DebugProtocol.VariablesArguments): Promise<IVariablesResponseBody> {
+        let variablesResponse = await super.variables(args);
+        let filteredVariables: DebugProtocol.Variable[] = [];
+
+        for(let variable of variablesResponse.variables) {
+            const variableName = variable.name;
+            // We want to filter out entries like "[function return value]", since we do not have a way
+            // to change "its value". On the other hand, Chrome's debug protocol never returns entries
+            // of this kind.
+            if (variableName && variableName[0] === '[' && variableName[variableName.length - 1] == ']') {
+                continue;
+            }
+
+            filteredVariables.push(variable);
+        }
+
+        variablesResponse.variables = filteredVariables;
+        return variablesResponse;
     }
 
     protected clearTargetContext(): void {

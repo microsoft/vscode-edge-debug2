@@ -124,7 +124,7 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
         });
     }
 
-    public attach(args: IAttachRequestArgs): Promise<void> {
+    public attach(args: IAttachRequestArgs): Promise<DebugProtocol.Capabilities | void> {
         if (args.urlFilter) {
             args.url = args.urlFilter;
         }
@@ -226,6 +226,13 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
             // to change "its value". On the other hand, Chrome's debug protocol never returns entries
             // of this kind.
             if (variableName && variableName[0] === '[' && variableName[variableName.length - 1] == ']') {
+                continue;
+            }
+
+            // Also filter the `arguments` automatic variable to be in line with what Chrome reports.
+            // Plus, changing the `callee`, `caller` fields of this `arguments` will yield an error. We
+            // don't have a way to handle it right now.
+            if (variableName === 'arguments' && variable.value === 'Arguments') {
                 continue;
             }
 

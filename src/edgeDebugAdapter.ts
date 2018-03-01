@@ -9,7 +9,7 @@ import * as path from 'path';
 import {ChromeDebugAdapter as CoreDebugAdapter, logger, utils as coreUtils, ISourceMapPathOverrides,
         IVariablesResponseBody} from 'vscode-chrome-debug-core';
 import {spawn, ChildProcess, fork, execSync} from 'child_process';
-import {Crdp, LoadedSourceEventReason, chromeConnection, chromeUtils, variables} from 'vscode-chrome-debug-core';
+import {Crdp, LoadedSourceEventReason, chromeConnection, chromeUtils, variables, ChromeDebugSession} from 'vscode-chrome-debug-core';
 import {DebugProtocol} from 'vscode-debugprotocol';
 
 import {ILaunchRequestArgs, IAttachRequestArgs, ICommonRequestArgs} from './edgeDebugInterfaces';
@@ -43,6 +43,7 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
     private _debuggerId: string;
     private _debugProxyPort: number;
     private _scriptParsedEventBookKeeping = {};
+    private _navigatingToUserRequestedUrl = false;
 
     public initialize(args: DebugProtocol.InitializeRequestArguments): DebugProtocol.Capabilities {
         const capabilities = super.initialize(args);
@@ -133,9 +134,19 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
     public configurationDone(): Promise<void> {
         if (this._breakOnLoadActive) {
             // This means all the setBreakpoints requests have been completed. So we can navigate to the original file/url.
+            this._navigatingToUserRequestedUrl = true;
             this.chrome.Page.navigate({url: this._userRequestedUrl});
+            this.Events.emitMilestoneReached("RequestedNavigateToUserPage");
         }
         return super.configurationDone();
+    }
+
+    protected async onExecutionContextsCleared(): Promise<void> {
+        await super.onExecutionContextsCleared();
+        if (this._navigatingToUserRequestedUrl) {
+            // Chrome started to navigate to the user's requested url
+            this.Events.emit(ChromeDebugSession.NavigatedToUserRequestedUrlEventName);
+        }
     }
 
     public commonArgs(args: ICommonRequestArgs): void {

@@ -141,8 +141,9 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
         return super.configurationDone();
     }
 
-    protected async onExecutionContextsCleared(): Promise<void> {
-        await super.onExecutionContextsCleared();
+    protected async onScriptParsed(script: Crdp.Debugger.ScriptParsedEvent): Promise<void> {
+        await super.onScriptParsed(script);
+
         if (this._navigatingToUserRequestedUrl) {
             // Chrome started to navigate to the user's requested url
             this.Events.emit(ChromeDebugSession.NavigatedToUserRequestedUrlEventName);

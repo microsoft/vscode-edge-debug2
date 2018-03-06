@@ -43,12 +43,13 @@
     </Content>
   </ItemGroup>
 
-  <ItemGroup>
-    <FilesToSign Include="$(OutDir)\**\*.js">
-      <Authenticode>Microsoft</Authenticode>
-      <StrongName>StrongName</StrongName>
-    </FilesToSign>
-  </ItemGroup>
+  <Target Name="GetFilesToSign" DependsOnTargets="Build" BeforeTargets="AfterBuild">
+    <ItemGroup>
+      <FilesToSign Include="$(OutDir)\**\*.js">
+        <Authenticode>Microsoft</Authenticode>
+      </FilesToSign>
+    </ItemGroup>
+  </Target>
 
   <ItemGroup>
     <PackageReference Include="MicroBuild.Core">

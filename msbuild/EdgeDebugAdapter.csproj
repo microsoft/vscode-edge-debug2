@@ -43,7 +43,7 @@
     </Content>
   </ItemGroup>
 
-  <Target Name="GetFilesToSign" BeforeTargets="AfterBuild">
+  <Target Name="GetFilesToSign" DependsOnTargets="Build" BeforeTargets="AfterBuild">
     <ItemGroup>
       <FilesToSign Include="$(OutDir)\**\*.js">
         <Authenticode>Microsoft</Authenticode>

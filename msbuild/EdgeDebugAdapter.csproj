@@ -5,45 +5,24 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="..\images\**">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\node_modules\**">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\out\src\**">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\.gitignore">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\.travis.yml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\appveyor.yml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\landingPage.html">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\LICENSE">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\package.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\package.nls.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\package-lock.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\README.md">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <ImagesToCopy Include="..\images\**\*" />
+    <NodeModulesToCopy Include="..\node_modules\**\*" />
+    <SrcToCopy Include="..\out\src\**\*" />
+    <RootFilesToCopy Include="..\.gitignore;..\.travis.yml;..\appveyor.yml;..\landingPage.html;..\LICENSE;..\package.json;..\package.nls.json;..\package-lock.json;..\README.md" />
   </ItemGroup>
 
-  <Target Name="GetFilesToSign" DependsOnTargets="_CopyOutOfDateSourceItemsToOutputDirectory" BeforeTargets="SignFiles">
+  <Target Name="CopyFilesToSign" BeforeTargets="GetFilesToSign">
+    <Copy SourceFiles="@(ImagesToCopy)"
+          DestinationFiles="@(ImagesToCopy->'$(OutDir)\images\%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Copy SourceFiles="@(NodeModulesToCopy)"
+          DestinationFiles="@(NodeModulesToCopy->'$(OutDir)\node_modules\%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Copy SourceFiles="@(SrcToCopy)"
+          DestinationFiles="@(SrcToCopy->'$(OutDir)\out\src\%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Copy SourceFiles="@(RootFilesToCopy)"
+          DestinationFolder="$(OutDir)" />
+  </Target>
+
+  <Target Name="GetFilesToSign" DependsOnTargets="CopyFilesToSign" BeforeTargets="SignFiles">
     <ItemGroup>
       <FilesToSign Include="$(OutDir)\**\*.js">
         <Authenticode>Microsoft</Authenticode>

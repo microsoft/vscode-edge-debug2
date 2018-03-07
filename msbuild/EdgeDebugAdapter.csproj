@@ -14,8 +14,6 @@
   <Target Name="CopyFilesToSign" BeforeTargets="GetFilesToSign">
     <Copy SourceFiles="@(ImagesToCopy)"
           DestinationFiles="@(ImagesToCopy->'$(OutDir)\images\%(RecursiveDir)%(Filename)%(Extension)')" />
-    <Copy SourceFiles="@(NodeModulesToCopy)"
-          DestinationFiles="@(NodeModulesToCopy->'$(OutDir)\node_modules\%(RecursiveDir)%(Filename)%(Extension)')" />
     <Copy SourceFiles="@(SrcToCopy)"
           DestinationFiles="@(SrcToCopy->'$(OutDir)\out\src\%(RecursiveDir)%(Filename)%(Extension)')" />
     <Copy SourceFiles="@(RootFilesToCopy)"
@@ -28,6 +26,11 @@
         <Authenticode>Microsoft</Authenticode>
       </FilesToSign>
     </ItemGroup>
+  </Target>
+
+  <Target Name="CopyNodeModules" AfterTargets="SignFiles">
+    <Copy SourceFiles="@(NodeModulesToCopy)"
+          DestinationFiles="@(NodeModulesToCopy->'$(OutDir)\node_modules\%(RecursiveDir)%(Filename)%(Extension)')" />
   </Target>
 
   <ItemGroup>

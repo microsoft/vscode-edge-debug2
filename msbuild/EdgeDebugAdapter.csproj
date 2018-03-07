@@ -23,7 +23,7 @@
   <Target Name="GetFilesToSign" DependsOnTargets="CopyFilesToSign" BeforeTargets="SignFiles">
     <ItemGroup>
       <FilesToSign Include="$(OutDir)\**\*.js">
-        <Authenticode>Microsoft</Authenticode>
+        <Authenticode>AuthenticodeCertFriendlyName</Authenticode>
       </FilesToSign>
     </ItemGroup>
   </Target>

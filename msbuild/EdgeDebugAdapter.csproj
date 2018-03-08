@@ -39,11 +39,6 @@
     </ItemGroup>
   </Target>
 
-  <Target Name="CopyNodeModules" AfterTargets="SignFiles">
-    <Copy SourceFiles="@(NodeModulesToCopy)"
-          DestinationFiles="@(NodeModulesToCopy->'$(OutDir)\node_modules\%(RecursiveDir)%(Filename)%(Extension)')" />
-  </Target>
-
   <ItemGroup>
     <PackageReference Include="MicroBuild.Core">
       <Version>0.2.0</Version>

@@ -190,7 +190,7 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
     }
 
     protected threadName(): string {
-        return 'Chrome';
+        return 'Microsoft Edge';
     }
 
     protected onResumed(): void {

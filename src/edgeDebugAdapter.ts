@@ -123,7 +123,7 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
         });
     }
 
-    public attach(args: IAttachRequestArgs): Promise<DebugProtocol.Capabilities | void> {
+    public attach(args: IAttachRequestArgs): Promise<void> {
         if (args.urlFilter) {
             args.url = args.urlFilter;
         }
@@ -136,7 +136,7 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
             // This means all the setBreakpoints requests have been completed. So we can navigate to the original file/url.
             this._navigatingToUserRequestedUrl = true;
             this.chrome.Page.navigate({url: this._userRequestedUrl});
-            this.Events.emitMilestoneReached("RequestedNavigateToUserPage");
+            this.events.emitMilestoneReached("RequestedNavigateToUserPage");
         }
         return super.configurationDone();
     }
@@ -146,7 +146,7 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
 
         if (this._navigatingToUserRequestedUrl) {
             // Chrome started to navigate to the user's requested url
-            this.Events.emit(ChromeDebugSession.NavigatedToUserRequestedUrlEventName);
+            this.events.emit(ChromeDebugSession.FinishedStartingUpEventName);
         }
     }
 
@@ -270,6 +270,7 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
     }
 
     private spawnEdge(edgePath: string, edgeArgs: string[], env: {[key: string]: string}, cwd: string, usingRuntimeExecutable: boolean): ChildProcess {
+        this.events.emitStepStarted("LaunchTarget.LaunchExe");
         if (coreUtils.getPlatform() === coreUtils.Platform.Windows && !usingRuntimeExecutable) {
             const options = {
                 execArgv: [],

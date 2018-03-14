@@ -1,6 +1,9 @@
 import {DebugProtocol} from 'vscode-debugprotocol';
 import {logger, variables, Crdp, utils as coreUtils} from 'vscode-chrome-debug-core';
-import {localize, EdgeDebugAdapter} from './edgeDebugAdapter';
+import {EdgeDebugAdapter} from './edgeDebugAdapter';
+
+import * as nls from 'vscode-nls';
+const localize = nls.loadMessageBundle();
 
 interface EdgeDebugClient extends Crdp.DebuggerClient {
     msSetDebuggerPropertyValue(payload: {

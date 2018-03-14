@@ -19,7 +19,7 @@ import * as errors from './errors';
 
 import * as nls from 'vscode-nls';
 
-export const localize = nls.config(process.env.VSCODE_NLS_CONFIG)();
+let localize = nls.loadMessageBundle();
 
 interface ExtendedEdgeRemoteObject extends Crdp.Runtime.RemoteObject{
     msDebuggerPropertyId: string;

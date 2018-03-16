@@ -23,10 +23,10 @@
   </Target>
 
   <Target Name="DeleteUnwantedFiles" DependsOnTargets="CopyFilesToSign" BeforeTargets="GetFilesToSign">
-    <Delete Files="$(OutDir)\**\*.dll;
-                   $(OutDir)\**\*.pdb;
-                   $(OutDir)\**\*.deps.json;
-                   $(OutDir)\**\*.zip;
+    <Delete Files="$(OutDir)\EdgeDebugAdapter.dll;
+                   $(OutDir)\EdgeDebugAdapter.pdb;
+                   $(OutDir)\EdgeDebugAdapter.deps.json;
+                   $(OutDir)\node_modules\gulp-vinyl-zip\test\assets\archive.zip;
                    $(OutDir)\node_modules\globule\test\fixtures\expand\js\foo.js;
                    $(OutDir)\node_modules\globule\test\fixtures\expand\js\bar.js;
                    $(OutDir)\node_modules\resolve\test\resolver\other_path\root.js;

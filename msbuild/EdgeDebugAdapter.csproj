@@ -39,7 +39,7 @@
                    $(OutDir)\node_modules\union\test\fixtures\index.js;"/>
   </Target>
 
-  <Target Name="GetFilesToSign" DependsOnTargets="CopyFilesToSign" BeforeTargets="SignFiles">
+  <Target Name="GetFilesToSign" DependsOnTargets="DeleteUnwantedFiles" BeforeTargets="SignFiles">
     <ItemGroup>
       <FilesToSign Include="$(OutDir)\**\*.js">
         <Authenticode>Microsoft400</Authenticode>

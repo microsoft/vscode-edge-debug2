@@ -49,6 +49,10 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
         const capabilities = super.initialize(args);
         capabilities.supportsRestartRequest = true;
 
+        if (args.locale) {
+            localize = nls.config({ locale: args.locale })();
+        }
+
         return capabilities;
     }
 

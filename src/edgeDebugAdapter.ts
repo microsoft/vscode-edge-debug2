@@ -7,7 +7,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import {ChromeDebugAdapter as CoreDebugAdapter, logger, utils as coreUtils, ISourceMapPathOverrides,
-        IVariablesResponseBody} from 'vscode-chrome-debug-core';
+        IVariablesResponseBody,
+        telemetry} from 'vscode-chrome-debug-core';
 import {spawn, ChildProcess, fork, execSync} from 'child_process';
 import {Crdp, LoadedSourceEventReason, chromeConnection, chromeUtils, variables, ChromeDebugSession} from 'vscode-chrome-debug-core';
 import {DebugProtocol} from 'vscode-debugprotocol';
@@ -166,14 +167,27 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
     protected doAttach(port: number, targetUrl?: string, address?: string, timeout?: number, websocketUrl?: string, extraCRDPChannelPort?: number): Promise<void> {
         return super.doAttach(port, targetUrl, address, timeout, websocketUrl, extraCRDPChannelPort).then(() => {
             // Don't return this promise, a failure shouldn't fail attach
-            this.globalEvaluate({ expression: 'navigator.userAgent', silent: true })
+            const userAgentPromise = this.globalEvaluate({ expression: 'navigator.userAgent', silent: true }).then(evalResponse => evalResponse.result.value);
+            userAgentPromise
                 .then(
-                    evalResponse => logger.log('Target userAgent: ' + evalResponse.result.value),
+                    userAgent => logger.log('Target userAgent: ' + userAgent),
                     err => logger.log('Getting userAgent failed: ' + err.message))
                 .then(() => {
                     //const cacheDisabled = (<ICommonRequestArgs>this._launchAttachArgs).disableNetworkCache || false;
                     //this.chrome.Network.setCacheDisabled({ cacheDisabled });
                 });
+
+                const userAgentForTelemetryPromise = userAgentPromise.then(userAgent => {
+                    const properties = { "Versions.Target.UserAgent": userAgent };
+                    const edgeVersionMatch = userAgent.match(/Edge\/([0-9]+(?:.[0-9]+)+)/);
+                    if (edgeVersionMatch && edgeVersionMatch[1]) {
+                        properties["Versions.Target.Version"] = edgeVersionMatch[1];
+                    }
+                    return properties;
+                });
+
+                // Add version information to all telemetry events from now on
+                telemetry.telemetry.addCustomGlobalProperty(userAgentForTelemetryPromise);
         });
     }
 

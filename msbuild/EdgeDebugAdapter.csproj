@@ -4,10 +4,26 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ExtensionFilesToCopy Include="..\vsix\extension\**\*" />
 
-  <Target Name="GetFilesToSign" BeforeTargets="SignFiles">
+  </ItemGroup>
+
+  <Target Name="CopyFilesToSign" BeforeTargets="DeleteUnwantedFiles">
+    <Copy SourceFiles="@(ExtensionFilesToCopy)"
+          DestinationFiles="@(ExtensionFilesToCopy->'$(OutDir)\ziproot\%(RecursiveDir)%(Filename)%(Extension)')" />
+  </Target>
+
+  <Target Name="DeleteUnwantedFiles" DependsOnTargets="CopyFilesToSign" BeforeTargets="GetFilesToSign">
+    <Delete Files="$(OutDir)EdgeDebugAdapter.dll;
+                   $(OutDir)EdgeDebugAdapter2.dll;
+                   $(OutDir)EdgeDebugAdapter.pdb;
+                   $(OutDir)EdgeDebugAdapter.deps.json;"/>
+  </Target>
+
+  <Target Name="GetFilesToSign" DependsOnTargets="DeleteUnwantedFiles" BeforeTargets="SignFiles">
     <ItemGroup>
-      <FilesToSign Include="$(OutDir)vsix\extension\**\*.js">
+      <FilesToSign Include="$(OutDir)ziproot\**\*.js">
         <Authenticode>Microsoft400</Authenticode>
       </FilesToSign>
     </ItemGroup>

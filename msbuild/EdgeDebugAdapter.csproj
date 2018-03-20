@@ -5,8 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ExtensionFilesToCopy Include="..\vsix\extension\**\*" />
-
+    <ExtensionFilesToCopy Include="..\vsix\extension\**\*" Exclude="..\vsix\extension\msbuild\*"/>
   </ItemGroup>
 
   <Target Name="CopyFilesToSign" BeforeTargets="DeleteUnwantedFiles">
@@ -16,7 +15,6 @@
 
   <Target Name="DeleteUnwantedFiles" DependsOnTargets="CopyFilesToSign" BeforeTargets="GetFilesToSign">
     <Delete Files="$(OutDir)EdgeDebugAdapter.dll;
-                   $(OutDir)EdgeDebugAdapter2.dll;
                    $(OutDir)EdgeDebugAdapter.pdb;
                    $(OutDir)EdgeDebugAdapter.deps.json;"/>
   </Target>

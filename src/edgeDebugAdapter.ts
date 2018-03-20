@@ -21,7 +21,7 @@ import * as nls from 'vscode-nls';
 
 let localize = nls.loadMessageBundle();
 
-interface ExtendedEdgeRemoteObject extends Crdp.Runtime.RemoteObject{
+interface ExtendedEdgeRemoteObject extends Crdp.Runtime.RemoteObject {
     msDebuggerPropertyId: string;
 }
 
@@ -173,11 +173,7 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
             this.globalEvaluate({ expression: 'navigator.userAgent', silent: true })
                 .then(
                     evalResponse => logger.log('Target userAgent: ' + evalResponse.result.value),
-                    err => logger.log('Getting userAgent failed: ' + err.message))
-                .then(() => {
-                    //const cacheDisabled = (<ICommonRequestArgs>this._launchAttachArgs).disableNetworkCache || false;
-                    //this.chrome.Network.setCacheDisabled({ cacheDisabled });
-                });
+                    err => logger.log('Getting userAgent failed: ' + err.message));
         });
     }
 
@@ -185,7 +181,6 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
         return [
             ...super.runConnection(),
             this.chrome.Page.enable()
-            //this.chrome.Network.enable({})
         ];
     }
 
@@ -234,12 +229,12 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
         let variablesResponse = await super.variables(args);
         let filteredVariables: DebugProtocol.Variable[] = [];
 
-        for(let variable of variablesResponse.variables) {
+        for (let variable of variablesResponse.variables) {
             const variableName = variable.name;
             // We want to filter out entries like "[function return value]", since we do not have a way
             // to change "its value". On the other hand, Chrome's debug protocol never returns entries
             // of this kind.
-            if (variableName && variableName[0] === '[' && variableName[variableName.length - 1] == ']') {
+            if (variableName && variableName[0] === '[' && variableName[variableName.length - 1] === ']') {
                 continue;
             }
 
@@ -397,9 +392,9 @@ function findExecutable(program: string): string | undefined {
         if (PATHEXT) {
             const executableExtensions = PATHEXT.split(';');
             for (const extension of executableExtensions) {
-                const path = program + extension;
-                if (fs.existsSync(path)) {
-                    return path;
+                const programPath = program + extension;
+                if (fs.existsSync(programPath)) {
+                    return programPath;
                 }
             }
         }
@@ -416,7 +411,7 @@ function doesProcessExist(pid: number) {
     try {
         process.kill(pid, 0);
     } catch (e) {
-        if (e.code == 'ESRCH') {
+        if (e.code === 'ESRCH') {
             return false;
         }
         throw e;

@@ -32,9 +32,9 @@ export class EdgeConfigurationProvider implements vscode.DebugConfigurationProvi
         return Promise.resolve([DEFAULT_CONFIG]);
     }
 
-	/**
-	 * Try to add all missing attributes to the debug configuration being launched.
-	 */
+    /**
+     * Try to add all missing attributes to the debug configuration being launched.
+     */
     async resolveDebugConfiguration(folder: vscode.WorkspaceFolder | undefined, config: vscode.DebugConfiguration, token?: vscode.CancellationToken): Promise<vscode.DebugConfiguration> {
         // if launch.json is missing or empty
         if (!config.type && !config.request && !config.name) {

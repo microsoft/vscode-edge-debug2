@@ -10,13 +10,14 @@
 
   <Target Name="CopyFilesToSign" BeforeTargets="DeleteUnwantedFiles">
     <Copy SourceFiles="@(ExtensionFilesToCopy)"
-          DestinationFiles="@(ExtensionFilesToCopy->'$(OutDir)\ziproot\%(RecursiveDir)%(Filename)%(Extension)')" />
+          DestinationFiles="@(ExtensionFilesToCopy->'$(OutDir)ziproot\%(RecursiveDir)%(Filename)%(Extension)')" />
   </Target>
 
   <Target Name="DeleteUnwantedFiles" DependsOnTargets="CopyFilesToSign" BeforeTargets="GetFilesToSign">
     <Delete Files="$(OutDir)EdgeDebugAdapter.dll;
                    $(OutDir)EdgeDebugAdapter.pdb;
-                   $(OutDir)EdgeDebugAdapter.deps.json;"/>
+                   $(OutDir)EdgeDebugAdapter.deps.json;
+                   $(OutDir)ziproot\msbuild"/>
   </Target>
 
   <Target Name="GetFilesToSign" DependsOnTargets="DeleteUnwantedFiles" BeforeTargets="SignFiles">

@@ -177,17 +177,17 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
                     //this.chrome.Network.setCacheDisabled({ cacheDisabled });
                 });
 
-                const userAgentForTelemetryPromise = userAgentPromise.then(userAgent => {
-                    const properties = { "Versions.Target.UserAgent": userAgent };
-                    const edgeVersionMatch = userAgent.match(/Edge\/([0-9]+(?:.[0-9]+)+)/);
-                    if (edgeVersionMatch && edgeVersionMatch[1]) {
-                        properties["Versions.Target.Version"] = edgeVersionMatch[1];
-                    }
-                    return properties;
-                });
+            const userAgentForTelemetryPromise = userAgentPromise.then(userAgent => {
+                const properties = { "Versions.Target.UserAgent": userAgent };
+                const edgeVersionMatch = userAgent.match(/Edge\/([0-9]+(?:.[0-9]+)+)/);
+                if (edgeVersionMatch && edgeVersionMatch[1]) {
+                    properties["Versions.Target.Version"] = edgeVersionMatch[1];
+                }
+                return properties;
+            });
 
-                // Add version information to all telemetry events from now on
-                telemetry.telemetry.addCustomGlobalProperty(userAgentForTelemetryPromise);
+            // Add version information to all telemetry events from now on
+            telemetry.telemetry.addCustomGlobalProperty(userAgentForTelemetryPromise);
         });
     }
 

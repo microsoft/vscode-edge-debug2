@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ExtensionFilesToCopy Include="..\vsix\extension\**\*" Exclude="..\vsix\extension\msbuild\*"/>
+    <ExtensionFilesToCopy Include="..\vsix\extension\**\*" Exclude="..\vsix\extension\msbuild\**\*"/>
   </ItemGroup>
 
   <Target Name="CopyFilesToSign" BeforeTargets="DeleteUnwantedFiles">

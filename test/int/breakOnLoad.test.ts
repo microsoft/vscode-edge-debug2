@@ -3,11 +3,9 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import * as assert from 'assert';
 import * as path from 'path';
-const {createServer} = require('http-server');
+import { createServer } from 'http-server';
 
-import {DebugClient} from 'vscode-debugadapter-testsupport';
 import * as ts from 'vscode-chrome-debug-core-testsupport';
 
 import * as testSetup from './testSetup';
@@ -158,6 +156,29 @@ function runCommonTests(breakOnLoadStrategy: string) {
 
             await dc.hitBreakpointUnverified({ url, webRoot: testProjectRoot }, { path: scriptPath, line: bpLine, column: bpCol });
         });
+
+        test('Hits breakpoints on the first line of two scripts', async () => {
+            const testProjectRoot = path.join(DATA_ROOT, 'breakOnLoad_javaScript');
+            const scriptPath = path.join(testProjectRoot, 'src/script.js');
+            const script2Path = path.join(testProjectRoot, 'src/script2.js');
+
+            server = createServer({ root: testProjectRoot });
+            server.listen(7890);
+
+            const url = 'http://localhost:7890/index.html';
+
+            const bpLine = 1;
+            const bpCol = 1;
+
+            await dc.hitBreakpointUnverified({ url, webRoot: testProjectRoot }, { path: scriptPath, line: bpLine, column: bpCol });
+            await dc.setBreakpointsRequest({
+                lines: [bpLine],
+                breakpoints: [{ line: bpLine, column: bpCol }],
+                source: { path: script2Path }
+            });
+            await dc.continueRequest();
+            await dc.assertStoppedLocation('breakpoint', { path: script2Path, line: bpLine, column: bpCol })
+        });
     });
 }
 
@@ -239,10 +260,10 @@ suite('BreakOnLoad', () => {
         });
     });
 
-    suite('BreakOnLoad Disabled (strategy: none)', () => {
+    suite('BreakOnLoad Disabled (strategy: off)', () => {
         let dc: ts.ExtendedDebugClient;
         setup(() => {
-            return testSetup.setup(undefined, { breakOnLoadStrategy: "none" })
+            return testSetup.setup(undefined, { breakOnLoadStrategy: "off" })
                 .then(_dc => dc = _dc);
         });
 

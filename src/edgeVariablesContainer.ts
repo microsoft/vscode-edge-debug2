@@ -28,9 +28,9 @@ export class MSPropertyContainer extends variables.BaseVariableContainer {
     }
 
     public async expand(adapter: EdgeDebugAdapter, filter?: string, start?: number, count?: number): Promise<DebugProtocol.Variable[]> {
-        let variables = await super.expand(adapter, filter, start, count);
+        let vars = await super.expand(adapter, filter, start, count);
 
-        for( let variable of variables) {
+        for (let variable of vars) {
             let extendedVarialbe = variable as ExtendedDebugProtocolVariable;
 
             if (extendedVarialbe.msDebuggerPropertyId) {
@@ -40,7 +40,7 @@ export class MSPropertyContainer extends variables.BaseVariableContainer {
                 delete extendedVarialbe.msDebuggerPropertyId;
             }
         }
-        return variables;
+        return vars;
     }
 
     public async setValue(adapter: EdgeDebugAdapter, name: string, value: string): Promise<string> {

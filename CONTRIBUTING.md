@@ -1,6 +1,12 @@
-## Development setup
-We welcome any quality bugfixes or contributions!
+This project welcomes contributions and suggestions.  Most contributions require you to agree to a
+Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
+the rights to use your contribution. For details, visit https://cla.microsoft.com.
 
+When you submit a pull request, a CLA-bot will automatically determine whether you need to provide
+a CLA and decorate the PR appropriately (e.g., label, comment). Simply follow the instructions
+provided by the bot. You will only need to do this once across all repos using our CLA.
+
+## Development setup
 * Clone this repo
 * Run `npm install -g gulp` and `npm install` in '/vscode-edge-debug2'
     * You may see an error if `bufferutil` or `utf-8-validate` fail to build. These native modules required by `ws` are optional and the adapter should work fine without them.
@@ -15,7 +21,7 @@ In VS Code, run the `launch as server` launch config - it will start the adapter
 ## Testing
 Run `gulp tslint` to check your code against our tslint rules.
 
-We are working to enable unit tests and integration tests for the adapter.
+Unit tests and integration tests for the debug adapter are currently disabled.
 
 ## Naming
 * "Client": VS Code

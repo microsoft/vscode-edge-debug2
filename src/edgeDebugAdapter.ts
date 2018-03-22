@@ -75,7 +75,7 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
             }
 
             // Start with remote debugging enabled
-            const port = args.port || 9222;
+            const port = args.port || 2015;
             const edgeArgs: string[] = [];
             const edgeEnv: {[key: string]: string} = args.env || null;
             const edgeWorkingDir: string = args.cwd || null;

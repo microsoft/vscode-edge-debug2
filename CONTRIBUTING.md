@@ -21,7 +21,7 @@ In VS Code, run the `launch as server` launch config - it will start the adapter
 ## Testing
 Run `gulp tslint` to check your code against our tslint rules.
 
-We are working to enable unit tests and integration tests for the adapter.
+Unit tests and integration tests for the debug adapter are currently disabled.
 
 ## Naming
 * "Client": VS Code

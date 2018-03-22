@@ -1,10 +1,10 @@
 <h1 align="center">
   <br>
-  VS Code - Debugger for Edge
+  VS Code - Debugger for Microsoft Edge
   <br>
 </h1>
 
-<h4 align="center">Debug your JavaScript code running in Edge from VS Code and Visual Studio.</h4>
+<h4 align="center">Debug your JavaScript code running in Microsoft Edge from VS Code and Visual Studio.</h4>
 
 A VS Code extension to debug your JavaScript code in the Edge browser. This is also used to enable JavaScript debugging inside Edge browser when launched from ASP.Net Projects inside Visual Studio.
 Note: Edge debugging via [Edge DevTools Protocol](https://docs.microsoft.com/en-us/microsoft-edge/devtools-protocol/) is currently supported on [Windows Insider Preview](https://insider.windows.com/en-us/getting-started/) builds only. Afterwards this would work on Windows Version > Redstone 4 (RS4), also known as Windows 10 Spring Creator's update, only.
@@ -27,7 +27,7 @@ For use inside Visual Studio:
 1. Install the latest [Windows Insider Preview](https://insider.windows.com/en-us/getting-started/) build.
 2. Install the latest [Visual Studio 2017 Version 15.7 Preview](https://www.visualstudio.com/vs/preview/) build.
 3. Create an ASP.Net/ASP.Net Core Web Application.
-4. Select the browser as Edge and press f5.
+4. Select the browser as Microsoft Edge and press f5.
 
 ## Troubleshooting
 

@@ -120,7 +120,7 @@
               "type": "edge",
               "request": "attach",
               "name": "Attach to Edge",
-              "port": 9222,
+              "port": 2015,
               "webRoot": "^\"${2:\\${workspaceFolder\\}}\""
             }
           }
@@ -132,7 +132,7 @@
               "port": {
                 "type": "number",
                 "description": "%edge.port.description%",
-                "default": 9222
+                "default": 2015
               },
               "address": {
                 "type": "string",
@@ -287,7 +287,7 @@
               "port": {
                 "type": "number",
                 "description": "%edge.port.description%",
-                "default": 9222
+                "default": 2015
               },
               "address": {
                 "type": "string",

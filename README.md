@@ -34,13 +34,13 @@ For use inside Visual Studio:
 
 ### My breakpoints aren't hit. What's wrong?
 
-If your breakpoints aren't hit, it's most likely a sourcemapping issue or because you have set breakpoints before launching Edge and are expecting them to hit while the browser loads. If that's the case, you will have to refresh the page in Edge after we have attached from VS Code/Visual Studio to hit your breakpoint.
+If your breakpoints weren't hit, it's most likely a sourcemapping issue or because you set breakpoints before launching Edge and were expecting them to hit while the browser loads. If that's the case, you will have to refresh the page in Edge after we have attached from VS Code/Visual Studio to hit your breakpoint.
 
 If you are using sourcemaps, make sure they are configured right.
 
-### Cannot connect to the target: connect ECONNREFUSED 127.0.0.1:9222
+### Cannot connect to the target: connect ECONNREFUSED 127.0.0.1:2015
 This message means that the extension can't attach to Edge, probably because Edge wasn't launched in debug mode. Here are some things to try:
-* Ensure that the `port` property matches the port on which Edge is listening for remote debugging connections. This is `9222` by default. Ensure nothing else is using this port, including your web server. If something else on your computer responds at `http://localhost:9222`, then set a different port.
+* Ensure that the `port` property matches the port on which Edge is listening for remote debugging connections. This is `2015` by default. Ensure nothing else is using this port, including your web server. If something else on your computer responds at `http://localhost:2015`, then set a different port.
 * If all else fails, try to navigate to `http://localhost:<port>/json/list` in a browser when you see this message - if there is no response, then something is wrong upstream of the extension. If there is a page of JSON returned, then ensure that the `port` in the launch config matches the port in that url.
 * If the above steps do not work, try closing all windows of Edge and then relaunch.
 

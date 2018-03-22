@@ -1,8 +1,6 @@
 {
 	"extension.description": "Debug your JavaScript code in the Microsoft Edge browser",
-
-	"edge.toggleSkipping.title": "Toggle Skipping This File",
-
+	"edge.toggleSkipping.title": "Przełącz pominięcie tego pliku",
 	"edge.port.description": "Port to use for Microsoft Edge remote debugging.",
 	"edge.address.description": "TCP/IP address of debug port",
 	"edge.file.description": "A local html file to open in the browser",

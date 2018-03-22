@@ -28,13 +28,13 @@ For use inside Visual Studio:
 1. Install the latest [Windows Insider Preview](https://insider.windows.com/en-us/getting-started/) build.
 2. Install the latest [Visual Studio 2017 Version 15.7 Preview](https://www.visualstudio.com/vs/preview/) build.
 3. Create an ASP.Net/ASP.Net Core Web Application.
-4. Select the browser as Microsoft Edge and press f5.
+4. Select 'Microsoft Edge' from the 'Web Browser' submenu in the debug target dropdown, and then press F5.
 
 ## Troubleshooting
 
 ### My breakpoints aren't hit. What's wrong?
 
-If your breakpoints aren't hit, it's most likely a sourcemapping issue or because you are having breakpoints set before launching Edge and are expecting them to hit while the browser loads. If that's the case, you will have to refresh the page in Edge after we have attached from VS Code/Visual Studio to hit your breakpoint.
+If your breakpoints aren't hit, it's most likely a sourcemapping issue or because you have set breakpoints before launching Edge and are expecting them to hit while the browser loads. If that's the case, you will have to refresh the page in Edge after we have attached from VS Code/Visual Studio to hit your breakpoint.
 
 If you are using sourcemaps, make sure they are configured right.
 

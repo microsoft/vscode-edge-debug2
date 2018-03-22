@@ -6,12 +6,13 @@
 
 <h4 align="center">Debug your JavaScript code running in Microsoft Edge from VS Code and Visual Studio.</h4>
 
-A VS Code extension to debug your JavaScript code in the Edge browser. This is also used to enable JavaScript debugging inside Edge browser when launched from ASP.Net Projects inside Visual Studio.
-Note: Edge debugging via [Edge DevTools Protocol](https://docs.microsoft.com/en-us/microsoft-edge/devtools-protocol/) is currently supported on [Windows Insider Preview](https://insider.windows.com/en-us/getting-started/) builds only. Afterwards this would work on Windows Version > Redstone 4 (RS4), also known as Windows 10 Spring Creator's update, only.
+A VS Code extension to debug your JavaScript code in the Microsoft Edge browser. This is also used to enable JavaScript debugging inside Edge browser when launched from ASP.Net Projects in Visual Studio.
+
+Note: Edge debugging via [Edge DevTools Protocol](https://docs.microsoft.com/en-us/microsoft-edge/devtools-protocol/) is currently supported on [Windows Insider Preview](https://insider.windows.com/en-us/getting-started/) builds only.
 
 **Supported features**
 * Setting breakpoints, including in source files when source maps are enabled
-* Stepping, including with the buttons on the Chrome page
+* Stepping, including with the buttons on the Edge page
 * The Locals pane
 * Debugging eval scripts, script tags, and scripts that are added dynamically
 * Watches
@@ -33,7 +34,7 @@ For use inside Visual Studio:
 
 ### My breakpoints aren't hit. What's wrong?
 
-If your breakpoints aren't hit, it's most likely a sourcemapping issue or because you are having breakpoints in immediately executed code. If you for example have a breakpoint in a `render function` that runs on page load, sometimes our debugger might not be attached to Edge before the code has been executed. This means that you will have to refresh the page in Edge after we have attached from VS Code/Visual Studio to hit your breakpoint.
+If your breakpoints aren't hit, it's most likely a sourcemapping issue or because you are having breakpoints set before launching Edge and are expecting them to hit while the browser loads. If that's the case, you will have to refresh the page in Edge after we have attached from VS Code/Visual Studio to hit your breakpoint.
 
 If you are using sourcemaps, make sure they are configured right.
 

@@ -47,7 +47,7 @@ This message means that the extension can't attach to Edge, probably because Edg
 ## Data/Telemetry
 This project collects usage data and sends it to Microsoft to help improve our products and services. Read our [privacy statement](http://go.microsoft.com/fwlink/?LinkId=521839) to learn more.
 
-To opt out of all telemetry inside Visual Studio, go to Help -> Send Feedback -> Settings ->  `No, I would not like to participate`
+To opt out of all telemetry inside Visual Studio, go to Help > Send Feedback > Settings >  `No, I would not like to participate`
 
 To opt out of all telemetry inside Visual Studio Code, go to File > Preferences > Settings and add the following option: `"telemetry.enableTelemetry": false`
 

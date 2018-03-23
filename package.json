@@ -55,7 +55,7 @@
     "vscode": "^1.0.3",
     "vscode-chrome-debug-core-testsupport": "^3.17.1",
     "vscode-debugadapter-testsupport": "1.24.0",
-    "vscode-debugprotocol": "^1.24.0",
+    "vscode-debugprotocol": "^1.27.0",
     "vscode-nls-dev": "^3.0.7"
   },
   "main": "./out/src/extension",

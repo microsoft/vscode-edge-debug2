@@ -15,6 +15,7 @@ import * as testUtils from './testUtils';
 
 /** Not mocked - use for type only */
 import {EdgeDebugAdapter as _EdgeDebugAdapter} from '../src/edgeDebugAdapter';
+import { TelemetryPropertyCollector } from 'vscode-chrome-debug-core/lib/src/telemetry';
 
 class MockEdgeDebugSession {
     public sendEvent(event: DebugProtocol.Event): void {
@@ -116,7 +117,7 @@ suite('EdgeDebugAdapter', () => {
                 .setup(x => x.evaluate(It.isAny()))
                 .returns(() => Promise.resolve<any>({ result: { type: 'string', value: '123' }}));
 
-            return edgeDebugAdapter.launch({ file: 'c:\\path with space\\index.html', runtimeArgs: ['abc', 'def'] })
+            return edgeDebugAdapter.launch({ file: 'c:\\path with space\\index.html', runtimeArgs: ['abc', 'def'] }, new TelemetryPropertyCollector())
                 .then(() => assert(spawnCalled));
         });
     });

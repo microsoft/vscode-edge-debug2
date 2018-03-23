@@ -8,8 +8,7 @@ import * as path from 'path';
 
 import {ChromeDebugAdapter as CoreDebugAdapter, logger, utils as coreUtils, ISourceMapPathOverrides,
         IVariablesResponseBody,
-        telemetry,
-        ITelemetryPropertyCollector} from 'vscode-chrome-debug-core';
+        telemetry} from 'vscode-chrome-debug-core';
 import {spawn, ChildProcess, fork, execSync} from 'child_process';
 import {Crdp, LoadedSourceEventReason, chromeConnection, chromeUtils, variables, ChromeDebugSession} from 'vscode-chrome-debug-core';
 import {DebugProtocol} from 'vscode-debugprotocol';
@@ -58,8 +57,8 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
         return capabilities;
     }
 
-    public launch(args: ILaunchRequestArgs, telemetryPropertyCollector: ITelemetryPropertyCollector): Promise<void> {
-        return super.launch(args, telemetryPropertyCollector).then(() => {
+    public launch(args: ILaunchRequestArgs): Promise<void> {
+        return super.launch(args).then(() => {
             let runtimeExecutable: string;
             if (args.runtimeExecutable) {
                 const re = findExecutable(args.runtimeExecutable);

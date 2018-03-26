@@ -19,6 +19,7 @@ import * as utils from './utils';
 import * as errors from './errors';
 
 import * as nls from 'vscode-nls';
+import { FinishedStartingUpEventArguments } from 'vscode-chrome-debug-core/lib/src/executionTimingsReporter';
 
 let localize = nls.loadMessageBundle();
 
@@ -151,7 +152,7 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
 
         if (this._navigatingToUserRequestedUrl) {
             // Chrome started to navigate to the user's requested url
-            this.events.emit(ChromeDebugSession.FinishedStartingUpEventName);
+            this.events.emit(ChromeDebugSession.FinishedStartingUpEventName, { requestedContentWasDetected: true } as FinishedStartingUpEventArguments);
         }
     }
 

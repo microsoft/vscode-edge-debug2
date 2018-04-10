@@ -8,6 +8,7 @@ import {chromeConnection, ISourceMapPathOverrides} from 'vscode-chrome-debug-cor
 import * as mockery from 'mockery';
 import {EventEmitter} from 'events';
 import * as assert from 'assert';
+import * as path from 'path';
 import {Mock, MockBehavior, It} from 'typemoq';
 
 import {getMockEdgeConnectionApi, IMockEdgeConnectionAPI} from './debugProtocolMocks';
@@ -15,6 +16,7 @@ import * as testUtils from './testUtils';
 
 /** Not mocked - use for type only */
 import {EdgeDebugAdapter as _EdgeDebugAdapter} from '../src/edgeDebugAdapter';
+import { StepProgressEventsEmitter } from 'vscode-chrome-debug-core/out/src/executionTimingsReporter';
 
 class MockEdgeDebugSession {
     public sendEvent(event: DebugProtocol.Event): void {
@@ -31,7 +33,7 @@ suite('EdgeDebugAdapter', () => {
     let mockEdge: IMockEdgeConnectionAPI;
 
     let edgeDebugAdapter: _EdgeDebugAdapter;
-
+    let isAttached = false;
     setup(() => {
         testUtils.setupUnhandledRejectionListener();
         mockery.enable({ useCleanCache: true, warnOnReplace: false, warnOnUnregistered: false });
@@ -48,16 +50,23 @@ suite('EdgeDebugAdapter', () => {
             .returns(() => Promise.resolve());
         mockEdgeConnection
             .setup(x => x.isAttached)
-            .returns(() => false);
+            .returns(() => isAttached);
+        mockEdgeConnection
+            .setup(x => x.attachedTarget)
+            .returns(() => ({ description: "", devtoolsFrontendUrl: "", id: "", title: "", type: "", webSocketDebuggerUrl: "" }));
         mockEdgeConnection
             .setup(x => x.run())
             .returns(() => Promise.resolve());
         mockEdgeConnection
             .setup(x => x.onClose(It.isAny()));
+        mockEdgeConnection
+            .setup(x => x.events)
+            .returns(x => new StepProgressEventsEmitter());
 
         // Instantiate the EdgeDebugAdapter, injecting the mock EdgeConnection
         const cDAClass: typeof _EdgeDebugAdapter = require(MODULE_UNDER_TEST).EdgeDebugAdapter;
-        edgeDebugAdapter = new cDAClass({ chromeConnection: function() { return mockEdgeConnection.object; } } as any, new MockEdgeDebugSession() as any);
+        edgeDebugAdapter = new cDAClass({ chromeConnection: function() {
+            return mockEdgeConnection.object; } } as any, new MockEdgeDebugSession() as any);
     });
 
     teardown(() => {
@@ -81,24 +90,24 @@ suite('EdgeDebugAdapter', () => {
         test('launches with minimal correct args', () => {
             let spawnCalled = false;
             function fork(edgeSpawnHelperPath: string, [edgePath, ...args]: string[]): any {
-                // Just assert that the edge path is some string with 'MicrosoftEdge' in the path, and there are >0 args
                 assert(edgeSpawnHelperPath.indexOf('edgeSpawnHelper.js') >= 0);
                 return spawn(edgePath, args);
             }
 
             function spawn(edgePath: string, args: string[]): any {
-                assert(edgePath.toLowerCase().indexOf('MicrosoftEdge') >= 0);
-                assert(args.indexOf('--remote-debugging-port=9222') >= 0);
-                assert(args.indexOf('about:blank') >= 0); // We now launch to about:blank first and then redirect later
-                assert(args.indexOf('abc') >= 0);
-                assert(args.indexOf('def') >= 0);
+                assert(edgePath.toLowerCase().indexOf('microsoftedge') >= 0);
+                assert(args.indexOf('--devtools-server-port') >= 0);
+                assert(args.indexOf('2015') >= 0);
+                // We should initially launch with landing page
+                let landingPagePath = path.dirname(path.dirname(__dirname));
+                assert(args.indexOf(encodeURI('file:///' + landingPagePath + '/landingPage.html')) >= 0);
                 spawnCalled = true;
 
                 const stdio = { on: () => { } };
                 return { on: () => { }, unref: () => { }, stdout: stdio, stderr: stdio };
             }
 
-            // Mock fork/spawn for edge process, and 'fs' for finding chrome.exe.
+            // Mock fork/spawn for edge process, and 'fs' for finding MicrosoftEdge.
             // These are mocked as empty above - note that it's too late for mockery here.
             originalFork = require('child_process').fork;
             originalSpawn = require('child_process').spawn;
@@ -109,14 +118,17 @@ suite('EdgeDebugAdapter', () => {
 
             mockEdgeConnection
                 .setup(x => x.attach(It.isValue(undefined), It.isAnyNumber(), It.isAnyString(), It.isValue(undefined), It.isValue(undefined)))
-                .returns(() => Promise.resolve())
+                .returns(() => {
+                    isAttached = true;
+                    return Promise.resolve();
+                })
                 .verifiable();
 
             mockEdge.Runtime
                 .setup(x => x.evaluate(It.isAny()))
                 .returns(() => Promise.resolve<any>({ result: { type: 'string', value: '123' }}));
 
-            return edgeDebugAdapter.launch({ file: 'c:\\path with space\\index.html', runtimeArgs: ['abc', 'def'] })
+            return edgeDebugAdapter.launch({ file: 'c:\\path with space\\index.html' })
                 .then(() => assert(spawnCalled));
         });
     });

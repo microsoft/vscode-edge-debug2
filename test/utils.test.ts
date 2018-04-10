@@ -30,7 +30,8 @@ suite('Utils', () => {
         mockery.disable();
     });
 
-    suite('getEdgePath()', () => {
+    suite('getBrowserPath()', () => {
+
         test('win', () => {
             // Overwrite the statSync mock to say the x86 path doesn't exist
             const statSync = (aPath: string) => {
@@ -53,5 +54,6 @@ suite('Utils', () => {
                 Utils.getEdgePath(),
                 'MicrosoftEdge');
         });
+
     });
 });

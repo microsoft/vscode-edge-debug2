@@ -16,6 +16,7 @@ import * as testUtils from './testUtils';
 
 /** Not mocked - use for type only */
 import {EdgeDebugAdapter as _EdgeDebugAdapter} from '../src/edgeDebugAdapter';
+import { StepProgressEventsEmitter } from 'vscode-chrome-debug-core/out/src/executionTimingsReporter';
 
 class MockEdgeDebugSession {
     public sendEvent(event: DebugProtocol.Event): void {
@@ -32,6 +33,7 @@ suite('EdgeDebugAdapter', () => {
     let mockEdge: IMockEdgeConnectionAPI;
 
     let edgeDebugAdapter: _EdgeDebugAdapter;
+    let isAttached = false;
     setup(() => {
         testUtils.setupUnhandledRejectionListener();
         mockery.enable({ useCleanCache: true, warnOnReplace: false, warnOnUnregistered: false });
@@ -48,16 +50,23 @@ suite('EdgeDebugAdapter', () => {
             .returns(() => Promise.resolve());
         mockEdgeConnection
             .setup(x => x.isAttached)
-            .returns(() => false);
+            .returns(() => isAttached);
+        mockEdgeConnection
+            .setup(x => x.attachedTarget)
+            .returns(() => ({ description: "", devtoolsFrontendUrl: "", id: "", title: "", type: "", webSocketDebuggerUrl: "" }));
         mockEdgeConnection
             .setup(x => x.run())
             .returns(() => Promise.resolve());
         mockEdgeConnection
             .setup(x => x.onClose(It.isAny()));
+        mockEdgeConnection
+            .setup(x => x.events)
+            .returns(x => new StepProgressEventsEmitter());
 
         // Instantiate the EdgeDebugAdapter, injecting the mock EdgeConnection
         const cDAClass: typeof _EdgeDebugAdapter = require(MODULE_UNDER_TEST).EdgeDebugAdapter;
-        edgeDebugAdapter = new cDAClass({ edgeConnection: function() { return mockEdgeConnection.object; } } as any, new MockEdgeDebugSession() as any);
+        edgeDebugAdapter = new cDAClass({ chromeConnection: function() {
+            return mockEdgeConnection.object; } } as any, new MockEdgeDebugSession() as any);
     });
 
     teardown(() => {
@@ -106,6 +115,18 @@ suite('EdgeDebugAdapter', () => {
             require('child_process').spawn = spawn;
             originalStatSync = require('fs').statSync;
             require('fs').statSync = () => true;
+
+            mockEdgeConnection
+                .setup(x => x.attach(It.isValue(undefined), It.isAnyNumber(), It.isAnyString(), It.isValue(undefined), It.isValue(undefined)))
+                .returns(() => {
+                    isAttached = true;
+                    return Promise.resolve();
+                })
+                .verifiable();
+
+            mockEdge.Runtime
+                .setup(x => x.evaluate(It.isAny()))
+                .returns(() => Promise.resolve<any>({ result: { type: 'string', value: '123' }}));
 
             return edgeDebugAdapter.launch({ file: 'c:\\path with space\\index.html' })
                 .then(() => assert(spawnCalled));

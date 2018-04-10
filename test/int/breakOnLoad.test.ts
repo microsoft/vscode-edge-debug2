@@ -30,7 +30,7 @@ function runCommonTests(breakOnLoadStrategy: string) {
         return testSetup.teardown();
     });
 
-    suite('TypeScript Project with SourceMaps', () => {
+    suite.skip('TypeScript Project with SourceMaps', () => {
         test('Hits a single breakpoint in a file on load', async () => {
             const testProjectRoot = path.join(DATA_ROOT, 'breakOnLoad_sourceMaps');
             const scriptPath = path.join(testProjectRoot, 'src/script.ts');
@@ -95,7 +95,7 @@ function runCommonTests(breakOnLoadStrategy: string) {
         });
     });
 
-    suite('Simple JavaScript Project', () => {
+    suite.skip('Simple JavaScript Project', () => {
         test('Hits a single breakpoint in a file on load', async () => {
             const testProjectRoot = path.join(DATA_ROOT, 'breakOnLoad_javaScript');
             const scriptPath = path.join(testProjectRoot, 'src/script.js');
@@ -161,7 +161,7 @@ function runCommonTests(breakOnLoadStrategy: string) {
     });
 }
 
-suite('BreakOnLoad', () => {
+suite.skip('BreakOnLoad', () => {
     const DATA_ROOT = testSetup.DATA_ROOT;
 
     suite('Regex Common Tests', () => {

@@ -30,7 +30,7 @@ suite('Breakpoints', () => {
         return testSetup.teardown();
     });
 
-    suite('Column BPs', () => {
+    suite.skip('Column BPs', () => {
         test('Column BP is hit on correct column', async () => {
             const testProjectRoot = path.join(DATA_ROOT, 'columns');
             const scriptPath = path.join(testProjectRoot, 'src/script.ts');

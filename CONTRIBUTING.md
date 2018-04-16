@@ -19,9 +19,10 @@ Most of the code is actually in [this repo](https://github.com/Microsoft/vscode-
 In VS Code, run the `launch as server` launch config - it will start the adapter as a server listening on port 4712. In your test app launch.json, include this flag at the top level: `"debugServer": "4712"`. Then you'll be able to debug the adapter in the first instance of VS Code, in its original TypeScript, using sourcemaps.
 
 ## Testing
-Run `gulp tslint` to check your code against our tslint rules.
+* Run `gulp tslint` to check your code against our tslint rules.
+* Run `npm run test` to validate against our unit tests.
+* There are also some integration tests which can be run by `npm run intTest`
 
-Unit tests and integration tests for the debug adapter are currently disabled.
 
 ## Naming
 * "Client": VS Code

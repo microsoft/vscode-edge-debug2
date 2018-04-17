@@ -44,13 +44,6 @@ This message means that the extension can't attach to Edge, probably because Edg
 * If all else fails, try to navigate to `http://localhost:<port>/json/list` in a browser when you see this message - if there is no response, then something is wrong upstream of the extension. If there is a page of JSON returned, then ensure that the `port` in the launch config matches the port in that url.
 * If the above steps do not work, try closing all windows of Edge and then relaunch.
 
-## Data/Telemetry
-This project collects usage data and sends it to Microsoft to help improve our products and services. Read our [privacy statement](http://go.microsoft.com/fwlink/?LinkId=521839) to learn more.
-
-To opt out of all telemetry inside Visual Studio, go to Help > Send Feedback > Settings >  `No, I would not like to participate`
-
-To opt out of all telemetry inside Visual Studio Code, go to File > Preferences > Settings and add the following option: `"telemetry.enableTelemetry": false`
-
 ## Issues
 File a bug in this extension's [GitHub repo](https://github.com/Microsoft/vscode-edge-debug2), including the debug adapter log file. The debug adapter creates a log file for each run in the %temp% directory with the name `vscode-edge-debug2.txt`. You can drag this file into an issue comment to upload it to GitHub.
 

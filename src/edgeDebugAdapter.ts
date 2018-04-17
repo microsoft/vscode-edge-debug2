@@ -46,6 +46,8 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
     private _debugProxyPort: number;
     private _scriptParsedEventBookKeeping = {};
     private _navigatingToUserRequestedUrl = false;
+    private _navigationInProgress = false;
+    private _unsentLoadedSourceEvents: Crdp.Debugger.ScriptParsedEvent[] = [];
 
     public initialize(args: DebugProtocol.InitializeRequestArguments): DebugProtocol.Capabilities {
         const capabilities = super.initialize(args);
@@ -270,20 +272,42 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
         return variablesResponse;
     }
 
+    private async sendBackloggedLoadedSourceEvents(): Promise<void> {
+        await Promise.all(this._unsentLoadedSourceEvents.map(script => this.sendLoadedSourceEvent(script)));
+        this._unsentLoadedSourceEvents = [];
+    }
+
+    protected onExecutionContextsCleared(): Promise<void> {
+        this._navigationInProgress = true;
+        return super.onExecutionContextsCleared().then(() => {
+            this._navigationInProgress = false;
+            this.sendBackloggedLoadedSourceEvents();
+        });
+    }
+
     protected clearTargetContext(): void {
         super.clearTargetContext();
         this._scriptParsedEventBookKeeping = {};
     }
 
     protected async sendLoadedSourceEvent(script: Crdp.Debugger.ScriptParsedEvent): Promise<void> {
-        let loadedSourceReason: LoadedSourceEventReason;
-        if (!this._scriptParsedEventBookKeeping[script.scriptId]) {
-            this._scriptParsedEventBookKeeping[script.scriptId] = true;
-            loadedSourceReason = 'new';
+        // If navigation is in progress, we wait for it to complete before sending any new script loaded events
+        // This is done because in case of quick refreshes, we end up sending 'changed' events for new scripts because
+        // scriptParsedEventBookKeeping hasn't been refreshed yet
+        if (!this._navigationInProgress) {
+            let loadedSourceReason: LoadedSourceEventReason;
+            if (!this._scriptParsedEventBookKeeping[script.scriptId]) {
+                this._scriptParsedEventBookKeeping[script.scriptId] = true;
+                loadedSourceReason = 'new';
+            } else {
+                loadedSourceReason = 'changed';
+            }
+            return super.sendLoadedSourceEvent(script, loadedSourceReason);
         } else {
-            loadedSourceReason = 'changed';
+            // If navigation is in progress, create an array for unsent loaded source events and send them once navigation is done
+            this._unsentLoadedSourceEvents.push(script);
         }
-        return super.sendLoadedSourceEvent(script, loadedSourceReason);
+
     }
 
     private spawnEdge(edgePath: string, edgeArgs: string[], env: {[key: string]: string}, cwd: string, usingRuntimeExecutable: boolean): ChildProcess {

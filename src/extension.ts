@@ -5,7 +5,7 @@
 import * as vscode from 'vscode';
 import * as Core from 'vscode-chrome-debug-core';
 
-import {targetFilter} from './utils';
+import {isEdgeDebuggingSupported, targetFilter} from './utils';
 
 import * as nls from 'vscode-nls';
 const localize = nls.loadMessageBundle();
@@ -36,6 +36,13 @@ export class EdgeConfigurationProvider implements vscode.DebugConfigurationProvi
      * Try to add all missing attributes to the debug configuration being launched.
      */
     async resolveDebugConfiguration(folder: vscode.WorkspaceFolder | undefined, config: vscode.DebugConfiguration, token?: vscode.CancellationToken): Promise<vscode.DebugConfiguration> {
+        if (!isEdgeDebuggingSupported()) {
+            const errorMessage = localize('edge.debug.error.versionNotSupported', "Your version of Edge does not support debugging via the Edge DevTools Protocol. You can read more about supported versions here (https://aka.ms/edp-docs).");
+            return vscode.window.showErrorMessage(errorMessage).then(_ => {
+                return undefined;
+            });
+        }
+
         // if launch.json is missing or empty
         if (!config.type && !config.request && !config.name) {
             // Return null so it will create a launch.json and fall back on provideDebugConfigurations - better to point the user towards the config

@@ -22,13 +22,82 @@ Note: Edge debugging via [Edge DevTools Protocol](https://docs.microsoft.com/en-
 * Any features that aren't script debugging.
 
 ## Getting Started
-We are working on creating and publishing a VS Code Extension for this project.
+For use inside VS Code:
+1. [Install the extension](https://marketplace.visualstudio.com/items?itemName=msjsdiag.debugger-for-edge)
+2. Restart VS Code and open the folder containing the project you want to work on.
 
 For use inside Visual Studio:
 1. Install the latest [Windows Insider Preview](https://insider.windows.com/en-us/getting-started/) build.
 2. Install the latest [Visual Studio 2017 Version 15.7 Preview](https://www.visualstudio.com/vs/preview/) build.
 3. Create an ASP.Net/ASP.Net Core Web Application.
 4. Select 'Microsoft Edge' from the 'Web Browser' submenu in the debug target dropdown, and then press F5.
+
+## Using the debugger
+
+When your launch config is set up, you can debug your project. Pick a launch config from the dropdown on the Debug pane in Code. Press the play button or F5 to start.
+
+### Configuration
+
+The extension requires you to be serving your web application from local web server, which is started from either a VS Code task or from your command-line. Using the `url` parameter you simply tell VS Code which URL to launch in Edge.
+
+You can configure this with a `.vscode/launch.json` file in the root directory of your project. You can create this file manually, or Code will create one for you if you try to run your project, and it doesn't exist yet.
+
+### Launch
+Two example `launch.json` configs with `"request": "launch"`. You must specify either `file` or `url` to launch Edge against a local file or a url. If you use a url, set `webRoot` to the directory that files are served from. This can be either an absolute path or a path using `${workspaceFolder}` (the folder open in Code). `webRoot` is used to resolve urls (like "http://localhost/app.js") to a file on disk (like `/Users/me/project/app.js`), so be careful that it's set correctly.
+```json
+{
+    "version": "0.1.0",
+    "configurations": [
+        {
+            "name": "Launch localhost",
+            "type": "edge",
+            "request": "launch",
+            "url": "http://localhost/mypage.html",
+            "webRoot": "${workspaceFolder}/wwwroot"
+        },
+        {
+            "name": "Launch index.html (disable sourcemaps)",
+            "type": "edge",
+            "request": "launch",
+            "sourceMaps": false,
+            "file": "${workspaceFolder}/index.html"
+        },
+    ]
+}
+```
+
+### Other optional launch config fields
+* `trace`: When true, the adapter logs its own diagnostic info to a file. The file path will be printed in the Debug Console. This is often useful info to include when filing an issue on GitHub. If you set it to "verbose", it will also log to the console.
+* `url`: On a 'launch' config, it will launch Edge at this URL.
+* `sourceMaps`: By default, the adapter will use sourcemaps and your original sources whenever possible. You can disable this by setting `sourceMaps` to false.
+* `pathMapping`: This property takes a mapping of URL paths to local paths, to give you more flexibility in how URLs are resolved to local files. `"webRoot": "${workspaceFolder}"` is just shorthand for a pathMapping like `{ "/": "${workspaceFolder}" }`.
+
+## Sourcemaps
+The debugger uses sourcemaps to let you debug with your original sources, but sometimes the sourcemaps aren't generated properly and overrides are needed. In the config we support `sourceMapPathOverrides`, a mapping of source paths from the sourcemap, to the locations of these sources on disk. Useful when the sourcemap isn't accurate or can't be fixed in the build process.
+
+The left hand side of the mapping is a pattern that can contain a wildcard, and will be tested against the `sourceRoot` + `sources` entry in the source map. If it matches, the source file will be resolved to the path on the right hand side, which should be an absolute path to the source file on disk.
+
+A few mappings are applied by default, corresponding to some common default configs for Webpack and Meteor:
+```javascript
+// Note: These are the mappings that are included by default out of the box, with examples of how they could be resolved in different scenarios. These are not mappings that would make sense together in one project.
+// webRoot = /Users/me/project
+"sourceMapPathOverrides": {
+    "webpack:///./~/*": "${webRoot}/node_modules/*",       // Example: "webpack:///./~/querystring/index.js" -> "/Users/me/project/node_modules/querystring/index.js"
+    "webpack:///./*":   "${webRoot}/*",                    // Example: "webpack:///./src/app.js" -> "/Users/me/project/src/app.js",
+    "webpack:///*":     "*",                               // Example: "webpack:///project/app.ts" -> "/project/app.ts"
+    "webpack:///src/*": "${webRoot}/*",                    // Example: "webpack:///src/app.js" -> "/Users/me/project/app.js"
+    "meteor://💻app/*": "${webRoot}/*"                    // Example: "meteor://💻app/main.ts" -> "/Users/me/project/main.ts"
+}
+```
+If you set `sourceMapPathOverrides` in your launch config, that will override these defaults. `${workspaceFolder}` and `${webRoot}` can be used here. If you aren't sure what the left side should be, you can use the `trace` option to see the contents of the sourcemap, or look at the paths of the sources in Edge DevTools, or open your `.js.map` file and check the values manually.
+
+### Ionic/gulp-sourcemaps note
+Ionic and gulp-sourcemaps output a sourceRoot of `"/source/"` by default. If you can't fix this via your build config, we suggest this setting:
+```
+"sourceMapPathOverrides": {
+    "/source/*": "${workspaceFolder}/*"
+}
+```
 
 ## Troubleshooting
 

@@ -8,11 +8,11 @@
 
 A VS Code extension to debug your JavaScript code in the Microsoft Edge browser. This is also used to enable JavaScript debugging inside Edge browser when launched from ASP.Net Projects in Visual Studio.
 
-Note: Edge debugging via [Edge DevTools Protocol](https://docs.microsoft.com/en-us/microsoft-edge/devtools-protocol/) is currently supported on [Windows Insider Preview](https://insider.windows.com/en-us/getting-started/) builds only.
+Note: To see if your Windows version supports Edge debugging via Edge DevTools Protocol, please refer [here](https://docs.microsoft.com/en-us/microsoft-edge/devtools-protocol/).
 
 **Supported features**
 * Setting breakpoints, including in source files when source maps are enabled
-* Stepping, including with the buttons on the Edge page
+* Stepping through the code
 * The Locals pane
 * Debugging eval scripts, script tags, and scripts that are added dynamically
 * Watches
@@ -27,10 +27,11 @@ For use inside VS Code:
 2. Restart VS Code and open the folder containing the project you want to work on.
 
 For use inside Visual Studio:
-1. Install the latest [Windows Insider Preview](https://insider.windows.com/en-us/getting-started/) build.
-2. Install the latest [Visual Studio 2017 Version 15.7 Preview](https://www.visualstudio.com/vs/preview/) build.
+1. Install a supported version of Windows.
+2. Install the latest version of Visual Studio. Edge Debugging is supported for VS versions >= 15.7
 3. Create an ASP.Net/ASP.Net Core Web Application.
-4. Select 'Microsoft Edge' from the 'Web Browser' submenu in the debug target dropdown, and then press F5.
+4. Set a breakpoint in your JavaScript/TypeScript file.
+5. Select 'Microsoft Edge' from the 'Web Browser' submenu in the debug target dropdown, and then press F5.
 
 ## Using the debugger
 

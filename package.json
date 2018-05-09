@@ -71,7 +71,8 @@
     "intTest": "mocha --timeout 20000 -s 3500 -u tdd --colors --reporter node_modules/vscode-chrome-debug-core-testsupport/out/loggingReporter.js ./out/test/int/*.test.js",
     "lint": "gulp tslint",
     "vscode:prepublish": "gulp verify-no-linked-modules",
-    "postinstall": "node ./node_modules/vscode/bin/install"
+    "postinstall": "node ./node_modules/vscode/bin/install",
+    "package": "gulp package"
   },
   "contributes": {
     "breakpoints": [

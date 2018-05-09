@@ -141,9 +141,8 @@ gulp.task('vsce-publish', function () {
 });
 gulp.task('vsce-package', function () {
     const usePackagePathOptionIndex = process.argv.findIndex(arg => arg === "--packagePath");
-    const options = (usePackagePathOptionIndex >= 0 && usePackagePathOptionIndex < process.argv.length)
-        ? { packagePath: process.argv[usePackagePathOptionIndex + 1] }
-        : {};
+    const packagePath = process.argv[usePackagePathOptionIndex + 1];
+    const options = packagePath !== undefined ? { packagePath: packagePath } : {};
     return vsce.createVSIX(options);
 });
 

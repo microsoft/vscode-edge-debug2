@@ -5,7 +5,7 @@ import {EdgeDebugAdapter} from './edgeDebugAdapter';
 import * as nls from 'vscode-nls';
 const localize = nls.loadMessageBundle();
 
-interface EdgeDebugClient extends Crdp.DebuggerClient {
+interface EdgeDebugClient extends Crdp.DebuggerApi {
     msSetDebuggerPropertyValue(payload: {
         debuggerPropertyId: string,
         newValue: string

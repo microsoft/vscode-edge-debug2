@@ -9,7 +9,7 @@ import * as mockery from 'mockery';
 import {EventEmitter} from 'events';
 import * as assert from 'assert';
 import * as path from 'path';
-import {Mock, MockBehavior, It} from 'typemoq';
+import {Mock, IMock, MockBehavior, It} from 'typemoq';
 
 import {getMockEdgeConnectionApi, IMockEdgeConnectionAPI} from './debugProtocolMocks';
 import * as testUtils from './testUtils';
@@ -28,7 +28,7 @@ class MockEdgeDebugSession {
 
 const MODULE_UNDER_TEST = '../src/edgeDebugAdapter';
 suite('EdgeDebugAdapter', () => {
-    let mockEdgeConnection: Mock<chromeConnection.ChromeConnection>;
+    let mockEdgeConnection: IMock<chromeConnection.ChromeConnection>;
     let mockEventEmitter: EventEmitter;
     let mockEdge: IMockEdgeConnectionAPI;
 

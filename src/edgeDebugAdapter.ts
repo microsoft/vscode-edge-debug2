@@ -44,7 +44,6 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
     private _userRequestedUrl: string;
     private _debuggerId: string;
     private _debugProxyPort: number;
-    private _scriptParsedEventBookKeeping = {};
     private _navigatingToUserRequestedUrl = false;
     private _navigationInProgress = false;
     private _unsentLoadedSourceEvents: Crdp.Debugger.ScriptParsedEvent[] = [];
@@ -119,7 +118,6 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
             return args.noDebug ? undefined :
                 this.doAttach(port, launchUrl || args.urlFilter, args.address, args.timeout, undefined, args.extraCRDPChannelPort)
                 .then(() => {
-                    this._scriptParsedEventBookKeeping = {};
                     this._debugProxyPort = port;
 
                     if (!this._chromeConnection.isAttached || !this._chromeConnection.attachedTarget) {
@@ -285,24 +283,12 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
         });
     }
 
-    protected clearTargetContext(): void {
-        super.clearTargetContext();
-        this._scriptParsedEventBookKeeping = {};
-    }
-
     protected async sendLoadedSourceEvent(script: Crdp.Debugger.ScriptParsedEvent): Promise<void> {
         // If navigation is in progress, we wait for it to complete before sending any new script loaded events
         // This is done because in case of quick refreshes, we end up sending 'changed' events for new scripts because
         // scriptParsedEventBookKeeping hasn't been refreshed yet
         if (!this._navigationInProgress) {
-            let loadedSourceReason: LoadedSourceEventReason;
-            if (!this._scriptParsedEventBookKeeping[script.scriptId]) {
-                this._scriptParsedEventBookKeeping[script.scriptId] = true;
-                loadedSourceReason = 'new';
-            } else {
-                loadedSourceReason = 'changed';
-            }
-            return super.sendLoadedSourceEvent(script, loadedSourceReason);
+            return super.sendLoadedSourceEvent(script);
         } else {
             // If navigation is in progress, create an array for unsent loaded source events and send them once navigation is done
             this._unsentLoadedSourceEvents.push(script);

@@ -39,15 +39,12 @@ suite('EdgeDebugAdapter', () => {
         mockery.enable({ useCleanCache: true, warnOnReplace: false, warnOnUnregistered: false });
 
         // Create a ChromeConnection mock with .on and .attach. Tests can fire events via mockEventEmitter
-        mockEdgeConnection = Mock.ofType(chromeConnection.ChromeConnection, MockBehavior.Strict);
+        mockEdgeConnection = Mock.ofType(chromeConnection.ChromeConnection);
         mockEdge = getMockEdgeConnectionApi();
         mockEventEmitter = mockEdge.mockEventEmitter;
         mockEdgeConnection
             .setup(x => x.api)
             .returns(() => mockEdge.apiObjects);
-        mockEdgeConnection
-            .setup(x => x.attach(It.isValue(undefined), It.isAnyNumber(), It.isValue(undefined)))
-            .returns(() => Promise.resolve());
         mockEdgeConnection
             .setup(x => x.isAttached)
             .returns(() => isAttached);

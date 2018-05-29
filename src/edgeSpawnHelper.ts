@@ -3,6 +3,7 @@
  *--------------------------------------------------------*/
 
 import * as cp from 'child_process';
+import { createInterface } from 'readline';
 
 const edgePath = process.argv[2];
 const edgeArgs = process.argv.slice(3);
@@ -14,4 +15,12 @@ const edgeProc = cp.spawn(edgePath, edgeArgs, {
 });
 
 edgeProc.unref();
-process.send(edgeProc.pid);
+if (!edgeProc.pid) {
+    process.send(<ISpawnHelperResult>{"error": "Cannot get process id"});
+} else {
+    process.send(<ISpawnHelperResult>{"error": null});
+}
+
+export interface ISpawnHelperResult {
+    error: string | null
+}

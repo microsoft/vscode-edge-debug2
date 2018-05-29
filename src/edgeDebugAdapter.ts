@@ -15,6 +15,7 @@ import {DebugProtocol} from 'vscode-debugprotocol';
 
 import {ILaunchRequestArgs, IAttachRequestArgs, ICommonRequestArgs} from './edgeDebugInterfaces';
 import {ExtendedDebugProtocolVariable, MSPropertyContainer} from './edgeVariablesContainer';
+import {ISpawnHelperResult} from './edgeSpawnHelper';
 import * as utils from './utils';
 import * as errors from './errors';
 
@@ -39,7 +40,6 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
     private static PAGE_PAUSE_MESSAGE = 'Paused in Visual Studio Code';
 
     private _edgeProc: ChildProcess;
-    private _edgePID: number;
     private _breakOnLoadActive = false;
     private _userRequestedUrl: string;
     private _debuggerId: string;
@@ -109,25 +109,33 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
                 edgeArgs.push(launchUrl);
             }
 
-            this._edgeProc = this.spawnEdge(runtimeExecutable, edgeArgs, edgeEnv, edgeWorkingDir, !!args.runtimeExecutable);
-            this._edgeProc.on('error', (err) => {
-                const errMsg = 'Chrome error: ' + err;
+            let launchResult: Promise<ISpawnHelperResult>;
+
+            [this._edgeProc, launchResult] = this.spawnEdge(runtimeExecutable, edgeArgs, edgeEnv, edgeWorkingDir, !!args.runtimeExecutable);
+            const erroHanlder = (errMessage: string) => {
+                const errMsg = 'Edge launch error: ' + errMessage;
                 logger.error(errMsg);
                 this.terminateSession(errMsg);
-            });
+            };
 
-            return args.noDebug ? undefined :
-                this.doAttach(port, launchUrl || args.urlFilter, args.address, args.timeout, undefined, args.extraCRDPChannelPort)
-                .then(() => {
-                    this._scriptParsedEventBookKeeping = {};
-                    this._debugProxyPort = port;
+            this._edgeProc.on('error', erroHanlder);
 
-                    if (!this._chromeConnection.isAttached || !this._chromeConnection.attachedTarget) {
-                        throw coreUtils.errP(localize("edge.debug.error.notattached", "Debugging connection is not attached after the attaching process."));
-                    }
+            return launchResult.catch((err: Error) => {
+                erroHanlder(err.message);
+                throw err;
+            }).then(() => {
+                return args.noDebug ? undefined :
+                    this.doAttach(port, launchUrl || args.urlFilter, args.address, args.timeout, undefined, args.extraCRDPChannelPort);
+            }).then(() => {
+                this._scriptParsedEventBookKeeping = {};
+                this._debugProxyPort = port;
 
-                    this._debuggerId = this._chromeConnection.attachedTarget.id;
-                });
+                if (!this._chromeConnection.isAttached || !this._chromeConnection.attachedTarget) {
+                    throw coreUtils.errP(localize("edge.debug.error.notattached", "Debugging connection is not attached after the attaching process."));
+                }
+
+                this._debuggerId = this._chromeConnection.attachedTarget.id;
+            });;
         });
     }
 
@@ -309,8 +317,15 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
         }
 
     }
-
-    private spawnEdge(edgePath: string, edgeArgs: string[], env: {[key: string]: string}, cwd: string, usingRuntimeExecutable: boolean): ChildProcess {
+    /**
+     *
+     * @returns [
+     *           The launched Node.js ChildProcess object,
+     *           The promise to capture the launch result
+     *          ]
+     */
+    private spawnEdge(edgePath: string, edgeArgs: string[], env: {[key: string]: string}, cwd: string, usingRuntimeExecutable: boolean)
+            : [ChildProcess, Promise<ISpawnHelperResult>] {
         this.events.emitStepStarted("LaunchTarget.LaunchExe");
         if (coreUtils.getPlatform() === coreUtils.Platform.Windows && !usingRuntimeExecutable) {
             const options = {
@@ -329,10 +344,14 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
             const edgeProc = fork(getEdgeSpawnHelperPath(), [edgePath, ...edgeArgs], options);
             edgeProc.unref();
 
-            edgeProc.on('message', data => {
-                const pidStr = data.toString();
-                logger.log('got edge PID: ' + pidStr);
-                this._edgePID = parseInt(pidStr, 10);
+            const launchResult = new Promise<ISpawnHelperResult>((resolve, reject) => {
+                edgeProc.on('message', (result: ISpawnHelperResult) => {
+                    if (result.error) {
+                        reject(new Error(result.error));
+                    } else {
+                        resolve(result);
+                    }
+                });
             });
 
             edgeProc.on('error', (err) => {
@@ -348,7 +367,7 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
                 logger.log('[edgeSpawnHelper] ' + data.toString());
             });
 
-            return edgeProc;
+            return [edgeProc, launchResult];
         } else {
             logger.log(`spawn('${edgePath}', ${JSON.stringify(edgeArgs) })`);
             const options = {
@@ -366,7 +385,7 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
             }
             const edgeProc = spawn(edgePath, edgeArgs, options);
             edgeProc.unref();
-            return edgeProc;
+            return [edgeProc, Promise.resolve(<ISpawnHelperResult>{})];
         }
     }
 

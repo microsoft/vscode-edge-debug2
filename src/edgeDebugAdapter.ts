@@ -19,6 +19,7 @@ import * as utils from './utils';
 import * as errors from './errors';
 
 import * as nls from 'vscode-nls';
+import * as portscanner from 'portscanner';
 import { FinishedStartingUpEventArguments } from 'vscode-chrome-debug-core/lib/src/executionTimingsReporter';
 
 let localize = nls.loadMessageBundle();
@@ -60,7 +61,45 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
         return capabilities;
     }
 
-    public launch(args: ILaunchRequestArgs): Promise<void> {
+    private async _checkPortOccupiedByEDP(address: string, port: number): Promise<void> {
+        // See if EDP is using the port, if that's the case we can still launch
+        // We see if we can hit /json/version endpoint to verify if EDP is running on the port
+        const url = `http://${address}:${port}/json/version`;
+        logger.log(`Checking if EDP is running on the port by hitting ${url}`);
+
+        const jsonResponse = await utils.getURL(url, { headers: { Host: 'localhost' } })
+            .catch(e => {
+                // This means /json/version is not available. So the port is being used by another process.
+                // Error out in this case.
+                logger.log(`There was an error connecting to ${url} : ${e.message}`);
+                telemetry.telemetry.reportEvent('portOccupiedByAnotherProcess', port);
+                return coreUtils.errP(localize('edge.port.occupied', 'Cannot launch Edge. The specified debugging port {0} is in use by another process.', port));
+            });
+
+        // If we reach here that means EDP is running on the port, so we can continue
+        logger.log(`Port ${port} is already being used by EDP. Proceeding with the launch.`);
+    }
+
+    private async _checkPortOccupied(address = '127.0.0.1', port: number): Promise<void> {
+
+        return portscanner.checkPortStatus(port, address)
+        .then( status => {
+            logger.log(`Port ${port} status is: ` + status);
+            // If port's status is open, it is in use. Take action based on whether EDP is already running on the port or not
+            if (status === 'open') {
+                return this._checkPortOccupiedByEDP(address, port);
+            }
+        }, err => {
+            logger.log(`There was an error trying to verify port usage: ${err}`);
+        });
+    }
+
+    public async launch(args: ILaunchRequestArgs): Promise<void> {
+        const port = args.port || 2015;
+
+        // Check if the port is being used by another process
+        await this._checkPortOccupied(args.address, port);
+
         return super.launch(args).then(() => {
             let runtimeExecutable: string;
             if (args.runtimeExecutable) {
@@ -78,7 +117,6 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
             }
 
             // Start with remote debugging enabled
-            const port = args.port || 2015;
             const edgeArgs: string[] = [];
             const edgeEnv: {[key: string]: string} = args.env || null;
             const edgeWorkingDir: string = args.cwd || null;

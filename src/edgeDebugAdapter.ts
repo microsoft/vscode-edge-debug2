@@ -10,7 +10,7 @@ import {ChromeDebugAdapter as CoreDebugAdapter, logger, utils as coreUtils, ISou
         IVariablesResponseBody,
         telemetry} from 'vscode-chrome-debug-core';
 import {spawn, ChildProcess, fork, execSync} from 'child_process';
-import {Crdp, LoadedSourceEventReason, chromeConnection, chromeUtils, variables, ChromeDebugSession} from 'vscode-chrome-debug-core';
+import {Crdp, LoadedSourceEventReason, chromeConnection, chromeUtils, variables, ChromeDebugSession, IOnPausedResult} from 'vscode-chrome-debug-core';
 import {DebugProtocol} from 'vscode-debugprotocol';
 
 import {ILaunchRequestArgs, IAttachRequestArgs, ICommonRequestArgs} from './edgeDebugInterfaces';
@@ -204,7 +204,7 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
         ];
     }
 
-    protected async onPaused(notification: Crdp.Debugger.PausedEvent, expectingStopReason = this._expectingStopReason): Promise<void> {
+    protected async onPaused(notification: Crdp.Debugger.PausedEvent, expectingStopReason = this._expectingStopReason): Promise<IOnPausedResult> {
         return super.onPaused(notification, expectingStopReason);
     }
 

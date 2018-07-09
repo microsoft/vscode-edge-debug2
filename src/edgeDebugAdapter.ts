@@ -73,7 +73,7 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
                 // Error out in this case.
                 logger.log(`There was an error connecting to ${url} : ${e.message}`);
                 telemetry.telemetry.reportEvent('portOccupiedByAnotherProcess', port);
-                return coreUtils.errP(localize('edge.port.occupied', 'Cannot launch Edge. The specified debugging port {0} is in use by another process.', port));
+                return coreUtils.errP(localize('edge.port.occupied', 'Cannot launch Edge. The specified debugging port {0} is in use by another process. To continue debugging please make sure no process is running on the port.', port));
             });
 
         // If we reach here that means EDP is running on the port, so we can continue
@@ -91,7 +91,7 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
             }
         }, err => {
             logger.log(`There was an error trying to verify port usage: ${err}`);
-            telemetry.telemetry.reportEvent('errorCheckingPortOccupied', err);
+            telemetry.telemetry.reportEvent('errorCheckingDebuggingPortOccupiedByAnotherProcess', err);
         });
     }
 

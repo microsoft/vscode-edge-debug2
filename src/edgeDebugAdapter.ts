@@ -99,7 +99,7 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
         const port = args.port || 2015;
 
         // Check if the port is being used by another process
-        telemetry.telemetry.reportEvent('startingPortOccupiedCheck', port);
+        this.events.emitStepStarted('Launch.CheckWhetherPortOccupied');
         await this._checkPortOccupied(args.address, port);
 
         return super.launch(args).then(() => {

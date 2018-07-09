@@ -67,7 +67,7 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
         const url = `http://${address}:${port}/json/version`;
         logger.log(`Checking if EDP is running on the port by hitting ${url}`);
 
-        const jsonResponse = await utils.getURL(url, { headers: { Host: 'localhost' } })
+        const jsonResponse = await coreUtils.getURL(url, { headers: { Host: 'localhost' } })
             .catch(e => {
                 // This means /json/version is not available. So the port is being used by another process.
                 // Error out in this case.
@@ -91,6 +91,7 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
             }
         }, err => {
             logger.log(`There was an error trying to verify port usage: ${err}`);
+            telemetry.telemetry.reportEvent('errorCheckingPortOccupied', err);
         });
     }
 
@@ -98,6 +99,7 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
         const port = args.port || 2015;
 
         // Check if the port is being used by another process
+        telemetry.telemetry.reportEvent('startingPortOccupiedCheck', port);
         await this._checkPortOccupied(args.address, port);
 
         return super.launch(args).then(() => {

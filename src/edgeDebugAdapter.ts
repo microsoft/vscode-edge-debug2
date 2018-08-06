@@ -415,8 +415,6 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
         const edgeRemoteObject = object as ExtendedEdgeRemoteObject;
         if (edgeRemoteObject.msDebuggerPropertyId) {
             variable.msDebuggerPropertyId = edgeRemoteObject.msDebuggerPropertyId;
-        } else {
-            throw coreUtils.errP(localize("edge.debug.error.notAssociatedMsDebuggerPropertyId", "Cannot find msDebuggerPropertyId from returned Variable data."));
         }
 
         return variable;

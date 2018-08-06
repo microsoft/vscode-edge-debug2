@@ -16,15 +16,13 @@ export interface ExtendedDebugProtocolVariable extends DebugProtocol.Variable {
     msDebuggerPropertyId?: string;
 }
 
-export class MSPropertyContainer extends variables.BaseVariableContainer {
-    private _childPropertiesMapping: {
-        [propertyName: string]: string
-    }
+export class MSPropertyContainer extends variables.PropertyContainer {
+    private _childPropertiesMapping: Map<string, string>;
 
     public constructor(objectId: string, evaluateName?: string) {
         super(objectId, evaluateName);
 
-        this._childPropertiesMapping = {};
+        this._childPropertiesMapping = new Map<string, string>();
     }
 
     public async expand(adapter: EdgeDebugAdapter, filter?: string, start?: number, count?: number): Promise<DebugProtocol.Variable[]> {
@@ -34,7 +32,7 @@ export class MSPropertyContainer extends variables.BaseVariableContainer {
             let extendedVarialbe = variable as ExtendedDebugProtocolVariable;
 
             if (extendedVarialbe.msDebuggerPropertyId) {
-                this._childPropertiesMapping[variable.name] = extendedVarialbe.msDebuggerPropertyId;
+                this._childPropertiesMapping.set(variable.name, extendedVarialbe.msDebuggerPropertyId);
 
                 // Also remove the additional field from `variable`, so it will not appear when report to PineZorro/VS Code
                 delete extendedVarialbe.msDebuggerPropertyId;
@@ -44,11 +42,12 @@ export class MSPropertyContainer extends variables.BaseVariableContainer {
     }
 
     public async setValue(adapter: EdgeDebugAdapter, name: string, value: string): Promise<string> {
-        const msDebuggerPropertyId = this._childPropertiesMapping[name];
+        const msDebuggerPropertyId = this._childPropertiesMapping.get(name);
 
         if (!msDebuggerPropertyId) {
-            logger.error(`Cannot find msDebuggerPropertyId for {name}`);
-            throw coreUtils.errP(localize("edge.debug.error.notFoundMsDebuggerPropertyId", "Cannot find msDebuggerPropertyId for a property."));
+            // If msDebuggerPropertyId is not present, default to super setValue for this variable.
+            let result = await super.setValue(adapter, name, value);
+            return value;
         }
 
         const edgeDebugClient: EdgeDebugClient = adapter.chrome.Debugger as EdgeDebugClient;

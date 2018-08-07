@@ -46,15 +46,20 @@ export class MSPropertyContainer extends variables.PropertyContainer {
 
         if (!msDebuggerPropertyId) {
             // If msDebuggerPropertyId is not present, default to super setValue for this variable.
-            let result = await super.setValue(adapter, name, value);
+            await super.setValue(adapter, name, value)
+                .catch(() => {
+                    throw coreUtils.errP(localize("edge.debug.error.msSetDebuggerPropertyValue", "Unable to update the value for this property."));
+                });
             return value;
         }
 
         const edgeDebugClient: EdgeDebugClient = adapter.chrome.Debugger as EdgeDebugClient;
 
-        let result = await edgeDebugClient.msSetDebuggerPropertyValue({
+        await edgeDebugClient.msSetDebuggerPropertyValue({
             "debuggerPropertyId": msDebuggerPropertyId,
             "newValue": value
+        }).catch(() => {
+            throw coreUtils.errP(localize("edge.debug.error.msSetDebuggerPropertyValue", "Unable to update the value for this property."));
         });
 
         return value;

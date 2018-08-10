@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import * as path from 'path';
-import {createServer} from 'http-server';
+import { createServer } from 'http-server';
 
 import * as ts from 'vscode-chrome-debug-core-testsupport';
 
@@ -50,20 +50,20 @@ suite('msDebuggerPropertyId', () => {
 
             // Retrieve the variableReference for the Local scope
             let st = await dc.stackTraceRequest();
-            let scopes = await dc.scopesRequest({frameId: st.body.stackFrames[0].id});
+            let scopes = await dc.scopesRequest({ frameId: st.body.stackFrames[0].id });
             let localsRef = scopes.body.scopes[0].variablesReference;
-            let variables = await dc.variablesRequest({variablesReference: localsRef });
+            let variables = await dc.variablesRequest({ variablesReference: localsRef });
 
             // Update the x variable on the local scope
-            await dc.setVariableRequest({variablesReference: localsRef, name: 'x', value: '999'});
+            await dc.setVariableRequest({ variablesReference: localsRef, name: 'x', value: '999' });
 
             // Continue to end of function
             await dc.setBreakpointsRequest({ source: { path: scriptPath }, breakpoints: [{ line: bpLine2, column: bpCol2 }] });
             await dc.continueTo('breakpoint', { line: bpLine2, column: bpCol2 });
             st = await dc.stackTraceRequest();
-            scopes = await dc.scopesRequest({frameId: st.body.stackFrames[0].id});
+            scopes = await dc.scopesRequest({ frameId: st.body.stackFrames[0].id });
             localsRef = scopes.body.scopes[0].variablesReference;
-            variables = await dc.variablesRequest({variablesReference: localsRef });
+            variables = await dc.variablesRequest({ variablesReference: localsRef });
 
             // Ensure x is updated
             for (const variable of variables.body.variables) {
@@ -93,31 +93,31 @@ suite('msDebuggerPropertyId', () => {
 
             // Retrieve the variableReference for the Local scope
             let st = await dc.stackTraceRequest();
-            let scopes = await dc.scopesRequest({frameId: st.body.stackFrames[0].id});
+            let scopes = await dc.scopesRequest({ frameId: st.body.stackFrames[0].id });
             let localsRef = scopes.body.scopes[0].variablesReference;
-            let variables = await dc.variablesRequest({variablesReference: localsRef });
+            let variables = await dc.variablesRequest({ variablesReference: localsRef });
 
             // retrieve variableReference for 'obj'
             let objRef = findTargetVariableReference(variables.body.variables, 'obj');
 
             // Update obj.b
-            await dc.setVariableRequest({variablesReference: objRef, name: 'b', value: '999'});
+            await dc.setVariableRequest({ variablesReference: objRef, name: 'b', value: '999' });
 
             // Continue to end of function
             await dc.setBreakpointsRequest({ source: { path: scriptPath }, breakpoints: [{ line: bpLine2, column: bpCol2 }] });
             await dc.continueTo('breakpoint', { line: bpLine2, column: bpCol2 });
             st = await dc.stackTraceRequest();
-            scopes = await dc.scopesRequest({frameId: st.body.stackFrames[0].id});
+            scopes = await dc.scopesRequest({ frameId: st.body.stackFrames[0].id });
             localsRef = scopes.body.scopes[0].variablesReference;
-            variables = await dc.variablesRequest({variablesReference: localsRef });
+            variables = await dc.variablesRequest({ variablesReference: localsRef });
 
             // Retrieve new variableReference for 'obj'
             objRef = findTargetVariableReference(variables.body.variables, 'obj');
 
             // Ensure 'obj.b' is updated
-            variables = await dc.variablesRequest({variablesReference: objRef });
+            variables = await dc.variablesRequest({ variablesReference: objRef });
             for (const variable of variables.body.variables) {
-                if(variable.name === 'b') {
+                if (variable.name === 'b') {
                     assert.equal(variable.value, '999');
                     break;
                 }
@@ -143,29 +143,29 @@ suite('msDebuggerPropertyId', () => {
 
             // Retrieve the variableReference for the Local scope
             let st = await dc.stackTraceRequest();
-            let scopes = await dc.scopesRequest({frameId: st.body.stackFrames[0].id});
+            let scopes = await dc.scopesRequest({ frameId: st.body.stackFrames[0].id });
             let localsRef = scopes.body.scopes[0].variablesReference;
-            let variables = await dc.variablesRequest({variablesReference: localsRef });
+            let variables = await dc.variablesRequest({ variablesReference: localsRef });
 
             // retrieve variableReference for 'obj'
             let objRef = findTargetVariableReference(variables.body.variables, 'obj');
 
             // update obj.accessorProp (getter property does not use msDebuggerPropertyId)
-            await dc.setVariableRequest({variablesReference: objRef, name: 'accessorProp', value: '123'});
+            await dc.setVariableRequest({ variablesReference: objRef, name: 'accessorProp', value: '123' });
 
             // Continue to end of function
             await dc.setBreakpointsRequest({ source: { path: scriptPath }, breakpoints: [{ line: bpLine2, column: bpCol2 }] });
             await dc.continueTo('breakpoint', { line: bpLine2, column: bpCol2 });
             st = await dc.stackTraceRequest();
-            scopes = await dc.scopesRequest({frameId: st.body.stackFrames[0].id});
+            scopes = await dc.scopesRequest({ frameId: st.body.stackFrames[0].id });
             localsRef = scopes.body.scopes[0].variablesReference;
-            variables = await dc.variablesRequest({variablesReference: localsRef });
+            variables = await dc.variablesRequest({ variablesReference: localsRef });
 
             // Retrieve new variableReference for 'obj'
             objRef = findTargetVariableReference(variables.body.variables, 'obj');
 
             // Ensure 'obj.accessorProp' is updated
-            variables = await dc.variablesRequest({variablesReference: objRef });
+            variables = await dc.variablesRequest({ variablesReference: objRef });
             for (const variable of variables.body.variables) {
                 if (variable.name === 'accessorProp') {
                     assert.equal(variable.value, '123');

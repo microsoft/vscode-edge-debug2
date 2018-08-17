@@ -10,7 +10,7 @@ import * as ts from 'vscode-chrome-debug-core-testsupport';
 
 import * as testSetup from './testSetup';
 import * as assert from 'assert';
-import { DebugProtocol } from '../../node_modules/vscode-debugadapter/node_modules/vscode-debugprotocol/lib/debugProtocol';
+import { DebugProtocol } from 'vscode-debugprotocol/lib/debugProtocol';
 
 suite('msDebuggerPropertyId', () => {
     const DATA_ROOT = testSetup.DATA_ROOT;

@@ -14,7 +14,7 @@
   "publisher": "msjsdiag",
   "bugs": "https://github.com/microsoft/vscode-edge-debug2/issues",
   "engines": {
-    "vscode": "^1.17.0"
+    "vscode": "^1.21.0"
   },
   "categories": [
     "Debuggers"
@@ -53,7 +53,7 @@
     "typemoq": "^2.1.0",
     "typescript": "^2.8.3",
     "vsce": "^1.40.0",
-    "vscode": "^1.1.17",
+    "vscode": "^1.1.21",
     "vscode-chrome-debug-core-testsupport": "^3.21.0",
     "vscode-debugadapter-testsupport": "1.24.0",
     "vscode-debugprotocol": "^1.31.0-pre.0",

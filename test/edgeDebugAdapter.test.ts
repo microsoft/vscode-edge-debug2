@@ -3,7 +3,7 @@
  *--------------------------------------------------------*/
 
 import {DebugProtocol} from 'vscode-debugprotocol';
-import {chromeConnection, ISourceMapPathOverrides} from 'vscode-chrome-debug-core';
+import {chromeConnection, ISourceMapPathOverrides, ProtocolSchema} from 'vscode-chrome-debug-core';
 
 import * as mockery from 'mockery';
 import {EventEmitter} from 'events';
@@ -50,7 +50,7 @@ suite('EdgeDebugAdapter', () => {
             .returns(() => isAttached);
         mockEdgeConnection
             .setup(x => x.attachedTarget)
-            .returns(() => ({ description: "", devtoolsFrontendUrl: "", id: "", title: "", type: "", webSocketDebuggerUrl: "" }));
+            .returns(() => ({ description: "", devtoolsFrontendUrl: "", id: "", title: "", type: "", webSocketDebuggerUrl: "", version: Promise.resolve(new ProtocolSchema(0, 0)) }));
         mockEdgeConnection
             .setup(x => x.run())
             .returns(() => Promise.resolve());

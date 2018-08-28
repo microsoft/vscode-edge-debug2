@@ -19,7 +19,7 @@ export interface ExtendedDebugProtocolVariable extends DebugProtocol.Variable {
 export class MSPropertyContainer extends variables.PropertyContainer {
     private _childPropertiesMapping: Map<string, string>;
 
-    public constructor(objectId: string, evaluateName?: string) {
+    public constructor(objectId: string, private _useRuntimeCallFunctionOnForAllVariables: boolean, evaluateName?: string) {
         super(objectId, evaluateName);
 
         this._childPropertiesMapping = new Map<string, string>();
@@ -44,7 +44,7 @@ export class MSPropertyContainer extends variables.PropertyContainer {
     public async setValue(adapter: EdgeDebugAdapter, name: string, value: string): Promise<string> {
         const msDebuggerPropertyId = this._childPropertiesMapping.get(name);
 
-        if (!msDebuggerPropertyId) {
+        if (this._useRuntimeCallFunctionOnForAllVariables || !msDebuggerPropertyId) {
             // If msDebuggerPropertyId is not present, default to super setValue for this variable.
             await super.setValue(adapter, name, value)
                 .catch(() => {

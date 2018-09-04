@@ -8,7 +8,7 @@ import * as path from 'path';
 
 import {ChromeDebugAdapter as CoreDebugAdapter, logger, utils as coreUtils, ISourceMapPathOverrides,
         IVariablesResponseBody,
-        telemetry} from 'vscode-chrome-debug-core';
+        telemetry, ProtocolSchema } from 'vscode-chrome-debug-core';
 import {spawn, ChildProcess, fork, execSync} from 'child_process';
 import {Crdp, LoadedSourceEventReason, chromeConnection, chromeUtils, variables, ChromeDebugSession, IOnPausedResult} from 'vscode-chrome-debug-core';
 import {DebugProtocol} from 'vscode-debugprotocol';
@@ -49,6 +49,7 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
     private _navigatingToUserRequestedUrl = false;
     private _navigationInProgress = false;
     private _unsentLoadedSourceEvents: Crdp.Debugger.ScriptParsedEvent[] = [];
+    private _edgeProtocolVersion: ProtocolSchema;
 
     public initialize(args: DebugProtocol.InitializeRequestArguments): DebugProtocol.Capabilities {
         const capabilities = super.initialize(args);
@@ -212,7 +213,7 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
     }
 
     protected doAttach(port: number, targetUrl?: string, address?: string, timeout?: number, websocketUrl?: string, extraCRDPChannelPort?: number): Promise<void> {
-        return super.doAttach(port, targetUrl, address, timeout, websocketUrl, extraCRDPChannelPort).then(() => {
+        return super.doAttach(port, targetUrl, address, timeout, websocketUrl, extraCRDPChannelPort).then(async () => {
             // Don't return this promise, a failure shouldn't fail attach
             const userAgentPromise = this.globalEvaluate({ expression: 'navigator.userAgent', silent: true }).then(evalResponse => evalResponse.result.value);
             userAgentPromise
@@ -228,6 +229,8 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
                 }
                 return properties;
             });
+
+            this._edgeProtocolVersion = await this._chromeConnection.version;
 
             // Send the versions information as it's own event so we can easily backfill other events in the user session if needed
             userAgentForTelemetryPromise.then(versionInformation => telemetry.telemetry.reportEvent('target-version', versionInformation));
@@ -421,7 +424,12 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
     }
 
     protected createPropertyContainer(object: Crdp.Runtime.RemoteObject, evaluateName: string): variables.IVariableContainer {
-        return new MSPropertyContainer(object.objectId, evaluateName);
+        /**
+         * For EDP version 0.1 (RS4) Debugger.msSetDebuggerPropertyValue should be used for variables with msDebuggerPropertyId because Runtime.callFunctionOn will not work.
+         * For EDP version 0.2 (RS5) we should use Runtime.callFunctionOn for all cases
+         */
+        const useRuntimeCallFunctionOnForAllVariables = this._edgeProtocolVersion.isAtLeastVersion(0, 2);
+        return new MSPropertyContainer(object.objectId, useRuntimeCallFunctionOnForAllVariables, evaluateName);
     }
 }
 

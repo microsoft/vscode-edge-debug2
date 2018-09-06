@@ -18,6 +18,7 @@ export interface IMockEdgeConnectionAPI {
     Inspector: IMock<Crdp.InspectorApi>;
     Network: IMock<Crdp.NetworkApi>;
     Page: IMock<Crdp.PageApi>;
+    Log: IMock<Crdp.LogApi>;
 
     mockEventEmitter: EventEmitter;
 }
@@ -79,6 +80,13 @@ function getPageStubs() {
     };
 }
 
+function getLogStubs() {
+    return {
+        enable() { return Promise.resolve(); },
+        on(eventName, handler) { }
+    };
+}
+
 export function getMockEdgeConnectionApi(): IMockEdgeConnectionAPI {
     const mockEventEmitter = new EventEmitter();
 
@@ -111,6 +119,9 @@ export function getMockEdgeConnectionApi(): IMockEdgeConnectionAPI {
 
     const mockPage = Mock.ofInstance<Crdp.PageApi>(<any>getPageStubs());
 
+    const mockLog = Mock.ofInstance<Crdp.LogApi>(<any>getLogStubs());
+    mockLog.callBase = true;
+
     const mockBrowser = Mock.ofInstance<Crdp.BrowserApi>(<any>getBrowserStubs());
     mockBrowser.callBase = true;
 
@@ -121,7 +132,8 @@ export function getMockEdgeConnectionApi(): IMockEdgeConnectionAPI {
         Runtime: mockRuntime.object,
         Inspector: mockInspector.object,
         Network: mockNetwork.object,
-        Page: mockPage.object
+        Page: mockPage.object,
+        Log: mockLog.object
     };
 
     return {
@@ -134,6 +146,7 @@ export function getMockEdgeConnectionApi(): IMockEdgeConnectionAPI {
         Inspector: mockInspector,
         Network: mockNetwork,
         Page: mockPage,
+        Log: mockLog,
 
         mockEventEmitter
     };

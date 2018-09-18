@@ -231,7 +231,7 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
             });
 
             let protocolVersion : TargetVersions = await this._chromeConnection.version;
-            this._edgeProtocolVersion = protocolVersion.protocol;
+            this._edgeProtocolVersion = (protocolVersion === undefined) ? undefined : protocolVersion.protocol;
 
             // Send the versions information as it's own event so we can easily backfill other events in the user session if needed
             userAgentForTelemetryPromise.then(versionInformation => telemetry.telemetry.reportEvent('target-version', versionInformation));

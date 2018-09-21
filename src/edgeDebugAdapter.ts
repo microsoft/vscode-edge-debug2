@@ -8,7 +8,7 @@ import * as path from 'path';
 
 import {ChromeDebugAdapter as CoreDebugAdapter, logger, utils as coreUtils, ISourceMapPathOverrides,
         IVariablesResponseBody,
-        telemetry, ProtocolSchema } from 'vscode-chrome-debug-core';
+        telemetry, Version, TargetVersions } from 'vscode-chrome-debug-core';
 import {spawn, ChildProcess, fork, execSync} from 'child_process';
 import {Crdp, LoadedSourceEventReason, chromeConnection, chromeUtils, variables, ChromeDebugSession, IOnPausedResult} from 'vscode-chrome-debug-core';
 import {DebugProtocol} from 'vscode-debugprotocol';
@@ -49,7 +49,7 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
     private _navigatingToUserRequestedUrl = false;
     private _navigationInProgress = false;
     private _unsentLoadedSourceEvents: Crdp.Debugger.ScriptParsedEvent[] = [];
-    private _edgeProtocolVersion: ProtocolSchema;
+    private _edgeProtocolVersion: Version;
 
     public initialize(args: DebugProtocol.InitializeRequestArguments): DebugProtocol.Capabilities {
         const capabilities = super.initialize(args);
@@ -230,7 +230,9 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
                 return properties;
             });
 
-            this._edgeProtocolVersion = await this._chromeConnection.version;
+            let protocolVersion : TargetVersions = await this._chromeConnection.version;
+            // this._chromeConnection.version is never undefined (will always be at least 0.0)
+            this._edgeProtocolVersion = protocolVersion.protocol;
 
             // Send the versions information as it's own event so we can easily backfill other events in the user session if needed
             userAgentForTelemetryPromise.then(versionInformation => telemetry.telemetry.reportEvent('target-version', versionInformation));

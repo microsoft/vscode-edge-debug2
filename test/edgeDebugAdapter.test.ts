@@ -3,7 +3,7 @@
  *--------------------------------------------------------*/
 
 import {DebugProtocol} from 'vscode-debugprotocol';
-import {chromeConnection, ISourceMapPathOverrides, ProtocolSchema} from 'vscode-chrome-debug-core';
+import {chromeConnection, ISourceMapPathOverrides, Version, TargetVersions} from 'vscode-chrome-debug-core';
 
 import * as mockery from 'mockery';
 import {EventEmitter} from 'events';
@@ -50,7 +50,7 @@ suite('EdgeDebugAdapter', () => {
             .returns(() => isAttached);
         mockEdgeConnection
             .setup(x => x.attachedTarget)
-            .returns(() => ({ description: "", devtoolsFrontendUrl: "", id: "", title: "", type: "", webSocketDebuggerUrl: "", version: Promise.resolve(new ProtocolSchema(0, 0)) }));
+            .returns(() => ({ description: "", devtoolsFrontendUrl: "", id: "", title: "", type: "", webSocketDebuggerUrl: "", version: Promise.resolve(new TargetVersions(Version.unknownVersion(), Version.unknownVersion())) }));
         mockEdgeConnection
             .setup(x => x.run())
             .returns(() => Promise.resolve());
@@ -59,6 +59,9 @@ suite('EdgeDebugAdapter', () => {
         mockEdgeConnection
             .setup(x => x.events)
             .returns(x => new StepProgressEventsEmitter());
+        mockEdgeConnection
+            .setup(x => x.version)
+            .returns(() => Promise.resolve(new TargetVersions(Version.unknownVersion(), Version.unknownVersion())));
 
         // Instantiate the EdgeDebugAdapter, injecting the mock EdgeConnection
         const cDAClass: typeof _EdgeDebugAdapter = require(MODULE_UNDER_TEST).EdgeDebugAdapter;

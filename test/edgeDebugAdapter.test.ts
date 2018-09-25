@@ -134,9 +134,9 @@ suite('EdgeDebugAdapter', () => {
     });
 
     suite('evaluate()', () => {
-        let frameHandle_beforeOverride: any;
-        let chromeDebuggerEvaluateOnCallFrame_beforeOverride: any;
-        let remoteObjectToVariable_beforeOverride: any;
+        let frameHandle_beforeOverride;
+        let chromeDebuggerEvaluateOnCallFrame_beforeOverride;
+        let remoteObjectToVariable_beforeOverride;
 
         teardown(() => {
             // also hacky cleanup...

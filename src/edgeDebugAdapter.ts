@@ -7,7 +7,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import {ChromeDebugAdapter as CoreDebugAdapter, logger, utils as coreUtils, ISourceMapPathOverrides,
-        IVariablesResponseBody,
+        IVariablesResponseBody, IEvaluateResponseBody,
         telemetry, Version, TargetVersions } from 'vscode-chrome-debug-core';
 import {spawn, ChildProcess, fork, execSync} from 'child_process';
 import {Crdp, LoadedSourceEventReason, chromeConnection, chromeUtils, variables, ChromeDebugSession, IOnPausedResult} from 'vscode-chrome-debug-core';
@@ -230,7 +230,7 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
                 return properties;
             });
 
-            let protocolVersion : TargetVersions = await this._chromeConnection.version;
+            let protocolVersion: TargetVersions = await this._chromeConnection.version;
             // this._chromeConnection.version is never undefined (will always be at least 0.0)
             this._edgeProtocolVersion = protocolVersion.protocol;
 
@@ -315,6 +315,17 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
 
         variablesResponse.variables = filteredVariables;
         return variablesResponse;
+    }
+
+    // temporary work around for edge
+    public async evaluate (args: DebugProtocol.EvaluateArguments): Promise<IEvaluateResponseBody> {
+        return super.evaluate(args).then(evalResponseBody => {
+            if (args.context === 'watch' && evalResponseBody.type === 'Object' && evalResponseBody.result === '') {
+                return coreUtils.errP(errors.evalNotAvailableMsg);
+            } else {
+                return Promise.resolve(evalResponseBody);
+            }
+        });
     }
 
     private async sendBackloggedLoadedSourceEvents(): Promise<void> {

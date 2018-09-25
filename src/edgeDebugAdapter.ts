@@ -318,9 +318,9 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
     }
 
     // temporary work around for edge
-    public async evaluate (args: DebugProtocol.EvaluateArguments): Promise<IEvaluateResponseBody> {
+    public async evaluate(args: DebugProtocol.EvaluateArguments): Promise<IEvaluateResponseBody> {
         return super.evaluate(args).then(evalResponseBody => {
-            if (args.context === 'watch' && evalResponseBody.type === 'Object' && evalResponseBody.result === '') {
+            if (evalResponseBody.type === 'Object' && evalResponseBody.result === '' && evalResponseBody.indexedVariables === undefined) {
                 return coreUtils.errP(errors.evalNotAvailableMsg);
             } else {
                 return Promise.resolve(evalResponseBody);

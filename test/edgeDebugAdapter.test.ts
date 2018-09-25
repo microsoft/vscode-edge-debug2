@@ -133,6 +133,39 @@ suite('EdgeDebugAdapter', () => {
         });
     });
 
+    suite('evaluate()', () => {
+        let frameHandle_beforeOverride: any;
+        let chromeDebuggerEvaluateOnCallFrame_beforeOverride: any;
+        let remoteObjectToVariable_beforeOverride: any;
+
+        teardown(() => {
+            // also hacky cleanup...
+            (<any>edgeDebugAdapter)._frameHandles = frameHandle_beforeOverride;
+            (<any>edgeDebugAdapter).chrome.Debugger = chromeDebuggerEvaluateOnCallFrame_beforeOverride;
+            (<any>edgeDebugAdapter).remoteObjectToVariable = remoteObjectToVariable_beforeOverride;
+        })
+
+        test('returns error when watch variable is missing', () => {
+            let callFrameId: number = 1;
+            let evalArgs: DebugProtocol.EvaluateArguments = {expression: 'zzz', frameId: callFrameId, context: 'watch'};
+
+            // save originals
+            frameHandle_beforeOverride = (<any>edgeDebugAdapter)._frameHandles;
+            chromeDebuggerEvaluateOnCallFrame_beforeOverride = (<any>edgeDebugAdapter).chrome.Debugger;
+            remoteObjectToVariable_beforeOverride = (<any>edgeDebugAdapter).remoteObjectToVariable;
+
+            (<any>edgeDebugAdapter)._frameHandles = { get: () => ({ callFrameId })};
+            (<any>edgeDebugAdapter).chrome.Debugger = {evaluateOnCallFrame: () => ({ type: 'Object', subtype: 'error', result: ''})};
+            (<any>edgeDebugAdapter).remoteObjectToVariable = () => ({ type: 'Object', value: '', variablesReference: undefined, indexedVariables: undefined});
+
+            return edgeDebugAdapter.evaluate(evalArgs).then(
+                () => Promise.reject(new Error('Expected method to reject')),
+                (err) => {assert.equal(err.message, "not available", "Error should contain 'not available' message.")}
+            );
+        });
+
+    });
+
     suite('resolveWebRootPattern', () => {
         const WEBROOT = testUtils.pathResolve('/project/webroot');
         const resolveWebRootPattern = require(MODULE_UNDER_TEST).resolveWebRootPattern;

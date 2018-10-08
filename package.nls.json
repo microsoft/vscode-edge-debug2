@@ -22,5 +22,6 @@
 	"edge.timeout.description": "Retry for this number of milliseconds to connect to Edge. Default is 10000 ms.",
 	"edge.breakOnLoadStrategy.description": "The strategy to use for breakOnLoad.",
 	"edge.breakOnLoadStrategy.off.description": "Turns off breakOnLoad.",
-	"edge.breakOnLoadStrategy.regex.description": "Sets breakpoints optimistically in files with the same name as the file in which the breakpoint is set."
+	"edge.breakOnLoadStrategy.regex.description": "Sets breakpoints optimistically in files with the same name as the file in which the breakpoint is set.",
+	"edge.logTimestamps.description": "Boolean value to turn off/on logging of timestamps in the logfiles (turned on by default)."
 }

@@ -1,7 +1,7 @@
 {
   "name": "debugger-for-edge",
   "displayName": "Debugger for Edge",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "icon": "images/icon.png",
   "description": "%extension.description%",
   "author": {
@@ -266,6 +266,11 @@
                 "description": "%edge.showAsyncStacks.description%",
                 "default": true
               },
+              "logTimestamps": {
+                "type": "boolean",
+                "description": "%edge.logTimestamps.description%",
+                "default": true
+              },
               "breakOnLoadStrategy": {
                 "type": "enum",
                 "enum": [
@@ -373,6 +378,11 @@
               "showAsyncStacks": {
                 "type": "boolean",
                 "description": "%edge.showAsyncStacks.description%",
+                "default": true
+              },
+              "logTimestamps": {
+                "type": "boolean",
+                "description": "%edge.logTimestamps.description%",
                 "default": true
               }
             }

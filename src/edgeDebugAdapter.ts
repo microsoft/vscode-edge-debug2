@@ -230,8 +230,14 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
                 return properties;
             });
 
-            let protocolVersion: TargetVersions = await this._chromeConnection.version;
-            // this._chromeConnection.version is never undefined (will always be at least 0.0)
+            // protocolVersion depends on chrome connection having attached target, but it should never be undefined (should always be at least 0.0)
+            let protocolVersion: TargetVersions;
+            if (this._chromeConnection.attachedTarget) {
+                protocolVersion = await this._chromeConnection.version;
+            } else {
+                protocolVersion = new TargetVersions(Version.unknownVersion(), Version.unknownVersion());
+            }
+
             this._edgeProtocolVersion = protocolVersion.protocol;
 
             // Send the versions information as it's own event so we can easily backfill other events in the user session if needed

@@ -68,11 +68,7 @@ export class EdgeConfigurationProvider implements vscode.DebugConfigurationProvi
                     return null;
                 }
 
-                if (selectedTarget.detail) {
-                    config.url = selectedTarget.detail;
-                } else {
-                    config.websocketUrl = selectedTarget.detail;
-                }
+                config.websocketUrl = selectedTarget.detail;
             }
         }
 

@@ -212,6 +212,11 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
         super.commonArgs(args);
     }
 
+    private processEDPWebsocketProtocolVersion(version: string): Version {
+        // version strings from websocket protocol has a prepended 'v' e.g. "v0.2"
+        return Version.parse(version.substring(1));
+    }
+
     protected doAttach(port: number, targetUrl?: string, address?: string, timeout?: number, websocketUrl?: string, extraCRDPChannelPort?: number): Promise<void> {
         return super.doAttach(port, targetUrl, address, timeout, websocketUrl, extraCRDPChannelPort).then(async () => {
             // Don't return this promise, a failure shouldn't fail attach
@@ -230,15 +235,25 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
                 return properties;
             });
 
-            // protocolVersion depends on chrome connection having attached target, but it should never be undefined (should always be at least 0.0)
-            let protocolVersion: TargetVersions;
-            if (this._chromeConnection.attachedTarget) {
-                protocolVersion = await this._chromeConnection.version;
-            } else {
-                protocolVersion = new TargetVersions(Version.unknownVersion(), Version.unknownVersion());
-            }
+            const protocolVersionPromise = this._chromeConnection.api.Schema.getDomains().then(
+                allDomainsResponse => {
+                    return allDomainsResponse.domains.filter(domain => domain.name === 'Debugger');
+                },
+                err => {
+                    logger.log("Error trying to use EDP websocket API for protocol version " + err.message);
+                    return [];
+                }
+            );
 
-            this._edgeProtocolVersion = protocolVersion.protocol;
+            // using this._chromeConnection.version depends on this._chromeConnection having an attached target
+            if (this._chromeConnection.attachedTarget) {
+                let protocolVersion: TargetVersions = await this._chromeConnection.version;
+                this._edgeProtocolVersion = protocolVersion.protocol;
+            } else {
+                let websocketProtocolVersion = await protocolVersionPromise;
+                this._edgeProtocolVersion = websocketProtocolVersion.length ?
+                    this.processEDPWebsocketProtocolVersion(websocketProtocolVersion[0].version) : Version.unknownVersion();
+            }
 
             // Send the versions information as it's own event so we can easily backfill other events in the user session if needed
             userAgentForTelemetryPromise.then(versionInformation => telemetry.telemetry.reportEvent('target-version', versionInformation));

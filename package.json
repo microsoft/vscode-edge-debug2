@@ -70,7 +70,7 @@
     "onCommand:extension.edge-debug.toggleSmartStep"
   ],
   "scripts": {
-    "build:edge2": "cd vscode-edge-debug2 && gulp build",
+    "build:edge2": "gulp build --gulpfile vscode-edge-debug2/gulpfile.js",
     "build:edge3": "gulp build",
     "build": "npm run build:edge2 && npm run build:edge3",
     "watch": "gulp watch",

@@ -13,7 +13,7 @@ const localize = nls.loadMessageBundle();
 export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.commands.registerCommand('extension.edge-debug.toggleSkippingFile', toggleSkippingFile));
 
-    context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('edge', new EdgeConfigurationProvider()));
+    //context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('edge', new EdgeConfigurationProvider()));
 }
 
 export function deactivate() {
@@ -36,6 +36,7 @@ export class EdgeConfigurationProvider implements vscode.DebugConfigurationProvi
      * Try to add all missing attributes to the debug configuration being launched.
      */
     async resolveDebugConfiguration(folder: vscode.WorkspaceFolder | undefined, config: vscode.DebugConfiguration, token?: vscode.CancellationToken): Promise<vscode.DebugConfiguration> {
+        console.error("we get the fuck here");
         if (!isEdgeDebuggingSupported()) {
             const errorMessage = localize('edge.debug.error.versionNotSupported', "Your version of Edge does not support debugging via the Edge DevTools Protocol. You can read more about supported versions here (https://aka.ms/edp-docs).");
             return vscode.window.showErrorMessage(errorMessage).then(_ => {

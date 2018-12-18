@@ -11,6 +11,9 @@
     "exclude": [
         "node_modules/",
         "testapp/",
-        "testdata/"
+        "testdata/",
+        "vscode-edge-debug2/node_modules",
+        "vscode-edge-debug2/testapp/",
+        "vscode-edge-debug2/testdata/"
     ]
 }

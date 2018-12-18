@@ -32,14 +32,6 @@ suite('Utils', () => {
     });
 
     suite('getBrowserPath()', () => {
-        test('osx', () => {
-            mockery.registerMock('os', { platform: () => 'darwin' });
-            const Utils = getUtils();
-            assert.equal(
-                Utils.getBrowserPath(),
-                '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome');
-        });
-
         test('win', () => {
             // Overwrite the statSync mock to say the x86 path doesn't exist
             const statSync = (aPath: string) => {
@@ -51,32 +43,32 @@ suite('Utils', () => {
 
             const Utils = getUtils();
             assert.equal(
-                Utils.getBrowserPath(),
-                'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe');
+                Utils.getBrowserPath('beta'),
+                'C:\\Program Files (x86)\\Microsoft\\Edge Beta\\Application\\msedge.exe');
         });
 
         test('winx86', () => {
             mockery.registerMock('os', { platform: () => 'win32' });
             const Utils = getUtils();
             assert.equal(
-                Utils.getBrowserPath(),
-                'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe');
+                Utils.getBrowserPath('beta'),
+                'C:\\Program Files (x86)\\Microsoft\\Edge Beta\\Application\\msedge.exe');
         });
 
-        test('linux', () => {
-            mockery.registerMock('os', { platform: () => 'linux' });
+        test('winx86', () => {
+            mockery.registerMock('os', { platform: () => 'win32' });
             const Utils = getUtils();
             assert.equal(
-                Utils.getBrowserPath(),
-                '/usr/bin/google-chrome');
+                Utils.getBrowserPath('dev'),
+                'C:\\Program Files (x86)\\Microsoft\\Edge Dev\\Application\\msedge.exe');
         });
 
-        test('freebsd (default to Linux for anything unknown)', () => {
-            mockery.registerMock('os', { platform: () => 'freebsd' });
+        test('winx86', () => {
+            mockery.registerMock('os', { platform: () => 'win32' });
             const Utils = getUtils();
             assert.equal(
-                Utils.getBrowserPath(),
-                '/usr/bin/google-chrome');
+                Utils.getBrowserPath('canary'),
+                'C:\\Program Files (x86)\\Microsoft\\Edge SxS\\Application\\msedge.exe');
         });
     });
 

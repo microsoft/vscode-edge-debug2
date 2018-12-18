@@ -1,7 +1,7 @@
 /*---------------------------------------------------------
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
-
+import '@types/mocha';
 import {DebugProtocol} from 'vscode-debugprotocol';
 import {chromeConnection, ISourceMapPathOverrides, Version, TargetVersions} from 'vscode-chrome-debug-core';
 

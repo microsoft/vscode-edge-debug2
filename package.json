@@ -1,7 +1,7 @@
 {
-  "name": "debugger-for-chrome",
-  "displayName": "Debugger for Chrome",
-  "version": "4.11.1",
+  "name": "debugger-for-edge",
+  "displayName": "Debugger for Edge",
+  "version": "1.0.7",
   "icon": "images/icon.png",
   "description": "%extension.description%",
   "author": {
@@ -26,7 +26,8 @@
   "dependencies": {
     "vscode-chrome-debug-core": "^6.7.36",
     "vscode-debugadapter": "^1.32.1",
-    "vscode-nls": "^4.0.0"
+    "vscode-nls": "^4.0.0",
+    "vscode-edge-debug2": "file:./vscode-edge-debug2"
   },
   "devDependencies": {
     "@types/mocha": "^2.2.35",
@@ -52,7 +53,7 @@
     "ts-loader": "^1.0.0",
     "tslint": "^5.7.0",
     "typemoq": "^2.1.0",
-    "typescript": "^2.7.2",
+    "typescript": "^2.9.2",
     "vsce": "^1.48.0",
     "vscode": "^1.1.21",
     "vscode-chrome-debug-core-testsupport": "^3.20.0",
@@ -62,9 +63,11 @@
   },
   "main": "./out/src/extension",
   "activationEvents": [
+    "onDebug",
     "onDebugInitialConfigurations",
-    "onDebugResolve:chrome",
-    "onCommand:extension.chrome-debug.toggleSkippingFile"
+    "onDebugResolve:edge",
+    "onCommand:extension.edge-debug.toggleSkippingFile",
+    "onCommand:extension.edge-debug.toggleSmartStep"
   ],
   "scripts": {
     "build": "gulp build",
@@ -97,8 +100,8 @@
     ],
     "debuggers": [
       {
-        "type": "chrome",
-        "label": "Chrome",
+        "type": "msedge",
+        "label": "MsEdge",
         "program": "./out/src/chromeDebug.js",
         "runtime": "node",
         "aiKey": "AIF-d9b70cd4-b9f9-4d70-929b-a071c400b217",
@@ -110,23 +113,23 @@
         ],
         "configurationSnippets": [
           {
-            "label": "Chrome: Launch",
-            "description": "Launch Chrome to debug a URL",
+            "label": "Edge: Launch",
+            "description": "Launch Edge to debug a URL",
             "body": {
-              "type": "chrome",
+              "type": "edge",
               "request": "launch",
-              "name": "Launch Chrome",
+              "name": "Launch Edge",
               "url": "http://localhost:8080",
               "webRoot": "^\"${2:\\${workspaceFolder\\}}\""
             }
           },
           {
-            "label": "Chrome: Attach",
-            "description": "Attach to an instance of Chrome already in debug mode",
+            "label": "Edge: Attach",
+            "description": "Attach to an instance of Edge already in debug mode",
             "body": {
-              "type": "chrome",
+              "type": "edge",
               "request": "attach",
-              "name": "Attach to Chrome",
+              "name": "Attach to Edge",
               "port": 9222,
               "webRoot": "^\"${2:\\${workspaceFolder\\}}\""
             }
@@ -299,6 +302,9 @@
                 "default": [
                   "page"
                 ]
+              },
+              "version": {
+                "type": "string"
               }
             }
           },
@@ -404,6 +410,304 @@
               "showAsyncStacks": {
                 "type": "boolean",
                 "description": "%chrome.showAsyncStacks.description%",
+                "default": true
+              }
+            }
+          }
+        }
+      },
+      {
+        "type": "edge",
+        "label": "Edge",
+        "program": "./vscode-edge-debug2/out/src/edgeDebug.js",
+        "runtime": "node",
+        "aiKey": "AIF-d9b70cd4-b9f9-4d70-929b-a071c400b217",
+        "languages": [
+          "javascript",
+          "typescript",
+          "javascriptreact",
+          "typescriptreact"
+        ],
+        "configurationSnippets": [
+          {
+            "label": "Edge: Launch",
+            "description": "Launch Edge to debug a URL",
+            "body": {
+              "type": "edge",
+              "request": "launch",
+              "name": "Launch Edge",
+              "url": "http://localhost:8080",
+              "webRoot": "^\"${2:\\${workspaceFolder\\}}\""
+            }
+          },
+          {
+            "label": "Edge: Attach",
+            "description": "Attach to an instance of Edge already in debug mode",
+            "body": {
+              "type": "edge",
+              "request": "attach",
+              "name": "Attach to Edge",
+              "port": 2015,
+              "webRoot": "^\"${2:\\${workspaceFolder\\}}\""
+            }
+          }
+        ],
+        "configurationAttributes": {
+          "launch": {
+            "required": [],
+            "properties": {
+              "port": {
+                "type": "number",
+                "description": "%edge.port.description%",
+                "default": 2015
+              },
+              "address": {
+                "type": "string",
+                "description": "%edge.address.description%",
+                "default": "127.0.0.1"
+              },
+              "file": {
+                "type": "string",
+                "description": "%edge.file.description%",
+                "default": "${workspaceFolder}/index.html"
+              },
+              "url": {
+                "type": "string",
+                "description": "%edge.url.description%",
+                "default": "http://localhost:8080"
+              },
+              "webRoot": {
+                "type": "string",
+                "description": "%edge.webRoot.description%",
+                "default": "${workspaceFolder}"
+              },
+              "pathMapping": {
+                "type": "object",
+                "description": "%edge.pathMapping.description%",
+                "default": {
+                  "/": "${workspaceFolder}"
+                }
+              },
+              "runtimeExecutable": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "%edge.runtimeExecutable.description%",
+                "default": null
+              },
+              "runtimeArgs": {
+                "type": "array",
+                "description": "%edge.runtimeArgs.description%",
+                "items": {
+                  "type": "string"
+                },
+                "default": []
+              },
+              "env": {
+                "type": "object",
+                "description": "%edge.env.description%",
+                "default": {}
+              },
+              "cwd": {
+                "type": "string",
+                "description": "%edge.cwd.description%",
+                "default": null
+              },
+              "sourceMaps": {
+                "type": "boolean",
+                "description": "%edge.sourceMaps.description%",
+                "default": true
+              },
+              "diagnosticLogging": {
+                "type": "boolean",
+                "description": "%edge.diagnosticLogging.description%",
+                "default": true,
+                "deprecationMessage": "'diagnosticLogging' is deprecated. Use 'trace' instead."
+              },
+              "verboseDiagnosticLogging": {
+                "type": "boolean",
+                "description": "%edge.verboseDiagnosticLogging.description%",
+                "default": true,
+                "deprecationMessage": "'verboseDiagnosticLogging' is deprecated. Use 'trace' instead."
+              },
+              "trace": {
+                "type": [
+                  "boolean",
+                  "string"
+                ],
+                "enum": [
+                  "verbose",
+                  true
+                ],
+                "default": true,
+                "description": "%edge.trace.description%"
+              },
+              "userDataDir": {
+                "type": [
+                  "string",
+                  "boolean"
+                ],
+                "description": "%edge.userDataDir.description%",
+                "default": ""
+              },
+              "sourceMapPathOverrides": {
+                "type": "object",
+                "description": "%edge.sourceMapPathOverrides.description%",
+                "default": {
+                  "webpack:///*": "*",
+                  "webpack:///./*": "${webRoot}/*",
+                  "webpack:///src/*": "${webRoot}/*",
+                  "webpack:///./~/*": "${webRoot}/node_modules/*"
+                }
+              },
+              "smartStep": {
+                "type": "boolean",
+                "description": "%edge.smartStep.description%",
+                "default": true
+              },
+              "skipFiles": {
+                "type": "array",
+                "description": "%edge.skipFiles.description%",
+                "default": []
+              },
+              "timeout": {
+                "type": "number",
+                "description": "%edge.timeout.description%",
+                "default": 10000
+              },
+              "disableNetworkCache": {
+                "type": "boolean",
+                "description": "%edge.disableNetworkCache.description%",
+                "default": true
+              },
+              "urlFilter": {
+                "type": "string",
+                "description": "%edge.urlFilter.description%",
+                "default": ""
+              },
+              "showAsyncStacks": {
+                "type": "boolean",
+                "description": "%edge.showAsyncStacks.description%",
+                "default": true
+              },
+              "logTimestamps": {
+                "type": "boolean",
+                "description": "%edge.logTimestamps.description%",
+                "default": true
+              },
+              "breakOnLoadStrategy": {
+                "type": "enum",
+                "enum": [
+                  "regex",
+                  "off"
+                ],
+                "enumDescriptions": [
+                  "%edge.breakOnLoadStrategy.regex.description%",
+                  "%edge.breakOnLoadStrategy.off.description%"
+                ],
+                "description": "%edge.breakOnLoadStrategy.description",
+                "default": "off"
+              }
+            }
+          },
+          "attach": {
+            "required": [
+              "port"
+            ],
+            "properties": {
+              "port": {
+                "type": "number",
+                "description": "%edge.port.description%",
+                "default": 2015
+              },
+              "address": {
+                "type": "string",
+                "description": "%edge.address.description%",
+                "default": "127.0.0.1"
+              },
+              "sourceMaps": {
+                "type": "boolean",
+                "description": "%edge.sourceMaps.description%",
+                "default": true
+              },
+              "diagnosticLogging": {
+                "type": "boolean",
+                "description": "%edge.diagnosticLogging.description%",
+                "default": true,
+                "deprecationMessage": "'diagnosticLogging' is deprecated. Use 'trace' instead."
+              },
+              "verboseDiagnosticLogging": {
+                "type": "boolean",
+                "description": "%edge.verboseDiagnosticLogging.description%",
+                "default": true,
+                "deprecationMessage": "'verboseDiagnosticLogging' is deprecated. Use 'trace' instead."
+              },
+              "trace": {
+                "type": [
+                  "boolean",
+                  "string"
+                ],
+                "enum": [
+                  "verbose",
+                  true
+                ],
+                "default": true,
+                "description": "%edge.trace.description%"
+              },
+              "url": {
+                "type": "string",
+                "description": "%edge.url.description%",
+                "default": "http://localhost:8080"
+              },
+              "webRoot": {
+                "type": "string",
+                "description": "%edge.webRoot.description%",
+                "default": "${workspaceFolder}"
+              },
+              "pathMapping": {
+                "type": "object",
+                "description": "%edge.pathMapping.description%",
+                "default": {}
+              },
+              "sourceMapPathOverrides": {
+                "type": "object",
+                "description": "%edge.sourceMapPathOverrides.description%",
+                "default": {}
+              },
+              "smartStep": {
+                "type": "boolean",
+                "description": "%edge.smartStep.description%",
+                "default": true
+              },
+              "skipFiles": {
+                "type": "array",
+                "description": "%edge.skipFiles.description%",
+                "default": []
+              },
+              "timeout": {
+                "type": "number",
+                "description": "%edge.timeout.description%",
+                "default": 10000
+              },
+              "disableNetworkCache": {
+                "type": "boolean",
+                "description": "%edge.disableNetworkCache.description%",
+                "default": true
+              },
+              "urlFilter": {
+                "type": "string",
+                "description": "%edge.urlFilter.description%",
+                "default": ""
+              },
+              "showAsyncStacks": {
+                "type": "boolean",
+                "description": "%edge.showAsyncStacks.description%",
+                "default": true
+              },
+              "logTimestamps": {
+                "type": "boolean",
+                "description": "%edge.logTimestamps.description%",
                 "default": true
               }
             }

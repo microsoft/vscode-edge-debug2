@@ -14,16 +14,16 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.commands.registerCommand('extension.chrome-debug.toggleSkippingFile', toggleSkippingFile));
     context.subscriptions.push(vscode.commands.registerCommand('extension.chrome-debug.toggleSmartStep', toggleSmartStep));
 
-    context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('chrome', new ChromeConfigurationProvider()));
+    context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('edge', new ChromeConfigurationProvider()));
 }
 
 export function deactivate() {
 }
 
 const DEFAULT_CONFIG = {
-    type: 'chrome',
+    type: 'msedge',
     request: 'launch',
-    name: localize('chrome.launch.name', 'Launch Chrome against localhost'),
+    name: localize('edge.launch.name', 'Launch Edge against localhost'),
     url: 'http://localhost:8080',
     webRoot: '${workspaceFolder}'
 };
@@ -42,6 +42,11 @@ export class ChromeConfigurationProvider implements vscode.DebugConfigurationPro
             // Return null so it will create a launch.json and fall back on provideDebugConfigurations - better to point the user towards the config
             // than try to work automagically.
             return null;
+        }
+
+        // if no config flag, using legacy edge
+        if (config['version']) {
+            config.type = 'msedge';
         }
 
         if (config.request === 'attach') {

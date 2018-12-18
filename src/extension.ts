@@ -7,6 +7,7 @@ import * as Core from 'vscode-chrome-debug-core';
 import * as nls from 'vscode-nls';
 
 import { defaultTargetFilter, getTargetFilter } from './utils';
+import { ProtocolDetection } from './protocolDetection';
 
 const localize = nls.loadMessageBundle();
 
@@ -50,8 +51,10 @@ export class ChromeConfigurationProvider implements vscode.DebugConfigurationPro
         }
 
         if (config.request === 'attach') {
-            const discovery = new Core.chromeTargetDiscoveryStrategy.ChromeTargetDiscovery(
-                new Core.NullLogger(), new Core.telemetry.NullTelemetryReporter());
+            const nullLogger = new Core.NullLogger();
+            const nullTelemetryReporter = new Core.telemetry.NullTelemetryReporter();
+
+            const discovery = new Core.chromeTargetDiscoveryStrategy.ChromeTargetDiscovery(nullLogger, nullTelemetryReporter);
 
             let targets;
             try {
@@ -69,6 +72,19 @@ export class ChromeConfigurationProvider implements vscode.DebugConfigurationPro
 
                 config.websocketUrl = selectedTarget.websocketDebuggerUrl;
             }
+
+            const protocolDetection = new ProtocolDetection(nullLogger);
+
+            let detectedBrowserProtocol = await protocolDetection.hitVersionEndpoint(config.address || '127.0.0.1', config.port)
+                .catch(async e => {
+                    // if something went wrong, bail
+                    return null;
+                });
+
+            if (protocolDetection.extractBrowserProtocol(detectedBrowserProtocol).indexOf('Chrome') > -1) {
+                config.type = 'msedge';
+            }
+
         }
 
         return config;

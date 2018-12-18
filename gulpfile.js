@@ -41,6 +41,7 @@ const defaultLanguages = [
 
 const watchedSources = [
     'src/**/*',
+    '!src/**/vscode-edge-debug2/*',
     'test/**/*'
 ];
 

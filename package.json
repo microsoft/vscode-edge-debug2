@@ -70,7 +70,9 @@
     "onCommand:extension.edge-debug.toggleSmartStep"
   ],
   "scripts": {
-    "build": "gulp build",
+    "build:edge2": "cd vscode-edge-debug2 && gulp build",
+    "build:edge3": "gulp build",
+    "build": "npm run build:edge2 && npm run build:edge3",
     "watch": "gulp watch",
     "start": "node out/src/chromeDebug.js --server=4712",
     "test": "mocha --exit --timeout 20000 -s 2000 -u tdd --colors \"./out/test/*.test.js\"",

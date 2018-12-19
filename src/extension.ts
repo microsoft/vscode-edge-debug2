@@ -15,7 +15,7 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.commands.registerCommand('extension.chrome-debug.toggleSkippingFile', toggleSkippingFile));
     context.subscriptions.push(vscode.commands.registerCommand('extension.chrome-debug.toggleSmartStep', toggleSmartStep));
 
-    context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('edge', new ChromeConfigurationProvider()));
+    context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('edge', new EdgeConfigurationProvider()));
 }
 
 export function deactivate() {
@@ -29,7 +29,7 @@ const DEFAULT_CONFIG = {
     webRoot: '${workspaceFolder}'
 };
 
-export class ChromeConfigurationProvider implements vscode.DebugConfigurationProvider {
+export class EdgeConfigurationProvider implements vscode.DebugConfigurationProvider {
     provideDebugConfigurations(folder: vscode.WorkspaceFolder | undefined, token?: vscode.CancellationToken): vscode.ProviderResult<vscode.DebugConfiguration[]> {
         return Promise.resolve([DEFAULT_CONFIG]);
     }
@@ -45,7 +45,7 @@ export class ChromeConfigurationProvider implements vscode.DebugConfigurationPro
             return null;
         }
 
-        // if no config flag, using legacy edge
+        // if there is a version flag, switch to using the new msedge
         if (config['version']) {
             config.type = 'msedge';
         }

@@ -610,6 +610,12 @@
                 ],
                 "description": "%edge.breakOnLoadStrategy.description",
                 "default": "off"
+              },
+              "version": {
+                "//": [ "The version property is here so that intellisense will not identify 'version'",
+                        "as an invalid flag when debug type is 'edge'. ",
+                        "The legacy edge adapter, however, does not process a 'version'. "],
+                "type": "string"
               }
             }
           },

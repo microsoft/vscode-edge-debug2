@@ -79,9 +79,9 @@ export class ChromeDebugAdapter extends CoreDebugAdapter {
                 runtimeExecutable = re;
             }
 
-            runtimeExecutable = runtimeExecutable || utils.getBrowserPath();
+            runtimeExecutable = runtimeExecutable || utils.getBrowserPath(args['version']);
             if (!runtimeExecutable) {
-                return coreUtils.errP(localize('attribute.chrome.missing', "Can't find Chrome - install it or set the \"runtimeExecutable\" field in the launch config."));
+                return coreUtils.errP(localize('attribute.edge.missing', "Can't find Edge - install it or set the \"runtimeExecutable\" field in the launch config."));
             }
 
             // Start with remote debugging enabled
@@ -97,7 +97,7 @@ export class ChromeDebugAdapter extends CoreDebugAdapter {
             // Also start with extra stuff disabled
             chromeArgs.push(...['--no-first-run', '--no-default-browser-check']);
             if (args.runtimeArgs) {
-                telemetryPropertyCollector.addTelemetryProperty('numberOfChromeCmdLineSwitchesBeingUsed', String(args.runtimeArgs.length));
+                telemetryPropertyCollector.addTelemetryProperty('numberOfChromiumCmdLineSwitchesBeingUsed', String(args.runtimeArgs.length));
                 chromeArgs.push(...args.runtimeArgs);
             }
 
@@ -107,7 +107,7 @@ export class ChromeDebugAdapter extends CoreDebugAdapter {
                 args.userDataDir === true ||
                 (typeof args.userDataDir === 'undefined' && !args.runtimeExecutable)
             ) {
-                args.userDataDir = path.join(os.tmpdir(), `vscode-chrome-debug-userdatadir_${port}`);
+                args.userDataDir = path.join(os.tmpdir(), `vscode-edge-debug-userdatadir_${port}`);
             }
 
             if (args.userDataDir) {
@@ -140,7 +140,7 @@ export class ChromeDebugAdapter extends CoreDebugAdapter {
                  args.shouldLaunchChromeUnelevated);
             if (this._chromeProc) {
                 this._chromeProc.on('error', (err) => {
-                    const errMsg = 'Chrome error: ' + err;
+                    const errMsg = 'Edge error: ' + err;
                     logger.error(errMsg);
                     this.terminateSession(errMsg);
                 });
@@ -332,7 +332,7 @@ export class ChromeDebugAdapter extends CoreDebugAdapter {
     }
 
     protected threadName(): string {
-        return 'Chrome';
+        return 'Microsoft Edge';
     }
 
     protected onResumed(): void {
@@ -356,7 +356,7 @@ export class ChromeDebugAdapter extends CoreDebugAdapter {
             if (coreUtils.getPlatform() === coreUtils.Platform.Windows && this._chromePID) {
                 await this.killChromeOnWindows(this._chromePID);
             } else if (this._chromeProc) {
-                logger.log('Killing Chrome process');
+                logger.log('Killing Edge process');
                 this._chromeProc.kill('SIGINT');
             }
         }
@@ -366,7 +366,7 @@ export class ChromeDebugAdapter extends CoreDebugAdapter {
 
     private async killChromeOnWindows(chromePID: number): Promise<void> {
         let taskkillCmd = `taskkill /PID ${chromePID}`;
-        logger.log(`Killing Chrome process by pid: ${taskkillCmd}`);
+        logger.log(`Killing Edge process by pid: ${taskkillCmd}`);
         try {
             execSync(taskkillCmd);
         } catch (e) {
@@ -383,12 +383,12 @@ export class ChromeDebugAdapter extends CoreDebugAdapter {
             // If the process is not found, tasklist will give a generic "not found" message instead. Exit code will also be 0.
             // If we see an entry in the CSV for the PID, then we can assume the process was found.
             if (!tasklistOutput.includes(`"${chromePID}"`)) {
-                logger.log(`Chrome process with pid ${chromePID} is not running`);
+                logger.log(`Edge process with pid ${chromePID} is not running`);
                 return;
             }
 
             // Give the process some time to close gracefully
-            logger.log(`Chrome process with pid ${chromePID} is still alive, waiting...`);
+            logger.log(`Edge process with pid ${chromePID} is still alive, waiting...`);
             await new Promise<void>((resolve) => {
                 setTimeout(resolve, 200);
             });
@@ -396,7 +396,7 @@ export class ChromeDebugAdapter extends CoreDebugAdapter {
 
         // At this point we can assume the process won't close on its own, so force kill it
         let taskkillForceCmd = `taskkill /F /PID ${chromePID}`;
-        logger.log(`Killing Chrome process timed out. Killing again using force: ${taskkillForceCmd}`);
+        logger.log(`Killing Edge process timed out. Killing again using force: ${taskkillForceCmd}`);
         try {
             execSync(taskkillForceCmd);
         } catch (e) {}
@@ -448,7 +448,7 @@ export class ChromeDebugAdapter extends CoreDebugAdapter {
 
             chromeProc.on('message', data => {
                 const pidStr = data.toString();
-                logger.log('got chrome PID: ' + pidStr);
+                logger.log('got Edge PID: ' + pidStr);
                 this._chromePID = parseInt(pidStr, 10);
             });
 
@@ -488,7 +488,7 @@ export class ChromeDebugAdapter extends CoreDebugAdapter {
     }
 
     private async spawnChromeUnelevatedWithWindowsScriptHost(chromePath: string, chromeArgs: string[]): Promise<number> {
-        const semaphoreFile = path.join(os.tmpdir(), 'launchedUnelevatedChromeProcess.id');
+        const semaphoreFile = path.join(os.tmpdir(), 'launchedUnelevatedEdgeProcess.id');
         if (fs.existsSync(semaphoreFile)) { // remove the previous semaphoreFile if it exists.
             fs.unlinkSync(semaphoreFile);
         }
@@ -504,7 +504,7 @@ export class ChromeDebugAdapter extends CoreDebugAdapter {
         const pidStr = await findNewlyLaunchedChromeProcess(semaphoreFile);
 
         if (pidStr) {
-            logger.log(`Parsed output file and got Chrome PID ${pidStr}`);
+            logger.log(`Parsed output file and got Edge PID ${pidStr}`);
             return parseInt(pidStr, 10);
         }
 
@@ -647,7 +647,7 @@ async function findNewlyLaunchedChromeProcess(semaphoreFile: string): Promise<st
         });
     }
 
-    const error = new Error(`Cannot acquire Chrome process id`);
+    const error = new Error(`Cannot acquire Edge process id`);
     let telemetryProperties: any = {
         semaphoreFileContent: lastAccessFileContent
     };

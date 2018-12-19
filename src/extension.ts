@@ -7,6 +7,7 @@ import * as Core from 'vscode-chrome-debug-core';
 import * as nls from 'vscode-nls';
 
 import { defaultTargetFilter, getTargetFilter } from './utils';
+import { ProtocolDetection } from './protocolDetection';
 
 const localize = nls.loadMessageBundle();
 
@@ -14,21 +15,21 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.commands.registerCommand('extension.chrome-debug.toggleSkippingFile', toggleSkippingFile));
     context.subscriptions.push(vscode.commands.registerCommand('extension.chrome-debug.toggleSmartStep', toggleSmartStep));
 
-    context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('chrome', new ChromeConfigurationProvider()));
+    context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('edge', new EdgeConfigurationProvider()));
 }
 
 export function deactivate() {
 }
 
 const DEFAULT_CONFIG = {
-    type: 'chrome',
+    type: 'msedge',
     request: 'launch',
-    name: localize('chrome.launch.name', 'Launch Chrome against localhost'),
+    name: localize('edge.launch.name', 'Launch Edge against localhost'),
     url: 'http://localhost:8080',
     webRoot: '${workspaceFolder}'
 };
 
-export class ChromeConfigurationProvider implements vscode.DebugConfigurationProvider {
+export class EdgeConfigurationProvider implements vscode.DebugConfigurationProvider {
     provideDebugConfigurations(folder: vscode.WorkspaceFolder | undefined, token?: vscode.CancellationToken): vscode.ProviderResult<vscode.DebugConfiguration[]> {
         return Promise.resolve([DEFAULT_CONFIG]);
     }
@@ -44,9 +45,16 @@ export class ChromeConfigurationProvider implements vscode.DebugConfigurationPro
             return null;
         }
 
+        // if there is a version flag, switch to using the new msedge
+        if (config['version']) {
+            config.type = 'msedge';
+        }
+
         if (config.request === 'attach') {
-            const discovery = new Core.chromeTargetDiscoveryStrategy.ChromeTargetDiscovery(
-                new Core.NullLogger(), new Core.telemetry.NullTelemetryReporter());
+            const nullLogger = new Core.NullLogger();
+            const nullTelemetryReporter = new Core.telemetry.NullTelemetryReporter();
+
+            const discovery = new Core.chromeTargetDiscoveryStrategy.ChromeTargetDiscovery(nullLogger, nullTelemetryReporter);
 
             let targets;
             try {
@@ -64,6 +72,19 @@ export class ChromeConfigurationProvider implements vscode.DebugConfigurationPro
 
                 config.websocketUrl = selectedTarget.websocketDebuggerUrl;
             }
+
+            const protocolDetection = new ProtocolDetection(nullLogger);
+
+            let detectedBrowserProtocol = await protocolDetection.hitVersionEndpoint(config.address || '127.0.0.1', config.port)
+                .catch(async e => {
+                    // if something went wrong, bail
+                    return null;
+                });
+
+            if (protocolDetection.extractBrowserProtocol(detectedBrowserProtocol).indexOf('Chrome') > -1) {
+                config.type = 'msedge';
+            }
+
         }
 
         return config;

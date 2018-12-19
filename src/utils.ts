@@ -6,30 +6,65 @@ import * as path from 'path';
 import { utils as coreUtils, chromeConnection } from 'vscode-chrome-debug-core';
 
 const WIN_APPDATA = process.env.LOCALAPPDATA || '/';
-const DEFAULT_CHROME_PATH = {
-    LINUX: '/usr/bin/google-chrome',
-    OSX: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-    WIN: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
-    WIN_LOCALAPPDATA: path.join(WIN_APPDATA, 'Google\\Chrome\\Application\\chrome.exe'),
-    WINx86: 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
+
+const MSEDGE_BETA_VERSION = 'beta';
+const MSEDGE_DEV_VERSION = 'dev';
+const MSEDGE_CANARY_VERSION = 'canary';
+
+interface IMSEdgeVersionPaths {
+    WINx86_SYSTEMPATH: string;
+    WINx86_USERPATH: string;
+}
+
+const MSEDGE_BETA_PATHS: IMSEdgeVersionPaths = {
+    WINx86_SYSTEMPATH: 'C:\\Program Files (x86)\\Microsoft\\Edge Beta\\Application\\msedge.exe',
+    WINx86_USERPATH: path.join(WIN_APPDATA, 'Microsoft\\Edge Beta\\Application\\msedge.exe')
+}
+
+const MSEDGE_DEV_PATHS: IMSEdgeVersionPaths = {
+    WINx86_SYSTEMPATH: 'C:\\Program Files (x86)\\Microsoft\\Edge Dev\\Application\\msedge.exe',
+    WINx86_USERPATH: path.join(WIN_APPDATA, 'Microsoft\\Edge Dev\\Application\\msedge.exe')
 };
 
-export function getBrowserPath(): string {
+const MSEDGE_CANARY_PATHS: IMSEdgeVersionPaths = {
+    WINx86_SYSTEMPATH: 'C:\\Program Files (x86)\\Microsoft\\Edge SxS\\Application\\msedge.exe',
+    WINx86_USERPATH: path.join(WIN_APPDATA, 'Microsoft\\Edge SxS\\Application\\msedge.exe')
+}
+
+export function getBrowserPath(msedgeVersion: string): string {
     const platform = coreUtils.getPlatform();
-    if (platform === coreUtils.Platform.OSX) {
-        return coreUtils.existsSync(DEFAULT_CHROME_PATH.OSX) ? DEFAULT_CHROME_PATH.OSX : null;
-    } else if (platform === coreUtils.Platform.Windows) {
-        if (coreUtils.existsSync(DEFAULT_CHROME_PATH.WINx86)) {
-            return DEFAULT_CHROME_PATH.WINx86;
-        } else if (coreUtils.existsSync(DEFAULT_CHROME_PATH.WIN)) {
-            return DEFAULT_CHROME_PATH.WIN;
-        } else if (coreUtils.existsSync(DEFAULT_CHROME_PATH.WIN_LOCALAPPDATA)) {
-            return DEFAULT_CHROME_PATH.WIN_LOCALAPPDATA;
-        } else {
-            return null;
+    if (platform === coreUtils.Platform.Windows) {
+        let possiblePaths: IMSEdgeVersionPaths;
+        switch (msedgeVersion) {
+            case MSEDGE_BETA_VERSION: {
+                possiblePaths = MSEDGE_BETA_PATHS;
+                break;
+            }
+            case MSEDGE_DEV_VERSION: {
+                possiblePaths = MSEDGE_DEV_PATHS;
+                break;
+            }
+            case MSEDGE_CANARY_VERSION: {
+                possiblePaths = MSEDGE_CANARY_PATHS;
+                break;
+            }
+            default: {
+                return null
+            }
         }
+        return getExecutable(possiblePaths);
     } else {
-        return coreUtils.existsSync(DEFAULT_CHROME_PATH.LINUX) ? DEFAULT_CHROME_PATH.LINUX : null;
+        return null;
+    }
+}
+
+function getExecutable(possiblePaths: IMSEdgeVersionPaths) {
+    if (coreUtils.existsSync(possiblePaths.WINx86_SYSTEMPATH)) {
+        return possiblePaths.WINx86_SYSTEMPATH;
+    } else if (coreUtils.existsSync(possiblePaths.WINx86_USERPATH)) {
+        return possiblePaths.WINx86_USERPATH;
+    } else {
+        return null;
     }
 }
 

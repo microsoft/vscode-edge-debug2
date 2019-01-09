@@ -97,7 +97,7 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
     }
 
     public async launch(args: ILaunchRequestArgs): Promise<void> {
-        const port = args.port || 2015;
+        const port = args.port || 9222;
 
         // Check if the port is being used by another process
         this.events.emitStepStarted('Launch.CheckWhetherPortOccupied');
@@ -143,7 +143,7 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
                 // The compiled file lives in root/out/src while the landingPage will live in root/
                 /* So when this script is getting executed from the %programdata% directory under EdgeAdapter/out/src, we need to find the
                 landingPage under EdgeAdapter/ hence we need to go 2 directories up */
-                let landingPagePath = path.dirname(path.dirname(__dirname));
+                let landingPagePath = path.dirname(path.dirname(path.dirname(__dirname)));
                 launchUrl = encodeURI("file:///" + landingPagePath + "/landingPage.html");
                 this._breakOnLoadActive = true;
 

@@ -39,13 +39,9 @@ const defaultLanguages = [
     { id: 'pl', folderName: 'plk' }
 ];
 
-// adding this due to intermitent Error: EPERM: operation not permitted, mkdir <directory> during build
-// found same issue as this guy: https://github.com/gulpjs/gulp/issues/738
-// for reasons unclear, this helped...
 const watchedSources = [
-    'src/**/*.*',
-    '!src/**/vscode-edge-debug2/*.*',
-    'test/**/*.*'
+    'src/**/*',
+    'test/**/*'
 ];
 
 const scripts = [

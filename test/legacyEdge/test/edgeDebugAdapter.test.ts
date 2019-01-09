@@ -15,7 +15,7 @@ import {getMockEdgeConnectionApi, IMockEdgeConnectionAPI} from './debugProtocolM
 import * as testUtils from './testUtils';
 
 /** Not mocked - use for type only */
-import {EdgeDebugAdapter as _EdgeDebugAdapter} from '../src/edgeDebugAdapter';
+import {EdgeDebugAdapter as _EdgeDebugAdapter} from '../../../src/legacyEdge/edgeDebugAdapter';
 import { StepProgressEventsEmitter } from 'vscode-chrome-debug-core/out/src/executionTimingsReporter';
 
 class MockEdgeDebugSession {
@@ -97,7 +97,7 @@ suite('EdgeDebugAdapter', () => {
             function spawn(edgePath: string, args: string[]): any {
                 assert(edgePath.toLowerCase().indexOf('microsoftedge') >= 0);
                 assert(args.indexOf('--devtools-server-port') >= 0);
-                assert(args.indexOf('2015') >= 0);
+                assert(args.indexOf('9222') >= 0);
                 // We should initially launch with landing page
                 let landingPagePath = path.dirname(path.dirname(__dirname));
                 assert(args.indexOf(encodeURI('file:///' + landingPagePath + '/landingPage.html')) >= 0);

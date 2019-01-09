@@ -8,7 +8,7 @@ import * as assert from 'assert';
 import * as testUtils from './testUtils';
 
 /** Utils without mocks - use for type only */
-import * as _Utils from '../src/utils';
+import * as _Utils from '../../../src/legacyEdge/utils';
 
 const MODULE_UNDER_TEST = '../src/utils';
 suite('Utils', () => {

@@ -46,7 +46,7 @@ export class EdgeConfigurationProvider implements vscode.DebugConfigurationProvi
         }
 
         // if there is a version flag, switch to using the new msedge
-        if (config['version']) {
+        if (config['version'] || config['runtimeExecutable']) {
             config.type = 'msedge';
         }
 

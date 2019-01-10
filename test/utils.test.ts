@@ -4,7 +4,7 @@
 
 import * as mockery from 'mockery';
 import * as assert from 'assert';
-
+import * as path from 'path';
 import * as testUtils from './testUtils';
 
 /** Utils without mocks - use for type only */
@@ -44,7 +44,7 @@ suite('Utils', () => {
             const Utils = getUtils();
             assert.equal(
                 Utils.getBrowserPath('beta'),
-                'C:\\Users\\sheya\\AppData\\Local\\Microsoft\\Edge Beta\\Application\\msedge.exe');
+                path.join(process.env.LOCALAPPDATA, '\\Microsoft\\Edge Beta\\Application\\msedge.exe'));
         });
 
         test('system install beta', () => {

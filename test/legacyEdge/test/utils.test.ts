@@ -10,7 +10,7 @@ import * as testUtils from './testUtils';
 /** Utils without mocks - use for type only */
 import * as _Utils from '../../../src/legacyEdge/utils';
 
-const MODULE_UNDER_TEST = '../src/utils';
+const MODULE_UNDER_TEST = '../../../src/legacyEdge/utils';
 suite('Utils', () => {
     function getUtils(): typeof _Utils {
         return require(MODULE_UNDER_TEST);

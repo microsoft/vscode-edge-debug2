@@ -51,7 +51,9 @@ const scripts = [
 
 const lintSources = [
     'src',
-    'test'
+    'test',
+    '!test/legacyEdge/testapp',
+    '!test/legacyEdge/testdata'
 ].map(function (tsFolder) { return tsFolder + '/**/*.ts'; });
 
 const tsProject = ts.createProject('tsconfig.json', { typescript });

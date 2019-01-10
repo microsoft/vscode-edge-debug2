@@ -5,7 +5,7 @@
 import * as vscode from 'vscode';
 import * as Core from 'vscode-chrome-debug-core';
 
-import {isEdgeDebuggingSupported, targetFilter} from './utils';
+import { isEdgeDebuggingSupported, targetFilter } from './utils';
 
 import * as nls from 'vscode-nls';
 const localize = nls.loadMessageBundle();
@@ -22,7 +22,7 @@ export function deactivate() {
 const DEFAULT_CONFIG = {
     type: 'edge',
     request: 'launch',
-    name: localize('edge.launch.name', "Launch Edge against localhost"),
+    name: localize('edge.launch.name', 'Launch Edge against localhost'),
     url: 'http://localhost:8080',
     webRoot: '${workspaceFolder}'
 };
@@ -37,7 +37,7 @@ export class EdgeConfigurationProvider implements vscode.DebugConfigurationProvi
      */
     async resolveDebugConfiguration(folder: vscode.WorkspaceFolder | undefined, config: vscode.DebugConfiguration, token?: vscode.CancellationToken): Promise<vscode.DebugConfiguration> {
         if (!isEdgeDebuggingSupported()) {
-            const errorMessage = localize('edge.debug.error.versionNotSupported', "Your version of Edge does not support debugging via the Edge DevTools Protocol. You can read more about supported versions here (https://aka.ms/edp-docs).");
+            const errorMessage = localize('edge.debug.error.versionNotSupported', 'Your version of Edge does not support debugging via the Edge DevTools Protocol. You can read more about supported versions here (https://aka.ms/edp-docs).');
             return vscode.window.showErrorMessage(errorMessage).then(_ => {
                 return undefined;
             });
@@ -97,7 +97,7 @@ async function pickTarget(targets: Core.chromeConnection.ITarget[]): Promise<ITa
         websocketDebuggerUrl: target.webSocketDebuggerUrl
     }));
 
-    const placeHolder = localize('edge.targets.placeholder', "Select a tab");
+    const placeHolder = localize('edge.targets.placeholder', 'Select a tab');
     const selected = await vscode.window.showQuickPick(items, { placeHolder, matchOnDescription: true, matchOnDetail: true });
     return selected;
 }

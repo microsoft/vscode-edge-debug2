@@ -85,7 +85,7 @@ export class ChromeDebugAdapter extends CoreDebugAdapter {
             }
 
             // Start with remote debugging enabled
-            const port = args.port || 9222;
+            const port = args.port || 2015;
             const chromeArgs: string[] = [];
             const chromeEnv: coreUtils.IStringDictionary<string> = args.env || null;
             const chromeWorkingDir: string = args.cwd || null;

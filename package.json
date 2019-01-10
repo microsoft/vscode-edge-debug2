@@ -26,8 +26,8 @@
   "dependencies": {
     "natives": "^1.1.6",
     "portscanner": "^2.2.0",
-    "vscode-chrome-debug-core": "^6.7.36",
-    "vscode-debugadapter": "^1.32.1",
+    "vscode-chrome-debug-core": "^6.7.40",
+    "vscode-debugadapter": "^1.33.0",
     "vscode-nls": "3.2.4"
   },
   "devDependencies": {
@@ -74,7 +74,9 @@
     "build": "gulp build",
     "watch": "gulp watch",
     "start": "node out/src/chromeDebug.js --server=4712",
-    "test": "mocha --exit --timeout 20000 -s 2000 -u tdd --colors \"./out/test/*.test.js\"",
+    "test:legacy-edge": "mocha --exit --timeout 20000 -s 2000 -u tdd --colors \"./out/test/legacyEdge/test/*.test.js\"",
+    "test:msedge": "mocha --exit --timeout 20000 -s 2000 -u tdd --colors \"./out/test/*.test.js\"",
+    "test": "npm run test:legacy-edge && npm run test:msedge",
     "intTest": "mocha --exit --timeout 20000 -s 3500 -u tdd --colors --reporter node_modules/vscode-chrome-debug-core-testsupport/out/loggingReporter.js ./out/test/int/*.test.js",
     "lint": "gulp tslint",
     "vscode:prepublish": "gulp verify-no-linked-modules",
@@ -131,7 +133,7 @@
               "type": "edge",
               "request": "attach",
               "name": "Attach to Edge",
-              "port": 9222,
+              "port": 2015,
               "webRoot": "^\"${2:\\${workspaceFolder\\}}\""
             }
           }
@@ -155,7 +157,7 @@
               "port": {
                 "type": "number",
                 "description": "%edge.port.description%",
-                "default": 9222
+                "default": 2015
               },
               "address": {
                 "type": "string",
@@ -331,7 +333,7 @@
               "port": {
                 "type": "number",
                 "description": "%chrome.port.description%",
-                "default": 9222
+                "default": 2015
               },
               "address": {
                 "type": "string",
@@ -467,7 +469,7 @@
               "type": "edge",
               "request": "attach",
               "name": "Attach to Edge",
-              "port": 9222,
+              "port": 2015,
               "webRoot": "^\"${2:\\${workspaceFolder\\}}\""
             }
           }
@@ -479,7 +481,7 @@
               "port": {
                 "type": "number",
                 "description": "%edge.port.description%",
-                "default": 9222
+                "default": 2015
               },
               "address": {
                 "type": "string",
@@ -686,7 +688,7 @@
               "port": {
                 "type": "number",
                 "description": "%edge.port.description%",
-                "default": 9222
+                "default": 2015
               },
               "address": {
                 "type": "string",

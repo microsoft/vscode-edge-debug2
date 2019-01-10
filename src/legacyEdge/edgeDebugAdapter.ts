@@ -6,15 +6,15 @@ import * as os from 'os';
 import * as fs from 'fs';
 import * as path from 'path';
 
-import {ChromeDebugAdapter as CoreDebugAdapter, logger, utils as coreUtils, ISourceMapPathOverrides,
+import { ChromeDebugAdapter as CoreDebugAdapter, logger, utils as coreUtils, ISourceMapPathOverrides,
         IVariablesResponseBody, IEvaluateResponseBody,
         telemetry, Version, TargetVersions } from 'vscode-chrome-debug-core';
-import {spawn, ChildProcess, fork, execSync} from 'child_process';
-import {Crdp, LoadedSourceEventReason, chromeConnection, chromeUtils, variables, ChromeDebugSession, IOnPausedResult} from 'vscode-chrome-debug-core';
-import {DebugProtocol} from 'vscode-debugprotocol';
+import { spawn, ChildProcess, fork, execSync } from 'child_process';
+import { Crdp, LoadedSourceEventReason, chromeConnection, chromeUtils, variables, ChromeDebugSession, IOnPausedResult } from 'vscode-chrome-debug-core';
+import { DebugProtocol } from 'vscode-debugprotocol';
 
-import {ILaunchRequestArgs, IAttachRequestArgs, ICommonRequestArgs} from './edgeDebugInterfaces';
-import {ExtendedDebugProtocolVariable, MSPropertyContainer} from './edgeVariablesContainer';
+import { ILaunchRequestArgs, IAttachRequestArgs, ICommonRequestArgs } from './edgeDebugInterfaces';
+import { ExtendedDebugProtocolVariable, MSPropertyContainer } from './edgeVariablesContainer';
 import * as utils from './utils';
 import * as errors from './errors';
 
@@ -143,8 +143,8 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
                 // The compiled file lives in root/out/src while the landingPage will live in root/
                 /* So when this script is getting executed from the %programdata% directory under EdgeAdapter/out/src, we need to find the
                 landingPage under EdgeAdapter/ hence we need to go 2 directories up */
-                let landingPagePath = path.dirname(path.dirname(__dirname));
-                launchUrl = encodeURI("file:///" + landingPagePath + "/landingPage.html");
+                let landingPagePath = path.dirname(path.dirname(path.dirname(__dirname)));
+                launchUrl = encodeURI('file:///' + landingPagePath + '/landingPage.html');
                 this._breakOnLoadActive = true;
 
                 edgeArgs.push(launchUrl);
@@ -164,7 +164,7 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
                     this._debugProxyPort = port;
 
                     if (!this._chromeConnection.isAttached || !this._chromeConnection.attachedTarget) {
-                        throw coreUtils.errP(localize("edge.debug.error.notattached", "Debugging connection is not attached after the attaching process."));
+                        throw coreUtils.errP(localize('edge.debug.error.notattached', 'Debugging connection is not attached after the attaching process.'));
                     }
 
                     this._debuggerId = this._chromeConnection.attachedTarget.id;
@@ -185,7 +185,7 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
             // This means all the setBreakpoints requests have been completed. So we can navigate to the original file/url.
             this._navigatingToUserRequestedUrl = true;
             this.chrome.Page.navigate({url: this._userRequestedUrl});
-            this.events.emitMilestoneReached("RequestedNavigateToUserPage");
+            this.events.emitMilestoneReached('RequestedNavigateToUserPage');
         }
         return super.configurationDone();
     }
@@ -222,10 +222,10 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
                     err => logger.log('Getting userAgent failed: ' + err.message));
 
             const userAgentForTelemetryPromise = userAgentPromise.then(userAgent => {
-                const properties = { "Versions.Target.UserAgent": userAgent };
+                const properties = { 'Versions.Target.UserAgent': userAgent };
                 const edgeVersionMatch = userAgent.match(/Edge\/([0-9]+(?:.[0-9]+)+)/);
                 if (edgeVersionMatch && edgeVersionMatch[1]) {
-                    properties["Versions.Target.Version"] = edgeVersionMatch[1];
+                    properties['Versions.Target.Version'] = edgeVersionMatch[1];
                 }
                 return properties;
             });
@@ -269,7 +269,7 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
 
         if (!hadTerminated) {
             if (!this._debuggerId) {
-                throw coreUtils.errP(localize("edge.debug.error.nodebuggerID", "Cannot find a debugger id."));
+                throw coreUtils.errP(localize('edge.debug.error.nodebuggerID', 'Cannot find a debugger id.'));
             }
 
             const closeTabApiUrl = `http://127.0.0.1:${this._debugProxyPort}/json/close/${this._debuggerId}`;
@@ -367,7 +367,7 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
     }
 
     private spawnEdge(edgePath: string, edgeArgs: string[], env: {[key: string]: string}, cwd: string, usingRuntimeExecutable: boolean): ChildProcess {
-        this.events.emitStepStarted("LaunchTarget.LaunchExe");
+        this.events.emitStepStarted('LaunchTarget.LaunchExe');
         if (coreUtils.getPlatform() === coreUtils.Platform.Windows && !usingRuntimeExecutable) {
             const options = {
                 execArgv: [],

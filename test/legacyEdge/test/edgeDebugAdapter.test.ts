@@ -1,21 +1,21 @@
 /*---------------------------------------------------------
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
-import '@types/mocha';
-import {DebugProtocol} from 'vscode-debugprotocol';
-import {chromeConnection, ISourceMapPathOverrides, Version, TargetVersions} from 'vscode-chrome-debug-core';
+/// <reference path="../../../node_modules/@types/mocha/index.d.ts" />
+import { DebugProtocol } from 'vscode-debugprotocol';
+import { chromeConnection, ISourceMapPathOverrides, Version, TargetVersions } from 'vscode-chrome-debug-core';
 
 import * as mockery from 'mockery';
-import {EventEmitter} from 'events';
+import { EventEmitter } from 'events';
 import * as assert from 'assert';
 import * as path from 'path';
-import {Mock, IMock, MockBehavior, It} from 'typemoq';
+import { Mock, IMock, MockBehavior, It } from 'typemoq';
 
-import {getMockEdgeConnectionApi, IMockEdgeConnectionAPI} from './debugProtocolMocks';
+import { getMockEdgeConnectionApi, IMockEdgeConnectionAPI } from './debugProtocolMocks';
 import * as testUtils from './testUtils';
 
 /** Not mocked - use for type only */
-import {EdgeDebugAdapter as _EdgeDebugAdapter} from '../src/edgeDebugAdapter';
+import { EdgeDebugAdapter as _EdgeDebugAdapter } from '../../../src/legacyEdge/edgeDebugAdapter';
 import { StepProgressEventsEmitter } from 'vscode-chrome-debug-core/out/src/executionTimingsReporter';
 
 class MockEdgeDebugSession {
@@ -26,7 +26,7 @@ class MockEdgeDebugSession {
     }
 }
 
-const MODULE_UNDER_TEST = '../src/edgeDebugAdapter';
+const MODULE_UNDER_TEST = '../../../src/legacyEdge/edgeDebugAdapter';
 suite('EdgeDebugAdapter', () => {
     let mockEdgeConnection: IMock<chromeConnection.ChromeConnection>;
     let mockEventEmitter: EventEmitter;
@@ -50,7 +50,7 @@ suite('EdgeDebugAdapter', () => {
             .returns(() => isAttached);
         mockEdgeConnection
             .setup(x => x.attachedTarget)
-            .returns(() => ({ description: "", devtoolsFrontendUrl: "", id: "", title: "", type: "", webSocketDebuggerUrl: "", version: Promise.resolve(new TargetVersions(Version.unknownVersion(), Version.unknownVersion())) }));
+            .returns(() => ({ description: '', devtoolsFrontendUrl: '', id: '', title: '', type: '', webSocketDebuggerUrl: '', version: Promise.resolve(new TargetVersions(Version.unknownVersion(), Version.unknownVersion())) }));
         mockEdgeConnection
             .setup(x => x.run())
             .returns(() => Promise.resolve());
@@ -85,7 +85,7 @@ suite('EdgeDebugAdapter', () => {
             // Hacky mock cleanup
             require('child_process').fork = originalFork;
             require('fs').statSync = originalStatSync;
-        })
+        });
 
         test('launches with minimal correct args', () => {
             let spawnCalled = false;
@@ -99,7 +99,7 @@ suite('EdgeDebugAdapter', () => {
                 assert(args.indexOf('--devtools-server-port') >= 0);
                 assert(args.indexOf('2015') >= 0);
                 // We should initially launch with landing page
-                let landingPagePath = path.dirname(path.dirname(__dirname));
+                let landingPagePath = path.dirname(path.dirname(path.dirname(path.dirname(__dirname))));
                 assert(args.indexOf(encodeURI('file:///' + landingPagePath + '/landingPage.html')) >= 0);
                 spawnCalled = true;
 
@@ -143,7 +143,7 @@ suite('EdgeDebugAdapter', () => {
             (<any>edgeDebugAdapter)._frameHandles = frameHandle_beforeOverride;
             (<any>edgeDebugAdapter).chrome.Debugger = chromeDebuggerEvaluateOnCallFrame_beforeOverride;
             (<any>edgeDebugAdapter).remoteObjectToVariable = remoteObjectToVariable_beforeOverride;
-        })
+        });
 
         test('returns error when watch variable is missing', () => {
             let callFrameId: number = 1;
@@ -160,7 +160,7 @@ suite('EdgeDebugAdapter', () => {
 
             return edgeDebugAdapter.evaluate(evalArgs).then(
                 () => Promise.reject(new Error('Expected method to reject')),
-                (err) => {assert.equal(err.message, "not available", "Error should contain 'not available' message.")}
+                (err) => {assert.equal(err.message, 'not available', 'Error should contain \'not available\' message.'); }
             );
         });
 
@@ -214,5 +214,5 @@ suite('EdgeDebugAdapter', () => {
                 resolveWebRootPattern(WEBROOT, overrides),
                 expOverrides);
         });
-    })
+    });
 });

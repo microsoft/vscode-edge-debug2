@@ -12,6 +12,7 @@
         "node_modules/",
         "testapp/",
         "testdata/",
-        "vscode-edge-debug2/*"
+        "test/legacyEdge/testapp/",
+        "test/legacyEdge/testdata/"
     ]
 }

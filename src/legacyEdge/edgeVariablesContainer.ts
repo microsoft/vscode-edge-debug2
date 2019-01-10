@@ -1,6 +1,6 @@
-import {DebugProtocol} from 'vscode-debugprotocol';
-import {logger, variables, Crdp, utils as coreUtils} from 'vscode-chrome-debug-core';
-import {EdgeDebugAdapter} from './edgeDebugAdapter';
+import { DebugProtocol } from 'vscode-debugprotocol';
+import { logger, variables, Crdp, utils as coreUtils } from 'vscode-chrome-debug-core';
+import { EdgeDebugAdapter } from './edgeDebugAdapter';
 
 import * as nls from 'vscode-nls';
 const localize = nls.loadMessageBundle();
@@ -48,7 +48,7 @@ export class MSPropertyContainer extends variables.PropertyContainer {
             // If msDebuggerPropertyId is not present, default to super setValue for this variable.
             await super.setValue(adapter, name, value)
                 .catch(() => {
-                    throw coreUtils.errP(localize("edge.debug.error.msSetDebuggerPropertyValue", "Unable to update the value for this property."));
+                    throw coreUtils.errP(localize('edge.debug.error.msSetDebuggerPropertyValue', 'Unable to update the value for this property.'));
                 });
             return value;
         }
@@ -56,10 +56,10 @@ export class MSPropertyContainer extends variables.PropertyContainer {
         const edgeDebugClient: EdgeDebugClient = adapter.chrome.Debugger as EdgeDebugClient;
 
         await edgeDebugClient.msSetDebuggerPropertyValue({
-            "debuggerPropertyId": msDebuggerPropertyId,
-            "newValue": value
+            'debuggerPropertyId': msDebuggerPropertyId,
+            'newValue': value
         }).catch(() => {
-            throw coreUtils.errP(localize("edge.debug.error.msSetDebuggerPropertyValue", "Unable to update the value for this property."));
+            throw coreUtils.errP(localize('edge.debug.error.msSetDebuggerPropertyValue', 'Unable to update the value for this property.'));
         });
 
         return value;

@@ -3,7 +3,7 @@
  *--------------------------------------------------------*/
 
 import * as os from 'os';
-import {utils as coreUtils, chromeConnection} from 'vscode-chrome-debug-core';
+import { utils as coreUtils, chromeConnection } from 'vscode-chrome-debug-core';
 
 export function isEdgeDebuggingSupported(): boolean {
     if (os.platform() !== 'win32') {

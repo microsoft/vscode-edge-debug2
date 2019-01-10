@@ -19,7 +19,7 @@ interface IMSEdgeVersionPaths {
 const MSEDGE_BETA_PATHS: IMSEdgeVersionPaths = {
     WINx86_SYSTEMPATH: 'C:\\Program Files (x86)\\Microsoft\\Edge Beta\\Application\\msedge.exe',
     WINx86_USERPATH: path.join(WIN_APPDATA, 'Microsoft\\Edge Beta\\Application\\msedge.exe')
-}
+};
 
 const MSEDGE_DEV_PATHS: IMSEdgeVersionPaths = {
     WINx86_SYSTEMPATH: 'C:\\Program Files (x86)\\Microsoft\\Edge Dev\\Application\\msedge.exe',
@@ -29,7 +29,7 @@ const MSEDGE_DEV_PATHS: IMSEdgeVersionPaths = {
 const MSEDGE_CANARY_PATHS: IMSEdgeVersionPaths = {
     WINx86_SYSTEMPATH: 'C:\\Program Files (x86)\\Microsoft\\Edge SxS\\Application\\msedge.exe',
     WINx86_USERPATH: path.join(WIN_APPDATA, 'Microsoft\\Edge SxS\\Application\\msedge.exe')
-}
+};
 
 export function getBrowserPath(msedgeVersion: string): string {
     const platform = coreUtils.getPlatform();
@@ -49,7 +49,7 @@ export function getBrowserPath(msedgeVersion: string): string {
                 break;
             }
             default: {
-                return null
+                return null;
             }
         }
         return getExecutable(possiblePaths);

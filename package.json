@@ -24,10 +24,11 @@
   ],
   "license": "SEE LICENSE IN LICENSE.txt",
   "dependencies": {
-    "vscode-chrome-debug-core": "^6.7.36",
-    "vscode-debugadapter": "^1.32.1",
-    "vscode-nls": "^4.0.0",
-    "vscode-edge-debug2": "file:./vscode-edge-debug2"
+    "natives": "^1.1.6",
+    "portscanner": "^2.2.0",
+    "vscode-chrome-debug-core": "^6.7.40",
+    "vscode-debugadapter": "^1.33.0",
+    "vscode-nls": "3.2.4"
   },
   "devDependencies": {
     "@types/mocha": "^2.2.35",
@@ -39,7 +40,7 @@
     "del": "^3.0.0",
     "event-stream": "^3.3.4",
     "glob": "^7.1.1",
-    "gulp": "^3.9.1",
+    "gulp": "~3.9.1",
     "gulp-sourcemaps": "^2.6.4",
     "gulp-tslint": "^8.1.3",
     "gulp-typescript": "^4.0.1",
@@ -70,12 +71,12 @@
     "onCommand:extension.edge-debug.toggleSmartStep"
   ],
   "scripts": {
-    "build:edge2": "gulp build --gulpfile vscode-edge-debug2/gulpfile.js",
-    "build:edge3": "gulp build",
-    "build": "npm run build:edge2 && npm run build:edge3",
+    "build": "gulp build",
     "watch": "gulp watch",
     "start": "node out/src/chromeDebug.js --server=4712",
-    "test": "mocha --exit --timeout 20000 -s 2000 -u tdd --colors \"./out/test/*.test.js\"",
+    "test:legacy-edge": "mocha --exit --timeout 20000 -s 2000 -u tdd --colors \"./out/test/legacyEdge/test/*.test.js\"",
+    "test:msedge": "mocha --exit --timeout 20000 -s 2000 -u tdd --colors \"./out/test/*.test.js\"",
+    "test": "npm run test:legacy-edge && npm run test:msedge",
     "intTest": "mocha --exit --timeout 20000 -s 3500 -u tdd --colors --reporter node_modules/vscode-chrome-debug-core-testsupport/out/loggingReporter.js ./out/test/int/*.test.js",
     "lint": "gulp tslint",
     "vscode:prepublish": "gulp verify-no-linked-modules",
@@ -132,43 +133,55 @@
               "type": "edge",
               "request": "attach",
               "name": "Attach to Edge",
-              "port": 9222,
+              "port": 2015,
               "webRoot": "^\"${2:\\${workspaceFolder\\}}\""
             }
           }
         ],
         "configurationAttributes": {
           "launch": {
-            "required": [],
+            "required": [
+              "version"
+            ],
             "properties": {
+              "version": {
+                "type": "string",
+                "enum": [
+                  "canary",
+                  "beta",
+                  "dev"
+                ],
+                "description": "%edge.version.description%",
+                "default": "dev"
+              },
               "port": {
                 "type": "number",
-                "description": "%chrome.port.description%",
-                "default": 9222
+                "description": "%edge.port.description%",
+                "default": 2015
               },
               "address": {
                 "type": "string",
-                "description": "%chrome.address.description%",
+                "description": "%edge.address.description%",
                 "default": "127.0.0.1"
               },
               "file": {
                 "type": "string",
-                "description": "%chrome.file.description%",
+                "description": "%edge.file.description%",
                 "default": "${workspaceFolder}/index.html"
               },
               "url": {
                 "type": "string",
-                "description": "%chrome.url.description%",
+                "description": "%edge.url.description%",
                 "default": "http://localhost:8080"
               },
               "webRoot": {
                 "type": "string",
-                "description": "%chrome.webRoot.description%",
+                "description": "%edge.webRoot.description%",
                 "default": "${workspaceFolder}"
               },
               "pathMapping": {
                 "type": "object",
-                "description": "%chrome.pathMapping.description%",
+                "description": "%edge.pathMapping.description%",
                 "default": {
                   "/": "${workspaceFolder}"
                 }
@@ -178,12 +191,12 @@
                   "string",
                   "null"
                 ],
-                "description": "%chrome.runtimeExecutable.description%",
+                "description": "%edge.runtimeExecutable.description%",
                 "default": null
               },
               "runtimeArgs": {
                 "type": "array",
-                "description": "%chrome.runtimeArgs.description%",
+                "description": "%edge.runtimeArgs.description%",
                 "items": {
                   "type": "string"
                 },
@@ -191,28 +204,28 @@
               },
               "env": {
                 "type": "object",
-                "description": "%chrome.env.description%",
+                "description": "%edge.env.description%",
                 "default": {}
               },
               "cwd": {
                 "type": "string",
-                "description": "%chrome.cwd.description%",
+                "description": "%edge.cwd.description%",
                 "default": null
               },
               "sourceMaps": {
                 "type": "boolean",
-                "description": "%chrome.sourceMaps.description%",
+                "description": "%edge.sourceMaps.description%",
                 "default": true
               },
               "diagnosticLogging": {
                 "type": "boolean",
-                "description": "%chrome.diagnosticLogging.description%",
+                "description": "%edge.diagnosticLogging.description%",
                 "default": true,
                 "deprecationMessage": "'diagnosticLogging' is deprecated. Use 'trace' instead."
               },
               "verboseDiagnosticLogging": {
                 "type": "boolean",
-                "description": "%chrome.verboseDiagnosticLogging.description%",
+                "description": "%edge.verboseDiagnosticLogging.description%",
                 "default": true,
                 "deprecationMessage": "'verboseDiagnosticLogging' is deprecated. Use 'trace' instead."
               },
@@ -226,19 +239,19 @@
                   true
                 ],
                 "default": true,
-                "description": "%chrome.trace.description%"
+                "description": "%edge.trace.description%"
               },
               "userDataDir": {
                 "type": [
                   "string",
                   "boolean"
                 ],
-                "description": "%chrome.userDataDir.description%",
+                "description": "%edge.userDataDir.description%",
                 "default": true
               },
               "sourceMapPathOverrides": {
                 "type": "object",
-                "description": "%chrome.sourceMapPathOverrides.description%",
+                "description": "%edge.sourceMapPathOverrides.description%",
                 "default": {
                   "webpack:///./*": "${webRoot}/*",
                   "webpack:///src/*": "${webRoot}/*",
@@ -249,37 +262,42 @@
               },
               "smartStep": {
                 "type": "boolean",
-                "description": "%chrome.smartStep.description%",
+                "description": "%edge.smartStep.description%",
                 "default": true
               },
               "skipFiles": {
                 "type": "array",
-                "description": "%chrome.skipFiles.description%",
+                "description": "%edge.skipFiles.description%",
                 "default": []
               },
               "timeout": {
                 "type": "number",
-                "description": "%chrome.timeout.description%",
+                "description": "%edge.timeout.description%",
                 "default": 10000
               },
               "disableNetworkCache": {
                 "type": "boolean",
-                "description": "%chrome.disableNetworkCache.description%",
+                "description": "%edge.disableNetworkCache.description%",
                 "default": true
               },
               "urlFilter": {
                 "type": "string",
-                "description": "%chrome.urlFilter.description%",
+                "description": "%edge.urlFilter.description%",
                 "default": ""
               },
               "showAsyncStacks": {
                 "type": "boolean",
-                "description": "%chrome.showAsyncStacks.description%",
+                "description": "%edge.showAsyncStacks.description%",
                 "default": true
               },
               "breakOnLoad": {
                 "type": "boolean",
-                "description": "%chrome.breakOnLoad.description%",
+                "description": "%edge.breakOnLoad.description%",
+                "default": true
+              },
+              "logTimestamps": {
+                "type": "boolean",
+                "description": "%edge.logTimestamps.description%",
                 "default": true
               },
               "breakOnLoadStrategy": {
@@ -289,10 +307,10 @@
                   "regex"
                 ],
                 "enumDescriptions": [
-                  "%chrome.breakOnLoadStrategy.instrument.description%",
-                  "%chrome.breakOnLoadStrategy.regex.description%"
+                  "%edge.breakOnLoadStrategy.instrument.description%",
+                  "%edge.breakOnLoadStrategy.regex.description%"
                 ],
-                "description": "%chrome.breakOnLoadStrategy.description%",
+                "description": "%edge.breakOnLoadStrategy.description%",
                 "default": "instrument"
               },
               "targetTypes": {
@@ -300,13 +318,10 @@
                   "array",
                   "null"
                 ],
-                "description": "%chrome.targetTypes.description%",
+                "description": "%edge.targetTypes.description%",
                 "default": [
                   "page"
                 ]
-              },
-              "version": {
-                "type": "string"
               }
             }
           },
@@ -318,7 +333,7 @@
               "port": {
                 "type": "number",
                 "description": "%chrome.port.description%",
-                "default": 9222
+                "default": 2015
               },
               "address": {
                 "type": "string",
@@ -413,6 +428,11 @@
                 "type": "boolean",
                 "description": "%chrome.showAsyncStacks.description%",
                 "default": true
+              },
+              "logTimestamps": {
+                "type": "boolean",
+                "description": "%edge.logTimestamps.description%",
+                "default": true
               }
             }
           }
@@ -421,7 +441,7 @@
       {
         "type": "edge",
         "label": "Edge",
-        "program": "./vscode-edge-debug2/out/src/edgeDebug.js",
+        "program": "./out/src/legacyEdge/edgeDebug.js",
         "runtime": "node",
         "aiKey": "AIF-d9b70cd4-b9f9-4d70-929b-a071c400b217",
         "languages": [
@@ -545,14 +565,6 @@
                 "default": true,
                 "description": "%edge.trace.description%"
               },
-              "userDataDir": {
-                "type": [
-                  "string",
-                  "boolean"
-                ],
-                "description": "%edge.userDataDir.description%",
-                "default": ""
-              },
               "sourceMapPathOverrides": {
                 "type": "object",
                 "description": "%edge.sourceMapPathOverrides.description%",
@@ -598,24 +610,73 @@
                 "description": "%edge.logTimestamps.description%",
                 "default": true
               },
-              "breakOnLoadStrategy": {
-                "type": "enum",
+              "version": {
+                "//": [
+                  "This property is here so that intellisense will show it as valid",
+                  "The __LEGACY_EDGE__ adapter does not process a 'version' flag"
+                ],
+                "type": "string",
                 "enum": [
+                  "canary",
+                  "beta",
+                  "dev"
+                ],
+                "description": "%edge.version.description%",
+                "default": "dev"
+              },
+              "userDataDir": {
+                "//": [
+                  "This property is here so that intellisense will show it as valid",
+                  "The __LEGACY_EDGE__ adapter does not process a 'userDataDir' flag"
+                ],
+                "type": [
+                  "string",
+                  "boolean"
+                ],
+                "description": "%edge.userDataDir.description%",
+                "default": ""
+              },
+              "breakOnLoad": {
+                "//": [
+                  "This property is here so that intellisense will show it as valid",
+                  "The __LEGACY_EDGE__ adapter does not process a 'breakOnLoad' flag"
+                ],
+                "type": "boolean",
+                "description": "%edge.breakOnLoad.description%",
+                "default": true
+              },
+              "breakOnLoadStrategy": {
+                "//": [
+                  "This property is here so that intellisense will show it as valid",
+                  "The __LEGACY_EDGE__ adapter does not process a 'breakOnLoadStrategy' flag"
+                ],
+                "type": "string",
+                "enum": [
+                  "instrument",
                   "regex",
                   "off"
                 ],
                 "enumDescriptions": [
+                  "%edge.breakOnLoadStrategy.instrument.description%",
                   "%edge.breakOnLoadStrategy.regex.description%",
                   "%edge.breakOnLoadStrategy.off.description%"
                 ],
-                "description": "%edge.breakOnLoadStrategy.description",
-                "default": "off"
+                "description": "%edge.breakOnLoadStrategy.description%",
+                "default": "instrument"
               },
-              "version": {
-                "//": [ "The version property is here so that intellisense will not identify 'version'",
-                        "as an invalid flag when debug type is 'edge'. ",
-                        "The legacy edge adapter, however, does not process a 'version'. "],
-                "type": "string"
+              "targetTypes": {
+                "//": [
+                  "This property is here so that intellisense will show it as valid",
+                  "The __LEGACY_EDGE__ adapter does not process a 'targetTypes' flag"
+                ],
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "description": "%edge.targetTypes.description%",
+                "default": [
+                  "page"
+                ]
               }
             }
           },
@@ -717,6 +778,20 @@
                 "type": "boolean",
                 "description": "%edge.logTimestamps.description%",
                 "default": true
+              },
+              "targetTypes": {
+                "//": [
+                  "This property is here so that intellisense will show it as valid",
+                  "The __LEGACY_EDGE__ adapter does not process a 'targetTypes' flag"
+                ],
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "description": "%edge.targetTypes.description%",
+                "default": [
+                  "page"
+                ]
               }
             }
           }

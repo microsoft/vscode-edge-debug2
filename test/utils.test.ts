@@ -4,7 +4,7 @@
 
 import * as mockery from 'mockery';
 import * as assert from 'assert';
-
+import * as path from 'path';
 import * as testUtils from './testUtils';
 
 /** Utils without mocks - use for type only */
@@ -32,7 +32,7 @@ suite('Utils', () => {
     });
 
     suite('getBrowserPath()', () => {
-        test('win', () => {
+        test('user install beta', () => {
             // Overwrite the statSync mock to say the x86 path doesn't exist
             const statSync = (aPath: string) => {
                 if (aPath.indexOf('(x86)') >= 0) throw new Error('Not found');
@@ -44,10 +44,10 @@ suite('Utils', () => {
             const Utils = getUtils();
             assert.equal(
                 Utils.getBrowserPath('beta'),
-                'C:\\Program Files (x86)\\Microsoft\\Edge Beta\\Application\\msedge.exe');
+                path.join(process.env.LOCALAPPDATA, '\\Microsoft\\Edge Beta\\Application\\msedge.exe'));
         });
 
-        test('winx86', () => {
+        test('system install beta', () => {
             mockery.registerMock('os', { platform: () => 'win32' });
             const Utils = getUtils();
             assert.equal(
@@ -55,7 +55,7 @@ suite('Utils', () => {
                 'C:\\Program Files (x86)\\Microsoft\\Edge Beta\\Application\\msedge.exe');
         });
 
-        test('winx86', () => {
+        test('system install dev', () => {
             mockery.registerMock('os', { platform: () => 'win32' });
             const Utils = getUtils();
             assert.equal(
@@ -63,7 +63,7 @@ suite('Utils', () => {
                 'C:\\Program Files (x86)\\Microsoft\\Edge Dev\\Application\\msedge.exe');
         });
 
-        test('winx86', () => {
+        test('system install canary', () => {
             mockery.registerMock('os', { platform: () => 'win32' });
             const Utils = getUtils();
             assert.equal(

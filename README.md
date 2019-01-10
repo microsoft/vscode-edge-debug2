@@ -7,7 +7,7 @@
   <br>
 </h1>
 
-<h4 align="center">Debug your JavaScript code running in Google Chrome from VS Code.</h4>
+<h4 align="center">Debug your JavaScript code running in Microsoft Edge from VS Code.</h4>
 
 <p align="center">
   <a href="https://vscode.visualstudio.com/1e32b5a6-a974-467b-9d5f-f47e49589c5e/_build/definition?definitionId=9"><img src="https://vscode.visualstudio.com/_apis/public/build/definitions/1e32b5a6-a974-467b-9d5f-f47e49589c5e/9/badge" alt="vsts"></a>
@@ -17,7 +17,7 @@
 </p>
 
 
-A VS Code extension to debug your JavaScript code in the Google Chrome browser, or other targets that support the [Chrome DevTools Protocol](https://chromedevtools.github.io/debugger-protocol-viewer/).
+A VS Code extension to debug your JavaScript code in the Microsoft Edge browser, or other targets that support the [Chrome DevTools Protocol](https://chromedevtools.github.io/debugger-protocol-viewer/).
 
 ![Demo](https://github.com/Microsoft/vscode-chrome-debug/blob/master/images/demo.gif?raw=true)
 
@@ -79,14 +79,14 @@ With `"request": "attach"`, you must launch Chrome with remote debugging enabled
 
 __Windows__
 * Right click the Chrome shortcut, and select properties
-* In the "target" field, append `--remote-debugging-port=9222`
-* Or in a command prompt, execute `<path to chrome>/chrome.exe --remote-debugging-port=9222`
+* In the "target" field, append `--remote-debugging-port=2015`
+* Or in a command prompt, execute `<path to chrome>/chrome.exe --remote-debugging-port=2015`
 
 __macOS__
-* In a terminal, execute `/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --remote-debugging-port=9222`
+* In a terminal, execute `/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --remote-debugging-port=2015`
 
 __Linux__
-* In a terminal, launch `google-chrome --remote-debugging-port=9222`
+* In a terminal, launch `google-chrome --remote-debugging-port=2015`
 
 If you have another instance of Chrome running and don't want to restart it, you can run the new instance under a separate user profile with the  `--user-data-dir` option. Example: `--user-data-dir=/tmp/chrome-debug`. This is the same as using the `userDataDir` option in a launch-type config.
 
@@ -101,7 +101,7 @@ An example `launch.json` file for an "attach" config.
             "name": "Attach to url with files served from ./out",
             "type": "chrome",
             "request": "attach",
-            "port": 9222,
+            "port": 2015,
             "url": "<url of the open browser tab to connect to>",
             "webRoot": "${workspaceFolder}/out"
         }
@@ -115,7 +115,7 @@ Normally, if Chrome is already running when you start debugging with a launch co
 
 If you are using an attach config, make sure you close other running instances of Chrome before launching a new one with `--remote-debugging-port`. Or, use a new profile with the `--user-data-dir` flag yourself.
 
-For other troubleshooting tips for this error, [see below](#cannot-connect-to-the-target:-connect-ECONNREFUSED-127.0.0.1:9222).
+For other troubleshooting tips for this error, [see below](#cannot-connect-to-the-target:-connect-ECONNREFUSED-127.0.0.1:2015).
 
 ### Errors from chrome-error://chromewebdata
 
@@ -201,10 +201,10 @@ If your breakpoints aren't hit, it's most likely a sourcemapping issue or becaus
 
 If you have a sourcemapping issue, please see https://github.com/Microsoft/vscode-chrome-debug#sourcemaps
 
-### Cannot connect to the target: connect ECONNREFUSED 127.0.0.1:9222
+### Cannot connect to the target: connect ECONNREFUSED 127.0.0.1:2015
 This message means that the extension can't attach to Chrome, because Chrome wasn't launched in debug mode. Here are some things to try:
-* If using an `attach` type config, ensure that you launched Chrome using `--remote-debugging-port=9222`. And if there was already a running instance, close it first or see note about `--user-data-dir` above.
-* Ensure that the `port` property matches the port on which Chrome is listening for remote debugging connections. This is `9222` by default. Ensure nothing else is using this port, including your web server. If something else on your computer responds at `http://localhost:9222`, then set a different port.
+* If using an `attach` type config, ensure that you launched Chrome using `--remote-debugging-port=2015`. And if there was already a running instance, close it first or see note about `--user-data-dir` above.
+* Ensure that the `port` property matches the port on which Chrome is listening for remote debugging connections. This is `2015` by default. Ensure nothing else is using this port, including your web server. If something else on your computer responds at `http://localhost:2015`, then set a different port.
 * If using a `launch` type config with the `userDataDir` option explicitly disabled, close other running instances of Chrome - if Chrome is already running, the extension may not be able to attach, when using launch mode. Chrome can even stay running in the background when all its windows are closed, which will interfere - check the taskbar or kill the process if necessary.
 * If all else fails, try to navigate to `http://localhost:<port>/json` in a browser when you see this message - if there is no response, then something is wrong upstream of the extension. If there is a page of JSON returned, then ensure that the `port` in the launch config matches the port in that url.
 

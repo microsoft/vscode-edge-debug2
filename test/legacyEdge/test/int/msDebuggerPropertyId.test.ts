@@ -78,8 +78,8 @@ suite('msDebuggerPropertyId', () => {
                 }
             }
             // Ensure x and y were checked
-            assert.equal(xChecked, true, "unable to confirm x was properly updated.");
-            assert.equal(yChecked, true, "unable to confirm y was properly updated.");
+            assert.equal(xChecked, true, 'unable to confirm x was properly updated.');
+            assert.equal(yChecked, true, 'unable to confirm y was properly updated.');
 
         });
 
@@ -134,7 +134,7 @@ suite('msDebuggerPropertyId', () => {
                     break;
                 }
             }
-            assert.equal(objChecked, true, "unable to confirm obj.b was properly updated.");
+            assert.equal(objChecked, true, 'unable to confirm obj.b was properly updated.');
             // Ensure 'obj2.b' is updated
             let obj2Checked = false;
             variables = await dc.variablesRequest({ variablesReference: objRef2 });
@@ -145,7 +145,7 @@ suite('msDebuggerPropertyId', () => {
                     break;
                 }
             }
-            assert.equal(obj2Checked, true, "unable to confirm obj2.b was properly updated.");
+            assert.equal(obj2Checked, true, 'unable to confirm obj2.b was properly updated.');
         });
 
         test('Test updating object scope accessor Property using Runtime.callFunctionOn.', async () => {
@@ -199,7 +199,7 @@ suite('msDebuggerPropertyId', () => {
                     break;
                 }
             }
-            assert.equal(objChecked, true, "unable to confirm obj.accessorProp was properly updated.");
+            assert.equal(objChecked, true, 'unable to confirm obj.accessorProp was properly updated.');
             // Ensure 'obj2.accessorProp' is updated
             let obj2Checked = false;
             variables = await dc.variablesRequest({ variablesReference: objRef });
@@ -210,7 +210,7 @@ suite('msDebuggerPropertyId', () => {
                     break;
                 }
             }
-            assert.equal(obj2Checked, true, "unable to confirm obj2.accessorProp was properly updated.");
+            assert.equal(obj2Checked, true, 'unable to confirm obj2.accessorProp was properly updated.');
         });
     });
 });

@@ -7,7 +7,7 @@
             "protocol": "inspector",
             "request": "launch",
             "cwd": "${workspaceFolder}",
-            "program": "${workspaceFolder}/out/src/chromeDebug.js",
+            "program": "${workspaceFolder}/out/src/legacyEdge/edgeDebug.js",
             "args": [ "--server=4712" ],
             "outFiles": ["${workspaceFolder}/out/**/*.js"]
         },
@@ -54,7 +54,7 @@
 			"outFiles": [ "${workspaceFolder}/out/**/*.js" ]
 		},
         {
-            "name": "attach chrome-debug",
+            "name": "attach edge-debug",
             "type": "node",
             "request": "attach",
             "protocol": "inspector",

@@ -103,6 +103,10 @@ suite('ChromeDebugAdapter', () => {
             mockChrome.Runtime
                 .setup(x => x.evaluate(It.isAny()))
                 .returns(() => Promise.resolve<any>({ result: { type: 'string', value: '123' }}));
+
+            mockChrome.Network
+                .setup(x => x.setCacheDisabled(It.isAny()))
+                .returns(() => Promise.resolve());
         });
 
         teardown(() => {
@@ -113,6 +117,8 @@ suite('ChromeDebugAdapter', () => {
 
         test('launches with minimal correct args', () => {
             let spawnCalled = false;
+            const originalGetBrowser = require('../src/utils').getBrowserPath;
+            require('../src/utils').getBrowserPath = (version) => { return 'c:\\someplace\\msedge.exe'; };
             function fork(chromeSpawnHelperPath: string, [chromePath, ...args]: string[]): any {
                 // Just assert that the chrome path is some string with 'chrome' in the path, and there are >0 args
                 assert(chromeSpawnHelperPath.indexOf('chromeSpawnHelper.js') >= 0);
@@ -120,8 +126,8 @@ suite('ChromeDebugAdapter', () => {
             }
 
             function spawn(chromePath: string, args: string[]): any {
-                assert(chromePath.toLowerCase().indexOf('chrome') >= 0);
-                assert(args.indexOf('--remote-debugging-port=9222') >= 0);
+                assert(chromePath.toLowerCase().indexOf('msedge') >= 0);
+                assert(args.indexOf('--remote-debugging-port=2015') >= 0);
                 assert(args.indexOf('about:blank') >= 0); // Now we use the landing page for all scenarios
                 assert(args.indexOf('abc') >= 0);
                 assert(args.indexOf('def') >= 0);

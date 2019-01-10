@@ -212,6 +212,15 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
         super.commonArgs(args);
     }
 
+    private processEDPProtocolVersion(version: string): Version {
+        // version strings from EDP api are in the form "v0.2" with a prepended "v"
+        // EDP api has a bug in it in that version 0.1 of EDP actually returns "v1.2", and they don't plan on fixing it, so here's a check for it
+        if (version === "v1.2") {
+            return Version.parse("0.1");
+        }
+        return Version.parse(version.substring(1));
+    }
+
     protected doAttach(port: number, targetUrl?: string, address?: string, timeout?: number, websocketUrl?: string, extraCRDPChannelPort?: number): Promise<void> {
         return super.doAttach(port, targetUrl, address, timeout, websocketUrl, extraCRDPChannelPort).then(async () => {
             // Don't return this promise, a failure shouldn't fail attach
@@ -230,9 +239,18 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
                 return properties;
             });
 
-            let protocolVersion: TargetVersions = await this._chromeConnection.version;
-            // this._chromeConnection.version is never undefined (will always be at least 0.0)
-            this._edgeProtocolVersion = protocolVersion.protocol;
+            const protocolVersionPromise = this._chromeConnection.api.Schema.getDomains().then(
+                allDomainsResponse => {
+                    return allDomainsResponse.domains.filter(domain => domain.name === 'Debugger');
+                },
+                err => {
+                    logger.log("Error trying to use EDP api for protocol version " + err.message);
+                    return [];
+                }
+            );
+
+            let protocolVersion = await protocolVersionPromise;
+            this._edgeProtocolVersion = protocolVersion.length ? this.processEDPProtocolVersion(protocolVersion[0].version) : Version.unknownVersion();
 
             // Send the versions information as it's own event so we can easily backfill other events in the user session if needed
             userAgentForTelemetryPromise.then(versionInformation => telemetry.telemetry.reportEvent('target-version', versionInformation));

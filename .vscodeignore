@@ -11,7 +11,7 @@ gulpfile.js
 tsconfig.json
 tsd.json
 tslint.json
-vscode-chrome-debug.txt
+vscode-edge-debug.txt
 images/demo.gif
 
 out/test/**

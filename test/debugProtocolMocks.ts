@@ -2,7 +2,6 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 /* tslint:disable:typedef */
-// Copied from -core because I don't want to include test stuff in the npm package
 
 import { EventEmitter } from 'events';
 import { Mock, It, IMock } from 'typemoq';

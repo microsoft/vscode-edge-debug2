@@ -82,12 +82,6 @@ __Windows__
 * In the "target" field, append `--remote-debugging-port=2015`
 * Or in a command prompt, execute `<path to chrome>/chrome.exe --remote-debugging-port=2015`
 
-__macOS__
-* In a terminal, execute `/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --remote-debugging-port=2015`
-
-__Linux__
-* In a terminal, launch `google-chrome --remote-debugging-port=2015`
-
 If you have another instance of Chrome running and don't want to restart it, you can run the new instance under a separate user profile with the  `--user-data-dir` option. Example: `--user-data-dir=/tmp/chrome-debug`. This is the same as using the `userDataDir` option in a launch-type config.
 
 Launch Chrome and navigate to your page.
@@ -195,17 +189,10 @@ Ionic and gulp-sourcemaps output a sourceRoot of `"/source/"` by default. If you
 
 ## Troubleshooting
 
-### My breakpoints aren't hit. What's wrong?
-
-If your breakpoints aren't hit, it's most likely a sourcemapping issue or because you are having breakpoints in immediately executed code. If you for example have a breakpoint in a `render function` that runs on page load, sometimes our debugger might not be attached to Chrome before the code has been executed. This means that you will have to refresh the page in Chrome after we have attached from VS Code to hit your breakpoint. We are working in simplify this in with "break-on-load" breakpoints in https://github.com/Microsoft/vscode-chrome-debug/issues/445, which will make this timing issue transparent.
-
-If you have a sourcemapping issue, please see https://github.com/Microsoft/vscode-chrome-debug#sourcemaps
-
 ### Cannot connect to the target: connect ECONNREFUSED 127.0.0.1:2015
-This message means that the extension can't attach to Chrome, because Chrome wasn't launched in debug mode. Here are some things to try:
-* If using an `attach` type config, ensure that you launched Chrome using `--remote-debugging-port=2015`. And if there was already a running instance, close it first or see note about `--user-data-dir` above.
-* Ensure that the `port` property matches the port on which Chrome is listening for remote debugging connections. This is `2015` by default. Ensure nothing else is using this port, including your web server. If something else on your computer responds at `http://localhost:2015`, then set a different port.
-* If using a `launch` type config with the `userDataDir` option explicitly disabled, close other running instances of Chrome - if Chrome is already running, the extension may not be able to attach, when using launch mode. Chrome can even stay running in the background when all its windows are closed, which will interfere - check the taskbar or kill the process if necessary.
+This message means that the extension can't attach to Edge, probably because Edge wasn't launched in debug mode. Here are some things to try:
+* Ensure that the port property matches the `port` on which Edge is listening for remote debugging connections. This is `2015` by default. Ensure nothing else is using this port, including your web server. If something else on your computer responds at `http://localhost:2015`, then set a different port.
+* If using an `attach` type config, ensure that you launched your browser with a remote debugging port.
 * If all else fails, try to navigate to `http://localhost:<port>/json` in a browser when you see this message - if there is no response, then something is wrong upstream of the extension. If there is a page of JSON returned, then ensure that the `port` in the launch config matches the port in that url.
 
 ### General things to try if you're having issues:

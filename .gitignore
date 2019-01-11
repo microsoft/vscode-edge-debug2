@@ -1,6 +1,6 @@
 .DS_Store
 .browse.VC.db
-vscode-chrome-debug.txt
+vscode-edge-debug.txt
 npm-debug.log
 *.vsix
 

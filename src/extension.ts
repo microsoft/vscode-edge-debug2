@@ -120,7 +120,7 @@ async function pickTarget(targets: Core.chromeConnection.ITarget[]): Promise<ITa
         websocketDebuggerUrl: target.webSocketDebuggerUrl
     }));
 
-    const placeHolder = localize('chrome.targets.placeholder', 'Select a tab');
+    const placeHolder = localize('edge.targets.placeholder', 'Select a tab');
     const selected = await vscode.window.showQuickPick(items, { placeHolder, matchOnDescription: true, matchOnDetail: true });
     return selected;
 }

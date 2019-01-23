@@ -1,4 +1,4 @@
-VS Code - Debugger for Chrome
+VS Code - Debugger for Edge
 
 Copyright (c) Microsoft Corporation
 

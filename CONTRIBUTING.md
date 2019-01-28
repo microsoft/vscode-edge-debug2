@@ -1,12 +1,6 @@
 # Contributing
 
-This project welcomes contributions and suggestions.  Most contributions require you to agree to a
-Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
-the rights to use your contribution. For details, visit https://cla.microsoft.com.
-
-When you submit a pull request, a CLA-bot will automatically determine whether you need to provide
-a CLA and decorate the PR appropriately (e.g., label, comment). Simply follow the instructions
-provided by the bot. You will only need to do this once across all repos using our CLA.
+Contributions are always welcome! We only ask that you open an issue first so we can discuss the problem and solution. We don't want you to waste any time headed in the wrong direction.
 
 ## Development setup
 
@@ -22,9 +16,7 @@ Most of the code is actually in [this repo](https://github.com/Microsoft/vscode-
 In VS Code, run the `launch as server` launch config - it will start the adapter as a server listening on port 4712. In your test app launch.json, include this flag at the top level: `"debugServer": "4712"`. Then you'll be able to debug the adapter in the first instance of VS Code, in its original TypeScript, using sourcemaps.
 
 ## Testing
-* Run `gulp tslint` to check your code against our tslint rules.
-* Run `npm run test` to validate against our unit tests.
-* There are also some integration tests which can be run by `npm run intTest`
+There is a set of mocha tests which can be run with either an npm script or with one of the launch configs. Run `npm run test` to validate against our unit tests. Run `npm run intTest` to validate against our integration tests. Also run `gulp tslint` to check your code against our tslint rules.
 
 See the project under testapp/ for a bunch of test scenarios crammed onto one page.
 

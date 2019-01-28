@@ -37,7 +37,7 @@ export class EdgeConfigurationProvider implements vscode.DebugConfigurationProvi
      */
     async resolveDebugConfiguration(folder: vscode.WorkspaceFolder | undefined, config: vscode.DebugConfiguration, token?: vscode.CancellationToken): Promise<vscode.DebugConfiguration> {
         if (!isEdgeDebuggingSupported()) {
-            const errorMessage = localize('edge.debug.error.versionNotSupported', 'Your version of EdgeHTML does not support debugging via the Edge DevTools Protocol. You can read more about supported versions here (https://aka.ms/edp-docs).');
+            const errorMessage = localize('edge.debug.error.versionNotSupported', 'Your version of Microsoft Edge does not support debugging via the Edge DevTools Protocol. You can read more about supported versions here (https://aka.ms/edp-docs).');
             return vscode.window.showErrorMessage(errorMessage).then(_ => {
                 return undefined;
             });

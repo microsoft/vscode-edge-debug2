@@ -69,7 +69,7 @@ function doBuild(buildNls, failOnError) {
     return tsResult.js
         .pipe(buildNls ? nls.rewriteLocalizeCalls() : es.through())
         .pipe(buildNls ? nls.createAdditionalLanguageFiles(defaultLanguages, 'i18n', 'out') : es.through())
-        .pipe(buildNls ? nls.bundleMetaDataFiles('ms-vscode.vscode-chrome-debug', 'out') : es.through())
+        .pipe(buildNls ? nls.bundleMetaDataFiles('ms-vscode.vscode-edge-debug2', 'out') : es.through())
         .pipe(buildNls ? nls.bundleLanguageFiles() : es.through())
 
         .pipe(sourcemaps.write('.', { includeContent: false, sourceRoot: '.' })) // .. to compensate for TS returning paths from 'out'
@@ -90,7 +90,7 @@ gulp.task('copy-scripts', () => {
 });
 
 gulp.task('clean', () => {
-    return del(['out/**', 'vscode-chrome-debug-*.vsix']);
+    return del(['out/**', 'vscode-edge-debug2-*.vsix']);
 });
 
 gulp.task('build', gulp.series(['clean', 'copy-scripts'], () => {

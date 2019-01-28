@@ -1,40 +1,29 @@
 <h1 align="center">
   <br>
-    <img src="https://github.com/Microsoft/vscode-chrome-debug/blob/master/images/icon.png?raw=true" alt="logo" width="200">
+    <img src="images/icon.png" alt="logo" width="200">
   <br>
-  VS Code - Debugger for Chrome
+  VS Code - Debugger for Edge
   <br>
   <br>
 </h1>
 
 <h4 align="center">Debug your JavaScript code running in Microsoft Edge from VS Code.</h4>
 
-<p align="center">
-  <a href="https://vscode.visualstudio.com/1e32b5a6-a974-467b-9d5f-f47e49589c5e/_build/definition?definitionId=9"><img src="https://vscode.visualstudio.com/_apis/public/build/definitions/1e32b5a6-a974-467b-9d5f-f47e49589c5e/9/badge" alt="vsts"></a>
-  <a href="https://marketplace.visualstudio.com/items?itemName=msjsdiag.debugger-for-chrome"><img src="https://vsmarketplacebadge.apphb.com/version/msjsdiag.debugger-for-chrome.svg?label=Debugger%20for%20Chrome" alt="Marketplace bagde"></a>
-    <a href="https://gitter.im/Microsoft/vscode-chrome-debug?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge"><img src="https://badges.gitter.im/Microsoft/vscode-chrome-debug.svg" alt="Release"></a>
-
-</p>
-
-
-A VS Code extension to debug your JavaScript code in the Microsoft Edge browser, or other targets that support the [Chrome DevTools Protocol](https://chromedevtools.github.io/debugger-protocol-viewer/).
-
-![Demo](https://github.com/Microsoft/vscode-chrome-debug/blob/master/images/demo.gif?raw=true)
+A VS Code extension to debug your JavaScript code in the Microsoft Edge browser from VS Code.
 
 **Supported features**
 * Setting breakpoints, including in source files when source maps are enabled
-* Stepping, including with the buttons on the Chrome page
+* Stepping through the code
 * The Locals pane
 * Debugging eval scripts, script tags, and scripts that are added dynamically
 * Watches
-* Console
 
 **Unsupported scenarios**
 * Debugging web workers
-* Any features that aren't script debugging.
+* Features that aren't script debugging.
 
 ## Getting Started
-1. [Install the extension](https://marketplace.visualstudio.com/items?itemName=msjsdiag.debugger-for-chrome)
+1. [Install the extension](https://marketplace.visualstudio.com/items?itemName=msjsdiag.debugger-for-edge)
 2. Restart VS Code and open the folder containing the project you want to work on.
 
 ## Using the debugger
@@ -43,48 +32,44 @@ When your launch config is set up, you can debug your project. Pick a launch con
 
 ### Configuration
 
-The extension operates in two modes - it can launch an instance of Chrome navigated to your app, or it can attach to a running instance of Chrome. Both modes requires you to be serving your web application from local web server, which is started from either a VS Code task or from your command-line. Using the `url` parameter you simply tell VS Code which URL to either open or launch in Chrome.
+The extension operates in two modes - it can launch an instance of Microsoft Edge navigated to your app, or it can attach to a running instance of Edge. Both modes require you to be serving your web application from a local web server, which is started from either a VS Code task or from your command-line. Using the `url` parameter you simply tell VS Code which URL to either open or launch in Edge.
 
-Just like when using the Node debugger, you configure these modes with a `.vscode/launch.json` file in the root directory of your project. You can create this file manually, or Code will create one for you if you try to run your project, and it doesn't exist yet.
-
-> **Tip**: See recipes for debugging different frameworks here: https://github.com/Microsoft/vscode-recipes
+You can configure these modes with a `.vscode/launch.json` file in the root directory of your project. You can create this file manually, or Code will create one for you if you try to run your project, and it doesn't exist yet.
 
 ### Launch
-Two example `launch.json` configs with `"request": "launch"`. You must specify either `file` or `url` to launch Chrome against a local file or a url. If you use a url, set `webRoot` to the directory that files are served from. This can be either an absolute path or a path using `${workspaceFolder}` (the folder open in Code). `webRoot` is used to resolve urls (like "http://localhost/app.js") to a file on disk (like `/Users/me/project/app.js`), so be careful that it's set correctly.
+
+Here are two example `launch.json` configs with `"request": "launch"`. You must specify either `file` or `url` to launch Edge against a local file or a url. If you use a url, set `webRoot` to the directory that files are served from. This can be either an absolute path or a path using `${workspaceFolder}` (the folder open in Code). `webRoot` is used to resolve urls (like "http://localhost/app.js") to a file on disk (like `/Users/me/project/app.js`), so be careful that it's set correctly.
 ```json
 {
     "version": "0.1.0",
     "configurations": [
         {
             "name": "Launch localhost",
-            "type": "chrome",
+            "type": "edge",
+            "version": "beta",
             "request": "launch",
             "url": "http://localhost/mypage.html",
             "webRoot": "${workspaceFolder}/wwwroot"
         },
         {
             "name": "Launch index.html",
-            "type": "chrome",
+            "type": "edge",
             "request": "launch",
+            "sourceMaps": false,
             "file": "${workspaceFolder}/index.html"
         },
     ]
 }
 ```
 
-If you want to use a different installation of Chrome, you can also set the `runtimeExecutable` field with a path to the Chrome app.
+If you want to use a different installation of a Chromium-based browser, you can also set the `runtimeExecutable` field with a path to the browser executable. On machines with the Microsoft EdgeHTML browser, simply omit the `version` flag (such as in the `Launch index.html` example above).
 
 ### Attach
-With `"request": "attach"`, you must launch Chrome with remote debugging enabled in order for the extension to attach to it. Here's how to do that:
+With `"request": "attach"`, you must launch Edge with remote debugging enabled in order for the extension to attach to it. Here's how you can do that:
 
 __Windows__
-* Right click the Chrome shortcut, and select properties
-* In the "target" field, append `--remote-debugging-port=2015`
-* Or in a command prompt, execute `<path to chrome>/chrome.exe --remote-debugging-port=2015`
-
-If you have another instance of Chrome running and don't want to restart it, you can run the new instance under a separate user profile with the  `--user-data-dir` option. Example: `--user-data-dir=/tmp/chrome-debug`. This is the same as using the `userDataDir` option in a launch-type config.
-
-Launch Chrome and navigate to your page.
+* Right click the Edge shortcut, and select properties
+* In the "target" field, append `--remote-debugging-port=2015` for Microsoft Edge (Chromium), or append `--devtools-server-port 2015` for Microsoft Edge (EdgeHTML)
 
 An example `launch.json` file for an "attach" config.
 ```json
@@ -93,52 +78,34 @@ An example `launch.json` file for an "attach" config.
     "configurations": [
         {
             "name": "Attach to url with files served from ./out",
-            "type": "chrome",
+            "type": "edge",
             "request": "attach",
             "port": 2015,
-            "url": "<url of the open browser tab to connect to>",
+            "url": "<url of the open browser page to connect to>",
             "webRoot": "${workspaceFolder}/out"
         }
     ]
 }
 ```
 
-### Chrome user profile note (`Cannot connect to the target: connect ECONNREFUSED`)
-
-Normally, if Chrome is already running when you start debugging with a launch config, then the new instance won't start in remote debugging mode. So by default, the extension launches Chrome with a separate user profile in a temp folder. Use the `userDataDir` launch config field to override or disable this. If you are using the `runtimeExecutable` field, this isn't enabled by default, but you can forcibly enable it with `"userDataDir": true`.
-
-If you are using an attach config, make sure you close other running instances of Chrome before launching a new one with `--remote-debugging-port`. Or, use a new profile with the `--user-data-dir` flag yourself.
-
-For other troubleshooting tips for this error, [see below](#cannot-connect-to-the-target:-connect-ECONNREFUSED-127.0.0.1:2015).
-
-### Errors from chrome-error://chromewebdata
-
-If you see errors with a location like `chrome-error://chromewebdata/` in the error stack, these errors are not from the extension or from your app - they are usually a sign that Chrome was not able to load your app.
-
-WHen you see these errors, first check whether Chrome was able to load your app. Does Chrome say "This site can't be reached" or something similar? You must start your own server to run your app. Double-check that your server is running, and that the url and port are configured correctly.
-
-### Other targets
-You can also theoretically attach to other targets that support the same Chrome Debugging protocol, such as Electron or Cordova. These aren't officially supported, but should work with basically the same steps. You can use a launch config by setting `"runtimeExecutable"` to a program or script to launch, or an attach config to attach to a process that's already running. If Code can't find the target, you can always verify that it is actually available by navigating to `http://localhost:<port>/json` in a browser. If you get a response with a bunch of JSON, and can find your target page in that JSON, then the target should be available to this extension.
-
-### Examples
-See our wiki page for some configured example apps: [Examples](https://github.com/Microsoft/vscode-chrome-debug/wiki/Examples)
-
-
 ### Other optional launch config fields
-* `trace`: When true, the adapter logs its own diagnostic info to a file. The file path will be printed in the Debug Console. This is often useful info to include when filing an issue on GitHub. If you set it to "verbose", it will also log to the console.
-* `runtimeExecutable`: Workspace relative or absolute path to the runtime executable to be used. If not specified, Chrome will be used from the default install location.
+* `trace`: When true, the adapter logs its own diagnostic info to a file. The file path will be printed in the Debug Console. This is often useful info to include when filing an issue on GitHub. If you set it to "verbose", it will log to a file and also log to the console.
+* `runtimeExecutable`: Workspace relative or absolute path to the runtime executable to be used. If not specified, Microsoft Edge will be used from the default install location.
 * `runtimeArgs`: Optional arguments passed to the runtime executable.
 * `env`: Optional dictionary of environment key/value pairs.
 * `cwd`: Optional working directory for the runtime executable.
-* `userDataDir`: Normally, if Chrome is already running when you start debugging with a launch config, then the new instance won't start in remote debugging mode. So by default, the extension launches Chrome with a separate user profile in a temp folder. Use this option to set a different path to use, or set to false to launch with your default user profile.
-* `url`: On a 'launch' config, it will launch Chrome at this URL.
+* `userDataDir`: Normally, if Edge is already running when you start debugging with a launch config, then the new instance won't start in remote debugging mode. So by default, the extension launches Edge with a separate user profile in a temp folder. Use this option to set a different path to use, or set to false to launch with your default user profile. Note that this is only applicable to Microsoft Edge (Chromium) and will not work with Microsoft Edge (EdgeHTML).
+* `url`: On a 'launch' config, it will launch Edge at this URL.
 * `urlFilter`: On an 'attach' config, or a 'launch' config with no 'url' set, search for a page with this url and attach to it. It can also contain wildcards, for example, `"localhost:*/app"` will match either `"http://localhost:123/app"` or `"http://localhost:456/app"`, but not `"https://stackoverflow.com"`.
-* `targetTypes`: On an 'attach' config, or a 'launch' config with no 'url' set, set a list of acceptable target types from the default `["page"]`. For example, if you are attaching to an Electron app, you might want to set this to `["page", "webview"]`. A value of `null` disables filtering by target type.
+* `targetTypes`: On an 'attach' config, or a 'launch' config with no 'url' set, set a list of acceptable target types from the default `["page"]`. For example, if you are attaching to an Electron app, you might want to set this to `["page", "webview"]`. A value of `null` disables filtering by target type. Note that this is only applicable to Microsoft Edge (Chromium) and will not work with Microsoft Edge (EdgeHTML).
 * `sourceMaps`: By default, the adapter will use sourcemaps and your original sources whenever possible. You can disable this by setting `sourceMaps` to false.
 * `pathMapping`: This property takes a mapping of URL paths to local paths, to give you more flexibility in how URLs are resolved to local files. `"webRoot": "${workspaceFolder}"` is just shorthand for a pathMapping like `{ "/": "${workspaceFolder}" }`.
 * `smartStep`: Automatically steps over code that doesn't map to source files. Especially useful for debugging with async/await.
 * `disableNetworkCache`: If true, the network cache will be disabled.
 * `showAsyncStacks`: If true, callstacks across async calls (like `setTimeout`, `fetch`, resolved Promises, etc) will be shown.
+
+### Other targets
+You can also theoretically attach to other targets that support the same Chrome Debugging protocol as the Microsoft Edge (Chromium) browser, such as Electron or Cordova. These aren't officially supported, but should work with basically the same steps. You can use a launch config by setting `"runtimeExecutable"` to a program or script to launch, or an attach config to attach to a process that's already running. If Code can't find the target, you can always verify that it is actually available by navigating to `http://localhost:<port>/json` in a browser. If you get a response with a bunch of JSON, and can find your target page in that JSON, then the target should be available to this extension.
 
 ## Skip files / Blackboxing / Ignore files
 You can use the `skipFiles` property to ignore/blackbox specific files while debugging. For example, if you set `"skipFiles": ["jquery.js"]`, then you will skip any file named 'jquery.js' when stepping through your code. You also won't break on exceptions thrown from 'jquery.js'. This works the same as "blackboxing scripts" in Chrome DevTools.
@@ -147,18 +114,6 @@ The supported formats are:
   * The name of a file (like `jquery.js`)
   * The name of a folder, under which to skip all scripts (like `node_modules`)
   * A path glob, to skip all scripts that match (like `node_modules/react/*.min.js`)
-
-## Page refreshing
-This debugger also enables you to refresh your target by simply hitting the restart button in the debugger UI. Additionally you can map the refresh action to your favorite keyboard shortcut by adding the following key mapping to [Key Bindings](https://code.visualstudio.com/docs/getstarted/keybindings):
-
-```json
-{
-    "key": "ctrl+r",
-    "command": "workbench.action.debug.restart",
-    "when": "inDebugMode"
-}
-```
-Read more here https://github.com/Microsoft/vscode-chrome-debug-core/issues/91#issuecomment-265027348
 
 ## Sourcemaps
 The debugger uses sourcemaps to let you debug with your original sources, but sometimes the sourcemaps aren't generated properly and overrides are needed. In the config we support `sourceMapPathOverrides`, a mapping of source paths from the sourcemap, to the locations of these sources on disk. Useful when the sourcemap isn't accurate or can't be fixed in the build process.
@@ -198,37 +153,10 @@ This message means that the extension can't attach to Edge, probably because Edg
 ### General things to try if you're having issues:
 * Ensure `webRoot` is set correctly if needed
 * Look at your sourcemap config carefully. A sourcemap has a path to the source files, and this extension uses that path to find the original source files on disk. Check the `sourceRoot` and `sources` properties in your sourcemap and make sure that they can be combined with the `webRoot` property in your launch config to build the correct path to the original source files.
-* This extension ignores sources that are inlined in the sourcemap - you may have a setup that works in Chrome Dev Tools, but not this extension, because the paths are incorrect, but Chrome Dev Tools are reading the inlined source content.
 * Check the console for warnings that this extension prints in some cases when it can't attach.
-* Ensure the code in Chrome matches the code in Code. Chrome may cache an old version.
+* Ensure the code in your browser matches the code in Code. The browser may cache an old version of your code.
 * If your breakpoints bind, but aren't hit, try refreshing the page. If you set a breakpoint in code that runs immediately when the page loads, you won't hit that breakpoint until you refresh the page.
-* File a bug in this extension's [GitHub repo](https://github.com/Microsoft/vscode-chrome-debug), including the debug adapter log file. Create the log file by setting the "trace" field in your launch config and reproducing the issue. It will print the path to the log file at the top of the Debug Console. You can drag this file into an issue comment to upload it to GitHub.
-* If you're using Webpack, we recommend using the `"devtool": "source-map"` option (in your `webpack.config.js` file) as the others produce lower-fidelity sourcemaps and you may have issues setting breakpoints. See the [full list of devtool options for webpack](https://webpack.js.org/configuration/devtool/) for more information.
-
-### The `.scripts` command
-This feature is extremely useful for understanding how the extension maps files in your workspace to files running in Chrome. You can enter `.scripts` in the Debug Console to see a listing of all scripts loaded in the runtime, their sourcemap information, and how they are mapped to files on disk. The format is like this:
-
-```
-› <The exact URL for a script, reported by Chrome> (<The local path that has been inferred for this script, using webRoot, if applicable>)
-    - <The exact source path from the sourcemap> (<The local path inferred for the source, using sourceMapPathOverrides, or webRoot, etc, if applicable>)
-```
-
-Example:
-```
-.scripts
-› eval://43
-› http://localhost:8080/index.html (/Users/me/project/wwwroot/index.html)
-› http://localhost:8080/out/test1.js (/Users/me/project/wwwroot/out/test1.js)
-    - /src/test1a.ts (/Users/me/project/wwwroot/src/test1a.ts)
-    - /src/test1b.ts (/Users/me/project/wwwroot/src/test1b.ts)
-    - /src/test1c.ts (/Users/me/project/wwwroot/src/test1c.ts)
-› http://localhost:8080/out/test2.js (/Users/me/project/wwwroot/out/test2.js)
-    - /src/test2.ts (/Users/me/project/wwwroot/src/test2.ts)
-```
-
-If the paths of your source files show as not being resolved correctly here, you may have to change `sourceMapPathOverrides` or `webRoot` to help the debugger resolve them to real paths on disk.
-
-If you are wondering what a script is, for example, that 'eval' script, you can also use `.scripts` to get its contents: `.scripts eval://43`.
+* File a bug in this extension's [GitHub repo](https://github.com/Microsoft/vscode-edge-debug2), including the debug adapter log file. Create the log file by setting the "trace" field in your launch config and reproducing the issue. It will print the path to the log file at the top of the Debug Console. You can drag this file into an issue comment to upload it to GitHub.
 
 ---
 

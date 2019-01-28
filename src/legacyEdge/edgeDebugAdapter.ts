@@ -116,7 +116,7 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
 
             runtimeExecutable = runtimeExecutable || utils.getEdgePath();
             if (!runtimeExecutable) {
-                return coreUtils.errP(localize('attribute.edge.missing', "Can't find Edge - install it or set the \"runtimeExecutable\" field in the launch config."));
+                return coreUtils.errP(localize('attribute.edge.missing', "Can't find Microsoft Edge - install it or set the \"runtimeExecutable\" field in the launch config."));
             }
 
             // Start with remote debugging enabled

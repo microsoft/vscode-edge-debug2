@@ -13,7 +13,7 @@ A VS Code extension to debug your JavaScript code in the Microsoft Edge browser 
 
 **Supported features**
 * Setting breakpoints, including in source files when source maps are enabled
-* Steppingb through the code
+* Stepping through the code
 * The Locals pane
 * Debugging eval scripts, script tags, and scripts that are added dynamically
 * Watches

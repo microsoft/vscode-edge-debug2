@@ -7,13 +7,14 @@ import * as Core from 'vscode-chrome-debug-core';
 import * as nls from 'vscode-nls';
 
 import { defaultTargetFilter, getTargetFilter } from './utils';
+import * as errors from './errors';
 import { ProtocolDetection } from './protocolDetection';
 
 const localize = nls.loadMessageBundle();
 
 export function activate(context: vscode.ExtensionContext) {
-    context.subscriptions.push(vscode.commands.registerCommand('extension.chrome-debug.toggleSkippingFile', toggleSkippingFile));
-    context.subscriptions.push(vscode.commands.registerCommand('extension.chrome-debug.toggleSmartStep', toggleSmartStep));
+    context.subscriptions.push(vscode.commands.registerCommand('extension.edge-debug.toggleSkippingFile', toggleSkippingFile));
+    context.subscriptions.push(vscode.commands.registerCommand('extension.edge-debug.toggleSmartStep', toggleSmartStep));
 
     context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('edge', new EdgeConfigurationProvider()));
 }
@@ -22,7 +23,7 @@ export function deactivate() {
 }
 
 const DEFAULT_CONFIG = {
-    type: 'msedge',
+    type: 'edge',
     request: 'launch',
     name: localize('edge.launch.name', 'Launch Edge against localhost'),
     url: 'http://localhost:8080',
@@ -30,6 +31,8 @@ const DEFAULT_CONFIG = {
 };
 
 export class EdgeConfigurationProvider implements vscode.DebugConfigurationProvider {
+    private static ATTACH_TIMEOUT = 10000;
+
     provideDebugConfigurations(folder: vscode.WorkspaceFolder | undefined, token?: vscode.CancellationToken): vscode.ProviderResult<vscode.DebugConfiguration[]> {
         return Promise.resolve([DEFAULT_CONFIG]);
     }
@@ -75,16 +78,15 @@ export class EdgeConfigurationProvider implements vscode.DebugConfigurationProvi
 
             const protocolDetection = new ProtocolDetection(nullLogger);
 
-            let detectedBrowserProtocol = await protocolDetection.hitVersionEndpoint(config.address || '127.0.0.1', config.port)
+            await protocolDetection.hitVersionEndpoint(config.address || '127.0.0.1', config.port, EdgeConfigurationProvider.ATTACH_TIMEOUT)
+                .then((detectedBrowserProtocol) => {
+                    if (protocolDetection.extractBrowserProtocol(detectedBrowserProtocol).indexOf('Chrome') > -1) {
+                        config.type = 'msedge';
+                    }
+                })
                 .catch(async e => {
-                    // if something went wrong, bail
-                    return null;
+                    Promise.reject(errors.getNotExistErrorResponse(String(EdgeConfigurationProvider.ATTACH_TIMEOUT), e.message));
                 });
-
-            if (protocolDetection.extractBrowserProtocol(detectedBrowserProtocol).indexOf('Chrome') > -1) {
-                config.type = 'msedge';
-            }
-
         }
 
         return config;

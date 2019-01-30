@@ -23,11 +23,13 @@
 	"edge.disableNetworkCache.description": "Controls whether to skip the network cache for each request",
 	"edge.urlFilter.description": "Will search for a page with this url and attach to it, if found. Can have * wildcards.",
 	"edge.showAsyncStacks.description": "Show the async calls that led to the current call stack",
+	"edge.logTimestamps.description": "Boolean value to turn off/on logging of timestamps in the logfiles (turned on by default).",
 	"edge.version.description": "Tells the adapter to use the Microsoft Edge (Chromium) browser. Omit this flag if wanting to launch with Microsoft Edge (EdgeHTML).",
 	"edge.userDataDir.description": "By default, Microsoft Edge is launched with a separate user profile in a temp folder. Use this option to override it. Set to false to launch with your default user profile. Note that this is only applicable to Microsoft Edge (Chromium) and will not work with Microsoft Edge (EdgeHTML).",
 	"edge.breakOnLoad.description": "Experimental feature -  If true, the debug adapter will attempt to set breakpoints in scripts before they are loaded, so it can hit breakpoints at the beginnings of those scripts. Has a perf impact. Note that this is only applicable to Microsoft Edge (Chromium) and will not work with Microsoft Edge (EdgeHTML).",
 	"edge.breakOnLoadStrategy.description": "The strategy to use for breakOnLoad. Note that this is only applicable to Microsoft Edge (Chromium) and will not work with Microsoft Edge (EdgeHTML).",
 	"edge.breakOnLoadStrategy.instrument.description": "Tell Microsoft Edge to pause as each script is loaded, resolving sourcemaps and setting breakpoints",
 	"edge.breakOnLoadStrategy.regex.description": "Sets breakpoints optimistically in files with the same name as the file in which the breakpoint is set.",
+	"edge.breakOnLoadStrategy.off.description": "Turns off breakOnLoad.",
 	"edge.targetTypes.description": "An array of acceptable target types. The default is `[\"page\"]`."
 }

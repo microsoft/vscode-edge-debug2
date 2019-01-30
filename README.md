@@ -1,7 +1,4 @@
 <h1 align="center">
-  <br>
-    <img src="images/icon.png" alt="logo" width="200">
-  <br>
   VS Code - Debugger for Edge
   <br>
   <br>

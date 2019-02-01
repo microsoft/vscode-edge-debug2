@@ -90,8 +90,8 @@ function getLogStubs() {
 
 function getSchemaStubs() {
     return {
-        getDomains() { return Promise.resolve({domains: []})}
-    }
+        getDomains() { return Promise.resolve({domains: []}); }
+    };
 }
 
 export function getMockEdgeConnectionApi(): IMockEdgeConnectionAPI {

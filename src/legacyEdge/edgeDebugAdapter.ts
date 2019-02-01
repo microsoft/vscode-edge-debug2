@@ -215,8 +215,8 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
     private processEDPProtocolVersion(version: string): Version {
         // version strings from EDP api are in the form "v0.2" with a prepended "v"
         // EDP api has a bug in it in that version 0.1 of EDP actually returns "v1.2", and they don't plan on fixing it, so here's a check for it
-        if (version === "v1.2") {
-            return Version.parse("0.1");
+        if (version === 'v1.2') {
+            return Version.parse('0.1');
         }
         return Version.parse(version.substring(1));
     }
@@ -244,7 +244,7 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
                     return allDomainsResponse.domains.filter(domain => domain.name === 'Debugger');
                 },
                 err => {
-                    logger.log("Error trying to use EDP api for protocol version " + err.message);
+                    logger.log('Error trying to use EDP api for protocol version ' + err.message);
                     return [];
                 }
             );

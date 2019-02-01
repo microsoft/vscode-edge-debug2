@@ -18,3 +18,5 @@ export function getNotExistErrorResponse(attribute: string, path: string): Promi
             variables: { path }
         }));
 }
+
+export { runtimeConnectionTimeout } from 'vscode-chrome-debug-core/out/src/errors';

@@ -1,7 +1,7 @@
 {
   "name": "debugger-for-edge",
   "displayName": "Debugger for Edge",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "icon": "images/icon.png",
   "description": "%extension.description%",
   "author": {
@@ -305,11 +305,13 @@
                 "type": "string",
                 "enum": [
                   "instrument",
-                  "regex"
+                  "regex",
+                  "off"
                 ],
                 "enumDescriptions": [
                   "%edge.breakOnLoadStrategy.instrument.description%",
-                  "%edge.breakOnLoadStrategy.regex.description%"
+                  "%edge.breakOnLoadStrategy.regex.description%",
+                  "%edge.breakOnLoadStrategy.off.description%"
                 ],
                 "description": "%edge.breakOnLoadStrategy.description%",
                 "default": "instrument"
@@ -333,28 +335,28 @@
             "properties": {
               "port": {
                 "type": "number",
-                "description": "%chrome.port.description%",
+                "description": "%edge.port.description%",
                 "default": 2015
               },
               "address": {
                 "type": "string",
-                "description": "%chrome.address.description%",
+                "description": "%edge.address.description%",
                 "default": "127.0.0.1"
               },
               "sourceMaps": {
                 "type": "boolean",
-                "description": "%chrome.sourceMaps.description%",
+                "description": "%edge.sourceMaps.description%",
                 "default": true
               },
               "diagnosticLogging": {
                 "type": "boolean",
-                "description": "%chrome.diagnosticLogging.description%",
+                "description": "%edge.diagnosticLogging.description%",
                 "default": true,
                 "deprecationMessage": "'diagnosticLogging' is deprecated. Use 'trace' instead."
               },
               "verboseDiagnosticLogging": {
                 "type": "boolean",
-                "description": "%chrome.verboseDiagnosticLogging.description%",
+                "description": "%edge.verboseDiagnosticLogging.description%",
                 "default": true,
                 "deprecationMessage": "'verboseDiagnosticLogging' is deprecated. Use 'trace' instead."
               },
@@ -368,51 +370,51 @@
                   true
                 ],
                 "default": true,
-                "description": "%chrome.trace.description%"
+                "description": "%edge.trace.description%"
               },
               "url": {
                 "type": "string",
-                "description": "%chrome.url.description%",
+                "description": "%edge.url.description%",
                 "default": "http://localhost:8080"
               },
               "webRoot": {
                 "type": "string",
-                "description": "%chrome.webRoot.description%",
+                "description": "%edge.webRoot.description%",
                 "default": "${workspaceFolder}"
               },
               "pathMapping": {
                 "type": "object",
-                "description": "%chrome.pathMapping.description%",
+                "description": "%edge.pathMapping.description%",
                 "default": {}
               },
               "sourceMapPathOverrides": {
                 "type": "object",
-                "description": "%chrome.sourceMapPathOverrides.description%",
+                "description": "%edge.sourceMapPathOverrides.description%",
                 "default": {}
               },
               "smartStep": {
                 "type": "boolean",
-                "description": "%chrome.smartStep.description%",
+                "description": "%edge.smartStep.description%",
                 "default": true
               },
               "skipFiles": {
                 "type": "array",
-                "description": "%chrome.skipFiles.description%",
+                "description": "%edge.skipFiles.description%",
                 "default": []
               },
               "timeout": {
                 "type": "number",
-                "description": "%chrome.timeout.description%",
+                "description": "%edge.timeout.description%",
                 "default": 10000
               },
               "disableNetworkCache": {
                 "type": "boolean",
-                "description": "%chrome.disableNetworkCache.description%",
+                "description": "%edge.disableNetworkCache.description%",
                 "default": true
               },
               "urlFilter": {
                 "type": "string",
-                "description": "%chrome.urlFilter.description%",
+                "description": "%edge.urlFilter.description%",
                 "default": ""
               },
               "targetTypes": {
@@ -420,14 +422,14 @@
                   "array",
                   "null"
                 ],
-                "description": "%chrome.targetTypes.description%",
+                "description": "%edge.targetTypes.description%",
                 "default": [
                   "page"
                 ]
               },
               "showAsyncStacks": {
                 "type": "boolean",
-                "description": "%chrome.showAsyncStacks.description%",
+                "description": "%edge.showAsyncStacks.description%",
                 "default": true
               },
               "logTimestamps": {
@@ -802,25 +804,25 @@
     "menus": {
       "debug/callstack/context": [
         {
-          "command": "extension.chrome-debug.toggleSkippingFile",
+          "command": "extension.edge-debug.toggleSkippingFile",
           "group": "navigation",
-          "when": "inDebugMode && debugType == 'chrome' && callStackItemType == 'stackFrame'"
+          "when": "inDebugMode && debugType == 'edge' && callStackItemType == 'stackFrame'"
         },
         {
-          "command": "extension.chrome-debug.toggleSmartStep",
+          "command": "extension.edge-debug.toggleSmartStep",
           "group": "navigation",
-          "when": "inDebugMode && debugType == 'chrome' && callStackItemType == 'stackFrame'"
+          "when": "inDebugMode && debugType == 'edge' && callStackItemType == 'stackFrame'"
         }
       ]
     },
     "commands": [
       {
-        "command": "extension.chrome-debug.toggleSkippingFile",
-        "title": "%chrome.toggleSkipping.title%"
+        "command": "extension.edge-debug.toggleSkippingFile",
+        "title": "%edge.toggleSkipping.title%"
       },
       {
-        "command": "extension.chrome-debug.toggleSmartStep",
-        "title": "%chrome.toggleSmartStep.title%"
+        "command": "extension.edge-debug.toggleSmartStep",
+        "title": "%edge.toggleSmartStep.title%"
       }
     ],
     "keybindings": [
@@ -828,7 +830,7 @@
         "command": "extension.node-debug.pickLoadedScript",
         "key": "ctrl+f4",
         "mac": "cmd+f4",
-        "when": "debugType == 'chrome'"
+        "when": "debugType == 'edge'"
       }
     ]
   }

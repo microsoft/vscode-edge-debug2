@@ -1,7 +1,7 @@
 'use strict';
 
 import { Logger } from 'vscode-debugadapter';
-import { utils, telemetry } from 'vscode-chrome-debug-core';
+import { utils } from 'vscode-chrome-debug-core';
 
 export class ProtocolDetection {
     private logger: Logger.ILogger;
@@ -10,18 +10,17 @@ export class ProtocolDetection {
         this.logger = _logger;
     }
 
-    public async hitVersionEndpoint(address: string, port: number): Promise<string> {
+    public async hitVersionEndpoint(address: string, port: number, timeout: number): Promise<string> {
         const url = `http://${address}:${port}/json/version`;
         this.logger.log(`Getting browser and debug protocol version via ${url}`);
 
-        const jsonResponse = await utils.getURL(url, { headers: { Host: 'localhost' } })
-            .catch(e => {
-                // This means /json/version is not available.
-                this.logger.log(`There was an error connecting to ${url} : ${e.message}`);
-                throw e;
-            });
-
-        return JSON.parse(jsonResponse);
+        return utils.retryAsync(async () => {
+            await utils.getURL(url, { headers: { Host: 'localhost' } })
+                .catch(e => this.logger.log(`There was an error connecting to ${url} : ${e.message}`));
+        }, timeout, /*intervalDelay=*/ 100)
+        .then((jsonResponse) => {
+            return JSON.parse(jsonResponse);
+        });
     }
 
     public extractBrowserProtocol(detectedBrowserJsonVersion: any): string {

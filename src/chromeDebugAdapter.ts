@@ -64,8 +64,8 @@ export class ChromeDebugAdapter extends CoreDebugAdapter {
 
         return super.launch(args, telemetryPropertyCollector).then(async () => {
             let runtimeExecutable: string;
-            if (args.shouldLaunchChromeUnelevated !== undefined) {
-                telemetryPropertyCollector.addTelemetryProperty('shouldLaunchChromeUnelevated', args.shouldLaunchChromeUnelevated.toString());
+            if (args.shouldLaunchEdgeUnelevated !== undefined) {
+                telemetryPropertyCollector.addTelemetryProperty('shouldLaunchEdgeUnelevated', args.shouldLaunchEdgeUnelevated.toString());
             }
             if (this._doesHostSupportLaunchUnelevatedProcessRequest) {
                 telemetryPropertyCollector.addTelemetryProperty('doesHostSupportLaunchUnelevated', 'true');
@@ -97,8 +97,10 @@ export class ChromeDebugAdapter extends CoreDebugAdapter {
             // Also start with extra stuff disabled
             chromeArgs.push(...['--no-first-run', '--no-default-browser-check']);
             if (args.runtimeArgs) {
-                telemetryPropertyCollector.addTelemetryProperty('numberOfChromiumCmdLineSwitchesBeingUsed', String(args.runtimeArgs.length));
+                telemetryPropertyCollector.addTelemetryProperty('numberOfEdgeCmdLineSwitchesBeingUsed', String(args.runtimeArgs.length));
                 chromeArgs.push(...args.runtimeArgs);
+            } else {
+                telemetryPropertyCollector.addTelemetryProperty('numberOfEdgeCmdLineSwitchesBeingUsed', '0');
             }
 
             // Set a default userDataDir, if the user opted in explicitly with 'true' or if args.userDataDir is not set (only when runtimeExecutable is not set).
@@ -137,7 +139,7 @@ export class ChromeDebugAdapter extends CoreDebugAdapter {
             }
 
             this._chromeProc = await this.spawnChrome(runtimeExecutable, chromeArgs, chromeEnv, chromeWorkingDir, !!args.runtimeExecutable,
-                 args.shouldLaunchChromeUnelevated);
+                 args.shouldLaunchEdgeUnelevated);
             if (this._chromeProc) {
                 this._chromeProc.on('error', (err) => {
                     const errMsg = 'Edge error: ' + err;

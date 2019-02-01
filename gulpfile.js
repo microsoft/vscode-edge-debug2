@@ -90,7 +90,7 @@ gulp.task('copy-scripts', () => {
 });
 
 gulp.task('clean', () => {
-    return del(['out/**', 'vscode-edge-debug2-*.vsix']);
+    return del(['out/**', 'debugger-for-edge-*.vsix']);
 });
 
 gulp.task('build', gulp.series(['clean', 'copy-scripts'], () => {
@@ -138,6 +138,20 @@ function verifyNoLinkedModules() {
     });
 }
 
+gulp.task('i18n-import', function () {
+    return es.merge(defaultLanguages.map(function (language) {
+        return gulp.src(`../${transifexExtensionName}-localization/${language.folderName}/**/*.xlf`)
+            .pipe(nls.prepareJsonFiles())
+            .pipe(gulp.dest(path.join('./i18n', language.folderName)));
+    }));
+});
+
+gulp.task('add-i18n', function () {
+    return gulp.src(['package.nls.json'])
+        .pipe(nls.createAdditionalLanguageFiles(defaultLanguages, 'i18n'))
+        .pipe(gulp.dest('.'));
+});
+
 gulp.task('verify-no-linked-modules', cb => verifyNoLinkedModules().then(() => cb, cb));
 
 gulp.task('vsce-publish', function () {
@@ -156,15 +170,9 @@ gulp.task('publish', function (callback) {
     runSequence('build', 'add-i18n', 'vsce-publish', callback);
 });
 
-gulp.task('package', function (callback) {
-    runSequence('build', 'add-i18n', 'vsce-package', callback);
-});
-
-gulp.task('add-i18n', function () {
-    return gulp.src(['package.nls.json'])
-        .pipe(nls.createAdditionalLanguageFiles(defaultLanguages, 'i18n'))
-        .pipe(gulp.dest('.'));
-});
+gulp.task('package', gulp.series(['build', 'add-i18n', 'vsce-package'], function (callback) {
+    return callback();
+}));
 
 gulp.task('transifex-push', gulp.series(['build'], function () {
     return gulp.src(['package.nls.json', 'out/nls.metadata.header.json', 'out/nls.metadata.json'])
@@ -182,13 +190,5 @@ gulp.task('transifex-pull', function () {
     return es.merge(defaultLanguages.map(function (language) {
         return nls.pullXlfFiles(transifexApiHostname, transifexApiName, transifexApiToken, language, [{ name: transifexExtensionName, project: transifexProjectName }]).
             pipe(gulp.dest(`../${transifexExtensionName}-localization/${language.folderName}`));
-    }));
-});
-
-gulp.task('i18n-import', function () {
-    return es.merge(defaultLanguages.map(function (language) {
-        return gulp.src(`../${transifexExtensionName}-localization/${language.folderName}/**/*.xlf`)
-            .pipe(nls.prepareJsonFiles())
-            .pipe(gulp.dest(path.join('./i18n', language.folderName)));
     }));
 });

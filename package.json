@@ -24,6 +24,7 @@
   ],
   "license": "SEE LICENSE IN LICENSE.txt",
   "dependencies": {
+    "natives": "^1.1.6",
     "portscanner": "^2.2.0",
     "vscode-chrome-debug-core": "^6.7.36",
     "vscode-debugadapter": "^1.31.0",

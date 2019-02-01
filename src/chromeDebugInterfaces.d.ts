@@ -26,7 +26,7 @@ export interface ILaunchRequestArgs extends Core.ILaunchRequestArgs, ICommonRequ
     userDataDir?: string|boolean;
     breakOnLoad?: boolean;
     _clientOverlayPausedMessage?: string;
-    shouldLaunchChromeUnelevated?: boolean;
+    shouldLaunchEdgeUnelevated?: boolean;
 }
 
 export interface IAttachRequestArgs extends Core.IAttachRequestArgs, ICommonRequestArgs {

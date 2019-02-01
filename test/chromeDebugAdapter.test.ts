@@ -193,7 +193,7 @@ suite('ChromeDebugAdapter', () => {
             await chromeDebugAdapter.launch({
                 file: 'c:\\path with space\\index.html',
                 runtimeArgs: ['abc', 'def'],
-                shouldLaunchChromeUnelevated: true
+                shouldLaunchEdgeUnelevated: true
             }, telemetryPropertyCollector);
 
             assert.equal(expectedProcessId, (<any>chromeDebugAdapter)._chromePID, 'Debug Adapter should receive the Chrome process id');
@@ -217,7 +217,7 @@ suite('ChromeDebugAdapter', () => {
                 'Should have seen a parameter like user-data-dir');
 
             const telemetryProperties = telemetryPropertyCollector.getProperties();
-            assert.equal(telemetryProperties.shouldLaunchChromeUnelevated, 'true', "Should send telemetry that Chrome is requested to be launched unelevated.'");
+            assert.equal(telemetryProperties.shouldLaunchEdgeUnelevated, 'true', "Should send telemetry that Chrome is requested to be launched unelevated.'");
             assert.equal(telemetryProperties.doesHostSupportLaunchUnelevated, 'true', "Should send telemetry that host supports launcheing Chrome unelevated.'");
 
             require('os').platform = originalGetPlatform;

@@ -12,7 +12,6 @@ const fs = require('fs');
 const nls = require('vscode-nls-dev');
 const vsce = require('vsce');
 const es = require('event-stream');
-const runSequence = require('run-sequence');
 const del = require('del');
 const tslint = require('gulp-tslint');
 const minimist = require('minimist');

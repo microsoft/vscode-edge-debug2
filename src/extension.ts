@@ -22,7 +22,7 @@ export function activate(context: vscode.ExtensionContext) {
 export function deactivate() {
 }
 
-const DEFAULT_CONFIG = {
+const DEFAULT_WIN_CONFIG = {
     type: 'edge',
     request: 'launch',
     name: localize('edge.launch.name', 'Launch Edge against localhost'),
@@ -30,11 +30,24 @@ const DEFAULT_CONFIG = {
     webRoot: '${workspaceFolder}'
 };
 
+const DEFAULT_MAC_CONFIG = {
+    type: 'edge',
+    version: 'stable',
+    request: 'launch',
+    name: localize('edge.launch.name', 'Launch Edge against localhost'),
+    url: 'http://localhost:8080',
+    webRoot: '${workspaceFolder}'
+}
+
 export class EdgeConfigurationProvider implements vscode.DebugConfigurationProvider {
     private static ATTACH_TIMEOUT = 10000;
 
     provideDebugConfigurations(folder: vscode.WorkspaceFolder | undefined, token?: vscode.CancellationToken): vscode.ProviderResult<vscode.DebugConfiguration[]> {
-        return Promise.resolve([DEFAULT_CONFIG]);
+        if (Core.utils.getPlatform() === Core.utils.Platform.OSX) {
+            return Promise.resolve([DEFAULT_MAC_CONFIG]);
+        } else {
+            return Promise.resolve([DEFAULT_WIN_CONFIG]);
+        }
     }
 
     /**

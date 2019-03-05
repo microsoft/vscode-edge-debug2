@@ -149,8 +149,9 @@
                 "type": "string",
                 "enum": [
                   "canary",
+                  "dev",
                   "beta",
-                  "dev"
+                  "stable"
                 ],
                 "description": "%edge.version.description%",
                 "default": "dev"
@@ -621,8 +622,9 @@
                 "type": "string",
                 "enum": [
                   "canary",
+                  "dev",
                   "beta",
-                  "dev"
+                  "stable"
                 ],
                 "description": "%edge.version.description%",
                 "default": "dev"

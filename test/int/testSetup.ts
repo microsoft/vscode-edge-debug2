@@ -16,11 +16,12 @@ const DEBUG_ADAPTER = './out/src/chromeDebug.js';
 let testLaunchProps: any;
 
 function formLaunchArgs(launchArgs: any): void {
+    launchArgs.version = 'canary';
     launchArgs.trace = 'verbose';
     launchArgs.disableNetworkCache = true;
 
     // Start with a clean userDataDir for each test run
-    const tmpDir = tmp.dirSync({ prefix: 'chrome2-' });
+    const tmpDir = tmp.dirSync({ prefix: 'edge2-' });
     launchArgs.userDataDir = tmpDir.name;
     if (testLaunchProps) {
         for (let key in testLaunchProps) {
@@ -42,7 +43,8 @@ export function setup(port?: number, launchProps?: any) {
     if (launchProps) {
         testLaunchProps = launchProps;
     }
-    return ts.setup(DEBUG_ADAPTER, 'chrome', patchLaunchArgs, port);
+
+    return ts.setup({entryPoint: DEBUG_ADAPTER, type: 'edge', patchLaunchArgs: patchLaunchArgs, port: port});
 }
 
 export function teardown() {

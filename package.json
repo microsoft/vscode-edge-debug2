@@ -58,8 +58,8 @@
     "typescript": "^2.9.2",
     "vsce": "^1.55.0",
     "vscode": "^1.1.28",
-    "vscode-chrome-debug-core-testsupport": "^3.20.0",
-    "vscode-debugadapter-testsupport": "1.24.0",
+    "vscode-chrome-debug-core-testsupport": "^4.0.0",
+    "vscode-debugadapter-testsupport": "^1.33.0",
     "vscode-debugprotocol": "^1.32.0",
     "vscode-nls-dev": "^3.2.2"
   },

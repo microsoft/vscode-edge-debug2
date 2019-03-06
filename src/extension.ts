@@ -37,7 +37,7 @@ const DEFAULT_MAC_CONFIG = {
     name: localize('edge.launch.name', 'Launch Edge against localhost'),
     url: 'http://localhost:8080',
     webRoot: '${workspaceFolder}'
-}
+};
 
 export class EdgeConfigurationProvider implements vscode.DebugConfigurationProvider {
     private static ATTACH_TIMEOUT = 10000;

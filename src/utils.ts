@@ -20,7 +20,7 @@ interface IWindowsMSEdgePaths {
 const WINx86_STABLE_PATHS: IWindowsMSEdgePaths = {
     WINx86_SYSTEMPATH: 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',
     WINx86_USERPATH: path.join(WIN_APPDATA, 'Microsoft\\Edge\\Application\\msedge.exe')
-}
+};
 
 const WINx86_BETA_PATHS: IWindowsMSEdgePaths = {
     WINx86_SYSTEMPATH: 'C:\\Program Files (x86)\\Microsoft\\Edge Beta\\Application\\msedge.exe',
@@ -70,9 +70,9 @@ export function getBrowserPath(msedgeVersion: string): string {
             }
         }
         return getWindowsExecutable(possiblePaths);
-    } else if (platform === coreUtils.Platform.OSX){
+    } else if (platform === coreUtils.Platform.OSX) {
         let macInstallPath: string;
-        switch(msedgeVersion) {
+        switch (msedgeVersion) {
             case MSEDGE_STABLE_VERSION: {
                 macInstallPath = OSX_MSEDGE_PATHS.OSX_STABLE_PATH;
                 break;

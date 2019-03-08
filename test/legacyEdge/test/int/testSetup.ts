@@ -11,7 +11,7 @@ import * as ts from 'vscode-chrome-debug-core-testsupport';
 import { DebugProtocol } from 'vscode-debugprotocol';
 import { DebugClient } from 'vscode-debugadapter-testsupport';
 
-const DEBUG_ADAPTER = './out/src/edgeDebug.js';
+const DEBUG_ADAPTER = './out/src/legacyEdge/edgeDebug.js';
 
 let testLaunchProps: any;
 
@@ -31,8 +31,8 @@ function patchLaunchArgs(launchArgs: any): void {
 }
 
 export const lowercaseDriveLetterDirname = __dirname.charAt(0).toLowerCase() + __dirname.substr(1);
-export const PROJECT_ROOT = path.join(lowercaseDriveLetterDirname, '../../../');
-export const DATA_ROOT = path.join(PROJECT_ROOT, 'testdata/');
+export const PROJECT_ROOT = path.join(lowercaseDriveLetterDirname, '../../../../../');
+export const DATA_ROOT = path.join(PROJECT_ROOT, 'test/legacyEdge/testdata/');
 
 export function setup(port?: number, launchProps?: any) {
     if (launchProps) {

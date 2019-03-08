@@ -17,11 +17,8 @@ const runSequence = require('run-sequence');
 const del = require('del');
 const minimist = require('minimist');
 
-const transifexApiHostname = 'www.transifex.com'
-const transifexApiName = 'api';
-const transifexApiToken = process.env.TRANSIFEX_API_TOKEN;
-const transifexProjectName = 'vscode-extensions';
-const transifexExtensionName = 'vscode-chrome-debug';
+const translationProjectName = 'vscode-extensions';
+const translationExtensionName = 'vscode-chrome-debug';
 
 const defaultLanguages = [
     { id: 'zh-tw', folderName: 'cht', transifexId: 'zh-hant' },
@@ -140,7 +137,7 @@ function verifyNoLinkedModules() {
 
 gulp.task('i18n-import', function () {
     return es.merge(defaultLanguages.map(function (language) {
-        return gulp.src(`../${transifexExtensionName}-localization/${language.folderName}/**/*.xlf`)
+        return gulp.src(`../${translationExtensionName}-localization/${language.folderName}/**/*.xlf`)
             .pipe(nls.prepareJsonFiles())
             .pipe(gulp.dest(path.join('./i18n', language.folderName)));
     }));
@@ -174,21 +171,25 @@ gulp.task('package', gulp.series(['build', 'add-i18n', 'vsce-package'], function
     return callback();
 }));
 
-gulp.task('transifex-push', gulp.series(['build'], function () {
+gulp.task('translations-export', gulp.series(['build'], function () {
     return gulp.src(['package.nls.json', 'out/nls.metadata.header.json', 'out/nls.metadata.json'])
-        .pipe(nls.createXlfFiles(transifexProjectName, transifexExtensionName))
-        .pipe(nls.pushXlfFiles(transifexApiHostname, transifexApiName, transifexApiToken));
+        .pipe(nls.createXlfFiles(translationProjectName, translationExtensionName))
+        .pipe(gulp.dest(path.join('..', 'vscode-translations-export')));
 }));
 
-gulp.task('transifex-push-test', gulp.series(['build'], function () {
-    return gulp.src(['package.nls.json', 'out/nls.metadata.header.json', 'out/nls.metadata.json'])
-        .pipe(nls.createXlfFiles(transifexProjectName, transifexExtensionName))
-        .pipe(gulp.dest(path.join('..', `${transifexExtensionName}-push-test`)));
-}));
+gulp.task('translations-import', function() {
+    var options = minimist(process.argv.slice(2), {
+        string: 'location',
+        default: {
+            location: '../vscode-translations-import'
+        }
+    });
+    return es.merge(defaultLanguages.map(function(language) {
+        let id = language.transifexId || language.id;
 
-gulp.task('transifex-pull', function () {
-    return es.merge(defaultLanguages.map(function (language) {
-        return nls.pullXlfFiles(transifexApiHostname, transifexApiName, transifexApiToken, language, [{ name: transifexExtensionName, project: transifexProjectName }]).
-            pipe(gulp.dest(`../${transifexExtensionName}-localization/${language.folderName}`));
+        console.log(path.join(options.location, id, 'vscode-extensions', `${translationExtensionName}.xlf`));
+        return gulp.src(path.join(options.location, id, 'vscode-extensions', `${translationExtensionName}.xlf`))
+            .pipe(nls.prepareJsonFiles())
+            .pipe(gulp.dest(path.join('./i18n', language.folderName)));
     }));
 });

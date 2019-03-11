@@ -14,7 +14,6 @@ const nls = require('vscode-nls-dev');
 const vsce = require('vsce');
 const es = require('event-stream');
 const del = require('del');
-const tslint = require('gulp-tslint');
 const minimist = require('minimist');
 
 const translationProjectName = 'vscode-extensions';

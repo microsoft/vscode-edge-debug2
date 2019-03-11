@@ -13,7 +13,6 @@ const fs = require('fs');
 const nls = require('vscode-nls-dev');
 const vsce = require('vsce');
 const es = require('event-stream');
-const runSequence = require('run-sequence');
 const del = require('del');
 const tslint = require('gulp-tslint');
 const minimist = require('minimist');
@@ -151,20 +150,6 @@ gulp.task('add-i18n', function () {
 });
 
 gulp.task('verify-no-linked-modules', cb => verifyNoLinkedModules().then(() => cb, cb));
-
-gulp.task('i18n-import', function() {
-	return es.merge(defaultLanguages.map(function(language) {
-		return gulp.src(`../${translationExtensionName}-localization/${language.folderName}/**/*.xlf`)
-			.pipe(nls.prepareJsonFiles())
-			.pipe(gulp.dest(path.join('./i18n', language.folderName)));
-	}));
-});
-
-gulp.task('add-i18n', function () {
-    return gulp.src(['package.nls.json'])
-        .pipe(nls.createAdditionalLanguageFiles(defaultLanguages, 'i18n'))
-        .pipe(gulp.dest('.'));
-});
 
 gulp.task('vsce-publish', function () {
     return vsce.publish();

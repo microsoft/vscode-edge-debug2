@@ -15,10 +15,11 @@ const vsce = require('vsce');
 const es = require('event-stream');
 const runSequence = require('run-sequence');
 const del = require('del');
+const tslint = require('gulp-tslint');
 const minimist = require('minimist');
 
 const translationProjectName = 'vscode-extensions';
-const translationExtensionName = 'vscode-chrome-debug';
+const translationExtensionName = 'vscode-edge-debug2';
 
 const defaultLanguages = [
     { id: 'zh-tw', folderName: 'cht', transifexId: 'zh-hant' },
@@ -151,9 +152,24 @@ gulp.task('add-i18n', function () {
 
 gulp.task('verify-no-linked-modules', cb => verifyNoLinkedModules().then(() => cb, cb));
 
+gulp.task('i18n-import', function() {
+	return es.merge(defaultLanguages.map(function(language) {
+		return gulp.src(`../${translationExtensionName}-localization/${language.folderName}/**/*.xlf`)
+			.pipe(nls.prepareJsonFiles())
+			.pipe(gulp.dest(path.join('./i18n', language.folderName)));
+	}));
+});
+
+gulp.task('add-i18n', function () {
+    return gulp.src(['package.nls.json'])
+        .pipe(nls.createAdditionalLanguageFiles(defaultLanguages, 'i18n'))
+        .pipe(gulp.dest('.'));
+});
+
 gulp.task('vsce-publish', function () {
     return vsce.publish();
 });
+
 gulp.task('vsce-package', function () {
     const cliOptions = minimist(process.argv.slice(2));
     const packageOptions = {
@@ -163,9 +179,9 @@ gulp.task('vsce-package', function () {
     return vsce.createVSIX(packageOptions);
 });
 
-gulp.task('publish', function (callback) {
-    runSequence('build', 'add-i18n', 'vsce-publish', callback);
-});
+gulp.task('publish', gulp.series(['build', 'add-i18n', 'vsce-publish'], function (callback) {
+    return callback();
+}));
 
 gulp.task('package', gulp.series(['build', 'add-i18n', 'vsce-package'], function (callback) {
     return callback();

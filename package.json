@@ -9,10 +9,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Microsoft/vscode-chrome-debug"
+    "url": "https://github.com/Microsoft/vscode-edge-debug2"
   },
   "publisher": "msjsdiag",
-  "bugs": "https://github.com/microsoft/vscode-chrome-debug/issues",
+  "bugs": "https://github.com/Microsoft/vscode-edge-debug2/issues",
   "engines": {
     "vscode": "^1.17.0"
   },

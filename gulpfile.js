@@ -13,12 +13,11 @@ const fs = require('fs');
 const nls = require('vscode-nls-dev');
 const vsce = require('vsce');
 const es = require('event-stream');
-const runSequence = require('run-sequence');
 const del = require('del');
 const minimist = require('minimist');
 
 const translationProjectName = 'vscode-extensions';
-const translationExtensionName = 'vscode-chrome-debug';
+const translationExtensionName = 'vscode-edge-debug2';
 
 const defaultLanguages = [
     { id: 'zh-tw', folderName: 'cht', transifexId: 'zh-hant' },
@@ -154,6 +153,7 @@ gulp.task('verify-no-linked-modules', cb => verifyNoLinkedModules().then(() => c
 gulp.task('vsce-publish', function () {
     return vsce.publish();
 });
+
 gulp.task('vsce-package', function () {
     const cliOptions = minimist(process.argv.slice(2));
     const packageOptions = {
@@ -163,9 +163,9 @@ gulp.task('vsce-package', function () {
     return vsce.createVSIX(packageOptions);
 });
 
-gulp.task('publish', function (callback) {
-    runSequence('build', 'add-i18n', 'vsce-publish', callback);
-});
+gulp.task('publish', gulp.series(['build', 'add-i18n', 'vsce-publish'], function (callback) {
+    return callback();
+}));
 
 gulp.task('package', gulp.series(['build', 'add-i18n', 'vsce-package'], function (callback) {
     return callback();

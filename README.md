@@ -1,12 +1,14 @@
 <h1 align="center">
-  VS Code - Debugger for Edge
   <br>
+  VS Code - Debugger for Microsoft Edge
   <br>
 </h1>
 
-<h4 align="center">Debug your JavaScript code running in Microsoft Edge from VS Code.</h4>
+<h4 align="center">Debug your JavaScript code running in Microsoft Edge from VS Code and Visual Studio.</h4>
 
-A VS Code extension to debug your JavaScript code in the Microsoft Edge browser from VS Code.
+A VS Code extension to debug your JavaScript code in the Microsoft Edge browser. This is also used to enable JavaScript debugging inside the Microsoft Edge browser when launched from ASP.Net Projects in Visual Studio.
+
+**Note:** This extension currently supports both Microsoft Edge (Chromium) and Microsoft Edge (EdgeHTML). This extension can debug any version of Microsoft Edge (Chromium) but only some versions of Microsoft Edge (EdgeHTML). To see if your Windows version supports debugging Microsoft Edge (EdgeHTML) via Edge DevTools Protocol, please refer [here](https://docs.microsoft.com/en-us/microsoft-edge/devtools-protocol/).
 
 **Supported features**
 * Setting breakpoints, including in source files when source maps are enabled
@@ -17,69 +19,88 @@ A VS Code extension to debug your JavaScript code in the Microsoft Edge browser 
 
 **Unsupported scenarios**
 * Debugging web workers
-* Features that aren't script debugging.
+* Any features that aren't script debugging.
 
 ## Getting Started
+For debugging inside VS Code:
 1. [Install the extension](https://marketplace.visualstudio.com/items?itemName=msjsdiag.debugger-for-edge)
-2. Restart VS Code and open the folder containing the project you want to work on.
+2. Open the folder containing the project you want to work on.
+
+For debugging Microsoft Edge (EdgeHTML) inside Visual Studio:
+1. Install a supported version of Windows.
+2. Install the latest version of Visual Studio. Debugging Microsoft Edge (EdgeHTML) is supported for VS versions >= 15.7
+3. Create an ASP.Net/ASP.Net Core Web Application.
+4. Set a breakpoint in your JavaScript/TypeScript file.
+5. Select 'Microsoft Edge' from the 'Web Browser' submenu in the debug target dropdown, and then press F5.
+
+We are actively working to add support for debugging Microsoft Edge (Chromium) to Visual Studio. Sign up [here](https://visualstudio.microsoft.com/vs/preview/) to stay updated!
 
 ## Using the debugger
-
 When your launch config is set up, you can debug your project. Pick a launch config from the dropdown on the Debug pane in Code. Press the play button or F5 to start.
 
 ### Configuration
-
 The extension operates in two modes - it can launch an instance of Microsoft Edge navigated to your app, or it can attach to a running instance of Edge. Both modes require you to be serving your web application from a local web server, which is started from either a VS Code task or from your command-line. Using the `url` parameter you simply tell VS Code which URL to either open or launch in Edge.
 
 You can configure these modes with a `.vscode/launch.json` file in the root directory of your project. You can create this file manually, or Code will create one for you if you try to run your project, and it doesn't exist yet.
 
 ### Launch
 
-Here are two example `launch.json` configs with `"request": "launch"`. You must specify either `file` or `url` to launch Edge against a local file or a url. If you use a url, set `webRoot` to the directory that files are served from. This can be either an absolute path or a path using `${workspaceFolder}` (the folder open in Code). `webRoot` is used to resolve urls (like "http://localhost/app.js") to a file on disk (like `/Users/me/project/app.js`), so be careful that it's set correctly.
+#### Microsoft Edge (EdgeHTML)
+Below are two example `launch.json` configs with `"request": "launch"`. You must specify either `file` or `url` to launch Microsoft Edge (EdgeHTML) against a local file or a url. If you use a url, set `webRoot` to the directory that files are served from. This can be either an absolute path or a path using `${workspaceFolder}` (the folder open in Code). `webRoot` is used to resolve urls (like "http://localhost/app.js") to a file on disk (like `/Users/me/project/app.js`), so be careful that it's set correctly.
 ```json
 {
-    "version": "0.1.0",
+    "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch localhost",
+            "name": "Launch localhost in Microsoft Edge (EdgeHTML)",
             "type": "edge",
-            "version": "beta",
             "request": "launch",
             "url": "http://localhost/mypage.html",
             "webRoot": "${workspaceFolder}/wwwroot"
         },
         {
-            "name": "Launch index.html",
+            "name": "Launch index.html in Microsoft Edge (EdgeHTML)",
             "type": "edge",
             "request": "launch",
-            "sourceMaps": false,
             "file": "${workspaceFolder}/index.html"
         },
     ]
 }
 ```
 
-If you want to use a different installation of a Chromium-based browser, you can also set the `runtimeExecutable` field with a path to the browser executable. On machines with the Microsoft EdgeHTML browser, simply omit the `version` flag (such as in the `Launch index.html` example above).
-
-### Attach
-With `"request": "attach"`, you must launch Edge with remote debugging enabled in order for the extension to attach to it. Here's how you can do that:
-
-__Windows__
-* Right click the Edge shortcut, and select properties
-* In the "target" field, append `--remote-debugging-port=2015` for Microsoft Edge (Chromium), or append `--devtools-server-port 2015` for Microsoft Edge (EdgeHTML)
-
-An example `launch.json` file for an "attach" config.
+#### Microsoft Edge (Chromium)
+If you are trying to launch Microsoft Edge (Chromium), the next version of Microsoft Edge, simply add a `version` attribute to your existing configuration with the version of Microsoft Edge (Chromium) you want to launch (`dev`, `beta`, or `canary`). The example configuration below will launch the Canary version of Microsoft Edge (Chromium):
 ```json
 {
-    "version": "0.1.0",
+    "name": "Launch localhost in Microsoft Edge (Chromium) Canary",
+    "type": "edge",
+    "request": "launch",
+    "version": "canary",
+    "url": "http://localhost/mypage.html",
+    "webRoot": "${workspaceFolder}/wwwroot"
+}
+```
+
+If you want to use a different installation of a Chromium-based browser, you can also set the `runtimeExecutable` field with a path to the browser executable.
+
+### Attach
+With `"request": "attach"`, you must launch Microsoft Edge with remote debugging enabled in order for the extension to attach to it. Here's how you can do that:
+
+__Windows__
+* Open the Command Prompt
+* Run `msedge.exe --remote-debugging-port=2015` for Microsoft Edge (Chromium) or `microsoftedge.exe --devtools-server-port=2015` for Microsoft Edge (EdgeHTML)
+
+The example `launch.json` config below will attach to either Microsoft Edge (Chromium) or Microsoft Edge (EdgeHTML) depending on which one you launched on port `2015`.
+```json
+{
+    "version": "0.2.0",
     "configurations": [
         {
-            "name": "Attach to url with files served from ./out",
             "type": "edge",
             "request": "attach",
+            "name": "Attach to Microsoft Edge",
             "port": 2015,
-            "url": "<url of the open browser page to connect to>",
-            "webRoot": "${workspaceFolder}/out"
+            "webRoot": "${workspaceFolder}"
         }
     ]
 }
@@ -87,12 +108,13 @@ An example `launch.json` file for an "attach" config.
 
 ### Other optional launch config fields
 * `trace`: When true, the adapter logs its own diagnostic info to a file. The file path will be printed in the Debug Console. This is often useful info to include when filing an issue on GitHub. If you set it to "verbose", it will log to a file and also log to the console.
-* `runtimeExecutable`: Workspace relative or absolute path to the runtime executable to be used. If not specified, Microsoft Edge will be used from the default install location.
+* `version`: When set to `canary`, `dev`, or `beta`, it will launch the matching version of Microsoft Edge (Chromium). If not specificed, Microsoft Edge (EdgeHTML) will be launched.
+* `runtimeExecutable`: Workspace relative or absolute path to the runtime executable to be used. If not specified, Microsoft Edge (EdgeHTML) will be used from the default install location.
 * `runtimeArgs`: Optional arguments passed to the runtime executable.
 * `env`: Optional dictionary of environment key/value pairs.
 * `cwd`: Optional working directory for the runtime executable.
-* `userDataDir`: Normally, if Edge is already running when you start debugging with a launch config, then the new instance won't start in remote debugging mode. So by default, the extension launches Edge with a separate user profile in a temp folder. Use this option to set a different path to use, or set to false to launch with your default user profile. Note that this is only applicable to Microsoft Edge (Chromium) and will not work with Microsoft Edge (EdgeHTML).
-* `url`: On a 'launch' config, it will launch Edge at this URL.
+* `userDataDir`: Normally, if Microsoft Edge is already running when you start debugging with a launch config, then the new instance won't start in remote debugging mode. So by default, the extension launches Microsoft Edge with a separate user profile in a temp folder. Use this option to set a different path to use, or set to false to launch with your default user profile. Note that this is only applicable to Microsoft Edge (Chromium) and will not work with Microsoft Edge (EdgeHTML).
+* `url`: On a 'launch' config, it will launch Microsoft Edge at this URL.
 * `urlFilter`: On an 'attach' config, or a 'launch' config with no 'url' set, search for a page with this url and attach to it. It can also contain wildcards, for example, `"localhost:*/app"` will match either `"http://localhost:123/app"` or `"http://localhost:456/app"`, but not `"https://stackoverflow.com"`.
 * `targetTypes`: On an 'attach' config, or a 'launch' config with no 'url' set, set a list of acceptable target types from the default `["page"]`. For example, if you are attaching to an Electron app, you might want to set this to `["page", "webview"]`. A value of `null` disables filtering by target type. Note that this is only applicable to Microsoft Edge (Chromium) and will not work with Microsoft Edge (EdgeHTML).
 * `sourceMaps`: By default, the adapter will use sourcemaps and your original sources whenever possible. You can disable this by setting `sourceMaps` to false.
@@ -102,10 +124,10 @@ An example `launch.json` file for an "attach" config.
 * `showAsyncStacks`: If true, callstacks across async calls (like `setTimeout`, `fetch`, resolved Promises, etc) will be shown.
 
 ### Other targets
-You can also theoretically attach to other targets that support the same Chrome Debugging protocol as the Microsoft Edge (Chromium) browser, such as Electron or Cordova. These aren't officially supported, but should work with basically the same steps. You can use a launch config by setting `"runtimeExecutable"` to a program or script to launch, or an attach config to attach to a process that's already running. If Code can't find the target, you can always verify that it is actually available by navigating to `http://localhost:<port>/json` in a browser. If you get a response with a bunch of JSON, and can find your target page in that JSON, then the target should be available to this extension.
+You can also theoretically attach to other targets that support the same [Chrome DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/tot) as the Microsoft Edge (Chromium) browser, such as Electron or Cordova. These aren't officially supported, but should work with basically the same steps. You can use a launch config by setting `"runtimeExecutable"` to a program or script to launch, or an attach config to attach to a process that's already running. If Code can't find the target, you can always verify that it is actually available by navigating to `http://localhost:<port>/json` in a browser. If you get a response with a bunch of JSON, and can find your target page in that JSON, then the target should be available to this extension.
 
-## Skip files / Blackboxing / Ignore files
-You can use the `skipFiles` property to ignore/blackbox specific files while debugging. For example, if you set `"skipFiles": ["jquery.js"]`, then you will skip any file named 'jquery.js' when stepping through your code. You also won't break on exceptions thrown from 'jquery.js'. This works the same as "blackboxing scripts" in Chrome DevTools.
+## Skip files / Mark as Library code
+You can use the `skipFiles` property to mark specific files as Library code while debugging. For example, if you set `"skipFiles": ["jquery.js"]`, then you will skip any file named 'jquery.js' when stepping through your code. You also won't break on exceptions thrown from 'jquery.js'. This works the same as "Mark as Library code" in the Microsoft Edge DevTools.
 
 The supported formats are:
   * The name of a file (like `jquery.js`)
@@ -129,10 +151,10 @@ A few mappings are applied by default, corresponding to some common default conf
     "meteor://💻app/*": "${webRoot}/*"                    // Example: "meteor://💻app/main.ts" -> "/Users/me/project/main.ts"
 }
 ```
-If you set `sourceMapPathOverrides` in your launch config, that will override these defaults. `${workspaceFolder}` and `${webRoot}` can be used here. If you aren't sure what the left side should be, you can use the `.scripts` command (details below). You can also use the `trace` option to see the contents of the sourcemap, or look at the paths of the sources in Chrome DevTools, or open your `.js.map` file and check the values manually.
+If you set `sourceMapPathOverrides` in your launch config, that will override these defaults. `${workspaceFolder}` and `${webRoot}` can be used here. If you aren't sure what the left side should be, you can use the `trace` option to see the contents of the sourcemap, or look at the paths of the sources in the Microsoft Edge DevTools, or open your `.js.map` file and check the values manually.
 
 ### Ionic/gulp-sourcemaps note
-Ionic and gulp-sourcemaps output a sourceRoot of `"/source/"` by default. If you can't fix this via your build config, I suggest this setting:
+Ionic and gulp-sourcemaps output a sourceRoot of `"/source/"` by default. If you can't fix this via your build config, we suggest this setting:
 ```json
 "sourceMapPathOverrides": {
     "/source/*": "${workspaceFolder}/*"
@@ -141,20 +163,27 @@ Ionic and gulp-sourcemaps output a sourceRoot of `"/source/"` by default. If you
 
 ## Troubleshooting
 
+### My breakpoints aren't hit when debugging Microsoft Edge(EdgeHTML). What's wrong?
+If your breakpoints weren't hit, it's most likely a sourcemapping issue or because you set breakpoints before launching Microsoft Edge (EdgeHTML) and were expecting them to hit while the browser loads. If that's the case, you will have to refresh the page in Microsoft Edge (EdgeHTML) after we have attached from VS Code/Visual Studio to hit your breakpoint.
+
+If you are using sourcemaps, make sure they are configured right.
+
 ### Cannot connect to the target: connect ECONNREFUSED 127.0.0.1:2015
-This message means that the extension can't attach to Edge, probably because Edge wasn't launched in debug mode. Here are some things to try:
-* Ensure that the port property matches the `port` on which Edge is listening for remote debugging connections. This is `2015` by default. Ensure nothing else is using this port, including your web server. If something else on your computer responds at `http://localhost:2015`, then set a different port.
-* If using an `attach` type config, ensure that you launched your browser with a remote debugging port.
-* If all else fails, try to navigate to `http://localhost:<port>/json` in a browser when you see this message - if there is no response, then something is wrong upstream of the extension. If there is a page of JSON returned, then ensure that the `port` in the launch config matches the port in that url.
+This message means that the extension can't attach to Microsoft Edge, probably because Microsoft Edge wasn't launched in debug mode. Here are some things to try:
+* Ensure that the `port` property matches the port on which Microsoft Edge is listening for remote debugging connections. This is `2015` by default. Ensure nothing else is using this port, including your web server. If something else on your computer responds at `http://localhost:2015`, then set a different port.
+* If all else fails, try to navigate to `http://localhost:<port>/json/list` in a browser when you see this message - if there is no response, then something is wrong upstream of the extension. If there is a page of JSON returned, then ensure that the `port` in the launch config matches the port in that url.
+* If the above steps do not work, try closing all windows of Microsoft Edge and then relaunch.
 
 ### General things to try if you're having issues:
 * Ensure `webRoot` is set correctly if needed
 * Look at your sourcemap config carefully. A sourcemap has a path to the source files, and this extension uses that path to find the original source files on disk. Check the `sourceRoot` and `sources` properties in your sourcemap and make sure that they can be combined with the `webRoot` property in your launch config to build the correct path to the original source files.
 * Check the console for warnings that this extension prints in some cases when it can't attach.
 * Ensure the code in your browser matches the code in Code. The browser may cache an old version of your code.
-* If your breakpoints bind, but aren't hit, try refreshing the page. If you set a breakpoint in code that runs immediately when the page loads, you won't hit that breakpoint until you refresh the page.
-* File a bug in this extension's [GitHub repo](https://github.com/Microsoft/vscode-edge-debug2), including the debug adapter log file. Create the log file by setting the "trace" field in your launch config and reproducing the issue. It will print the path to the log file at the top of the Debug Console. You can drag this file into an issue comment to upload it to GitHub.
+* If your breakpoints bind, but aren't hit in Microsoft Edge (EdgeHTML), try refreshing the page. If you set a breakpoint in code that runs immediately when the page loads in Microsoft Edge (EdgeHTML), you won't hit that breakpoint until you refresh the page.
 
----
+## Feedback
+Send us your feedback by [filing an issue](https://github.com/Microsoft/vscode-edge-debug2/issues/new) against this extension's [GitHub repo](https://github.com/Microsoft/vscode-edge-debug2). Please include the debug adapter log file, which is created for each run in the %temp% directory with the name `vscode-edge-debug2.txt`. You can drag this file into an issue comment to upload it to GitHub.
 
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
+For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
+contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.

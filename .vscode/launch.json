@@ -7,7 +7,7 @@
             "protocol": "inspector",
             "request": "launch",
             "cwd": "${workspaceFolder}",
-            "program": "${workspaceFolder}/out/src/edgeDebug.js",
+            "program": "${workspaceFolder}/out/src/legacyEdge/edgeDebug.js",
             "args": [ "--server=4712" ],
             "outFiles": ["${workspaceFolder}/out/**/*.js"]
         },
@@ -23,7 +23,7 @@
                 "-u", "tdd",
 				"--colors",
 				"out/test/*.test.js",
-                "--timeout", "1800000"
+                "--timeout", "1800000",
             ],
             "outFiles": ["${workspaceFolder}/out/**/*.js"]
         },
@@ -32,13 +32,28 @@
             "request": "launch",
             "name": "intTest",
             "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
-            "sourceMaps": false,
             "args": [
                 "-u", "tdd",
                 "--timeout", "999999",
                 "--colors",
                 "--reporter", "node_modules/vscode-chrome-debug-core-testsupport/out/loggingReporter.js",
                 "${workspaceFolder}/out/test/int/*.test.js"
+            ],
+            "outFiles": [
+                "${workspaceFolder}/out/**/*.js"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "intTest-LegacyEdge",
+            "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+            "args": [
+                "-u", "tdd",
+                "--timeout", "999999",
+                "--colors",
+                "--reporter", "node_modules/vscode-chrome-debug-core-testsupport/out/loggingReporter.js",
+                "${workspaceFolder}/out/test/legacyEdge/test/int/*.test.js"
             ],
             "outFiles": [
                 "${workspaceFolder}/out/**/*.js"
@@ -53,7 +68,7 @@
 				"--extensionDevelopmentPath=${workspaceFolder}"
 			],
 			"outFiles": [ "${workspaceFolder}/out/**/*.js" ]
-        },
+		},
         {
             "name": "attach edge-debug",
             "type": "node",

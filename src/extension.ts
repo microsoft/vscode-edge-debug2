@@ -4,14 +4,17 @@
 
 import * as vscode from 'vscode';
 import * as Core from 'vscode-chrome-debug-core';
-
-import {isEdgeDebuggingSupported, targetFilter} from './utils';
-
 import * as nls from 'vscode-nls';
+
+import { defaultTargetFilter, getTargetFilter } from './utils';
+import * as errors from './errors';
+import { ProtocolDetection } from './protocolDetection';
+
 const localize = nls.loadMessageBundle();
 
 export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.commands.registerCommand('extension.edge-debug.toggleSkippingFile', toggleSkippingFile));
+    context.subscriptions.push(vscode.commands.registerCommand('extension.edge-debug.toggleSmartStep', toggleSmartStep));
 
     context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('edge', new EdgeConfigurationProvider()));
 }
@@ -19,30 +22,38 @@ export function activate(context: vscode.ExtensionContext) {
 export function deactivate() {
 }
 
-const DEFAULT_CONFIG = {
+const DEFAULT_WIN_CONFIG = {
     type: 'edge',
     request: 'launch',
-    name: localize('edge.launch.name', "Launch Edge against localhost"),
+    name: localize('edge.launch.name', 'Launch Edge against localhost'),
+    url: 'http://localhost:8080',
+    webRoot: '${workspaceFolder}'
+};
+
+const DEFAULT_MAC_CONFIG = {
+    type: 'edge',
+    version: 'stable',
+    request: 'launch',
+    name: localize('edge.launch.name', 'Launch Edge against localhost'),
     url: 'http://localhost:8080',
     webRoot: '${workspaceFolder}'
 };
 
 export class EdgeConfigurationProvider implements vscode.DebugConfigurationProvider {
+    private static ATTACH_TIMEOUT = 10000;
+
     provideDebugConfigurations(folder: vscode.WorkspaceFolder | undefined, token?: vscode.CancellationToken): vscode.ProviderResult<vscode.DebugConfiguration[]> {
-        return Promise.resolve([DEFAULT_CONFIG]);
+        if (Core.utils.getPlatform() === Core.utils.Platform.OSX) {
+            return Promise.resolve([DEFAULT_MAC_CONFIG]);
+        } else {
+            return Promise.resolve([DEFAULT_WIN_CONFIG]);
+        }
     }
 
     /**
      * Try to add all missing attributes to the debug configuration being launched.
      */
     async resolveDebugConfiguration(folder: vscode.WorkspaceFolder | undefined, config: vscode.DebugConfiguration, token?: vscode.CancellationToken): Promise<vscode.DebugConfiguration> {
-        if (!isEdgeDebuggingSupported()) {
-            const errorMessage = localize('edge.debug.error.versionNotSupported', "Your version of Edge does not support debugging via the Edge DevTools Protocol. You can read more about supported versions here (https://aka.ms/edp-docs).");
-            return vscode.window.showErrorMessage(errorMessage).then(_ => {
-                return undefined;
-            });
-        }
-
         // if launch.json is missing or empty
         if (!config.type && !config.request && !config.name) {
             // Return null so it will create a launch.json and fall back on provideDebugConfigurations - better to point the user towards the config
@@ -50,13 +61,20 @@ export class EdgeConfigurationProvider implements vscode.DebugConfigurationProvi
             return null;
         }
 
+        // if there is a version flag, switch to using the new msedge
+        if (config['version'] || config['runtimeExecutable']) {
+            config.type = 'msedge';
+        }
+
         if (config.request === 'attach') {
-            const discovery = new Core.chromeTargetDiscoveryStrategy.ChromeTargetDiscovery(
-                new Core.NullLogger(), new Core.telemetry.NullTelemetryReporter());
+            const nullLogger = new Core.NullLogger();
+            const nullTelemetryReporter = new Core.telemetry.NullTelemetryReporter();
+
+            const discovery = new Core.chromeTargetDiscoveryStrategy.ChromeTargetDiscovery(nullLogger, nullTelemetryReporter);
 
             let targets;
             try {
-                targets = await discovery.getAllTargets(config.address || '127.0.0.1', config.port, targetFilter, config.url);
+                targets = await discovery.getAllTargets(config.address || '127.0.0.1', config.port, config.targetTypes === undefined ? defaultTargetFilter : getTargetFilter(config.targetTypes), config.url || config.urlFilter);
             } catch (e) {
                 // Target not running?
             }
@@ -70,6 +88,18 @@ export class EdgeConfigurationProvider implements vscode.DebugConfigurationProvi
 
                 config.websocketUrl = selectedTarget.websocketDebuggerUrl;
             }
+
+            const protocolDetection = new ProtocolDetection(nullLogger);
+
+            await protocolDetection.hitVersionEndpoint(config.address || '127.0.0.1', config.port, EdgeConfigurationProvider.ATTACH_TIMEOUT)
+                .then((detectedBrowserProtocol) => {
+                    if (protocolDetection.extractBrowserProtocol(detectedBrowserProtocol).indexOf('Chrome') > -1) {
+                        config.type = 'msedge';
+                    }
+                })
+                .catch(async e => {
+                    Promise.reject(errors.getNotExistErrorResponse(String(EdgeConfigurationProvider.ATTACH_TIMEOUT), e.message));
+                });
         }
 
         return config;
@@ -82,8 +112,16 @@ function toggleSkippingFile(path: string): void {
         path = activeEditor && activeEditor.document.fileName;
     }
 
-    const args: Core.IToggleSkipFileStatusArgs = typeof path === 'string' ? { path } : { sourceReference: path };
-    vscode.commands.executeCommand('workbench.customDebugRequest', 'toggleSkipFileStatus', args);
+    if (path && vscode.debug.activeDebugSession) {
+        const args: Core.IToggleSkipFileStatusArgs = typeof path === 'string' ? { path } : { sourceReference: path };
+        vscode.debug.activeDebugSession.customRequest('toggleSkipFileStatus', args);
+    }
+}
+
+function toggleSmartStep(): void {
+    if (vscode.debug.activeDebugSession) {
+        vscode.debug.activeDebugSession.customRequest('toggleSmartStep');
+    }
 }
 
 interface ITargetQuickPickItem extends vscode.QuickPickItem {
@@ -97,7 +135,7 @@ async function pickTarget(targets: Core.chromeConnection.ITarget[]): Promise<ITa
         websocketDebuggerUrl: target.webSocketDebuggerUrl
     }));
 
-    const placeHolder = localize('edge.targets.placeholder', "Select a tab");
+    const placeHolder = localize('edge.targets.placeholder', 'Select a tab');
     const selected = await vscode.window.showQuickPick(items, { placeHolder, matchOnDescription: true, matchOnDetail: true });
     return selected;
 }

@@ -4,7 +4,7 @@
 
 import * as mockery from 'mockery';
 import * as assert from 'assert';
-
+import * as path from 'path';
 import * as testUtils from './testUtils';
 
 /** Utils without mocks - use for type only */
@@ -18,8 +18,10 @@ suite('Utils', () => {
 
     setup(() => {
         testUtils.setupUnhandledRejectionListener();
+        testUtils.registerLocMocks();
 
         mockery.enable({ useCleanCache: true, warnOnReplace: false, warnOnUnregistered: false });
+        mockery.registerMock('fs', { statSync: () => { }, existsSync: () => false });
     });
 
     teardown(() => {
@@ -30,59 +32,61 @@ suite('Utils', () => {
     });
 
     suite('getBrowserPath()', () => {
-        test('returns MicrosoftEdge', () => {
+        test('user install beta', () => {
+            // Overwrite the statSync mock to say the x86 path doesn't exist
+            const statSync = (aPath: string) => {
+                if (aPath.indexOf('(x86)') >= 0) throw new Error('Not found');
+            };
+            const existsSync = () => false;
+            mockery.registerMock('fs', { statSync, existsSync });
+            mockery.registerMock('os', { platform: () => 'win32' });
+
             const Utils = getUtils();
-            assert.equal(Utils.getEdgePath(), 'MicrosoftEdge');
+            assert.equal(
+                Utils.getBrowserPath('beta'),
+                path.join(process.env.LOCALAPPDATA, '\\Microsoft\\Edge Beta\\Application\\msedge.exe'));
+        });
+
+        test('system install beta', () => {
+            mockery.registerMock('os', { platform: () => 'win32' });
+            const Utils = getUtils();
+            assert.equal(
+                Utils.getBrowserPath('beta'),
+                'C:\\Program Files (x86)\\Microsoft\\Edge Beta\\Application\\msedge.exe');
+        });
+
+        test('system install dev', () => {
+            mockery.registerMock('os', { platform: () => 'win32' });
+            const Utils = getUtils();
+            assert.equal(
+                Utils.getBrowserPath('dev'),
+                'C:\\Program Files (x86)\\Microsoft\\Edge Dev\\Application\\msedge.exe');
+        });
+
+        test('system install canary', () => {
+            mockery.registerMock('os', { platform: () => 'win32' });
+            const Utils = getUtils();
+            assert.equal(
+                Utils.getBrowserPath('canary'),
+                'C:\\Program Files (x86)\\Microsoft\\Edge SxS\\Application\\msedge.exe');
         });
     });
 
-    suite('isEdgeDebuggingSupported()', () => {
-        test('is not supported for non-Windows', () => {
-            mockery.registerMock('os', { platform: () => 'linux', release: () => '10.0.20000' });
-            const Utils = getUtils();
-            assert.equal(Utils.isEdgeDebuggingSupported(), false);
+    suite('getTargetFilter()', () => {
+        test('defaultTargetFilter', () => {
+            const {defaultTargetFilter} = getUtils();
+            const targets = [{type: 'page'}, {type: 'webview'}];
+            assert.deepEqual(targets.filter(defaultTargetFilter), [{type: 'page'}]);
         });
 
-        test('is not supported for Windows unexpected release', () => {
-            mockery.registerMock('os', { platform: () => 'win32', release: () => '10.unexpected' });
-            const Utils = getUtils();
-            assert.equal(Utils.isEdgeDebuggingSupported(), false);
-        });
-
-        test('is not supported for Windows before 10', () => {
-            mockery.registerMock('os', { platform: () => 'win32', release: () => '6.0.20000' });
-            const Utils = getUtils();
-            assert.equal(Utils.isEdgeDebuggingSupported(), false);
-        });
-
-        test('is not supported for Windows 10 older build', () => {
-            mockery.registerMock('os', { platform: () => 'win32', release: () => '10.0.17057' });
-            const Utils = getUtils();
-            assert.equal(Utils.isEdgeDebuggingSupported(), false);
-        });
-
-        test('is supported for Windows 10 RS4 build', () => {
-            mockery.registerMock('os', { platform: () => 'win32', release: () => '10.0.17058' });
-            const Utils = getUtils();
-            assert.equal(Utils.isEdgeDebuggingSupported(), true);
-        });
-
-        test('is supported for Windows 10 higher than RS4 build', () => {
-            mockery.registerMock('os', { platform: () => 'win32', release: () => '10.0.20000' });
-            const Utils = getUtils();
-            assert.equal(Utils.isEdgeDebuggingSupported(), true);
-        });
-
-        test('is supported for Windows higher minor version', () => {
-            mockery.registerMock('os', { platform: () => 'win32', release: () => '10.1.1' });
-            const Utils = getUtils();
-            assert.equal(Utils.isEdgeDebuggingSupported(), true);
-        });
-
-        test('is supported for Windows higher major version', () => {
-            mockery.registerMock('os', { platform: () => 'win32', release: () => '11.0.0' });
-            const Utils = getUtils();
-            assert.equal(Utils.isEdgeDebuggingSupported(), true);
+        test('getTargetFilter', () => {
+            const {getTargetFilter} = getUtils();
+            const targets = [{type: 'page'}, {type: 'webview'}];
+            assert.deepEqual(targets.filter(getTargetFilter(['page'])), [{type: 'page'}]);
+            assert.deepEqual(targets.filter(getTargetFilter(['webview'])), [{type: 'webview'}]);
+            assert.deepEqual(targets.filter(getTargetFilter(['page', 'webview'])), targets);
+            // Falsy targetTypes should effectively disable filtering.
+            assert.deepEqual(targets.filter(getTargetFilter()), targets);
         });
     });
 });

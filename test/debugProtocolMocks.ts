@@ -2,13 +2,12 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 /* tslint:disable:typedef */
-// Copied from -core because I don't want to include test stuff in the npm package
 
 import { EventEmitter } from 'events';
 import { Mock, It, IMock } from 'typemoq';
 import { Crdp } from 'vscode-chrome-debug-core';
 
-export interface IMockEdgeConnectionAPI {
+export interface IMockChromeConnectionAPI {
     apiObjects: Crdp.ProtocolApi;
 
     Browser: IMock<Crdp.BrowserApi>;
@@ -19,7 +18,6 @@ export interface IMockEdgeConnectionAPI {
     Network: IMock<Crdp.NetworkApi>;
     Page: IMock<Crdp.PageApi>;
     Log: IMock<Crdp.LogApi>;
-    Schema: IMock<Crdp.SchemaApi>;
 
     mockEventEmitter: EventEmitter;
 }
@@ -88,13 +86,7 @@ function getLogStubs() {
     };
 }
 
-function getSchemaStubs() {
-    return {
-        getDomains() { return Promise.resolve({domains: []})}
-    }
-}
-
-export function getMockEdgeConnectionApi(): IMockEdgeConnectionAPI {
+export function getMockChromeConnectionApi(): IMockChromeConnectionAPI {
     const mockEventEmitter = new EventEmitter();
 
     const mockConsole = Mock.ofInstance<Crdp.ConsoleApi>(<any>getConsoleStubs());
@@ -126,16 +118,13 @@ export function getMockEdgeConnectionApi(): IMockEdgeConnectionAPI {
 
     const mockPage = Mock.ofInstance<Crdp.PageApi>(<any>getPageStubs());
 
-    const mockLog = Mock.ofInstance<Crdp.LogApi>(<any>getLogStubs());
-    mockLog.callBase = true;
-
     const mockBrowser = Mock.ofInstance<Crdp.BrowserApi>(<any>getBrowserStubs());
     mockBrowser.callBase = true;
 
-    const mockSchema = Mock.ofInstance<Crdp.SchemaApi>(<any>getSchemaStubs());
-    mockSchema.callBase = true;
+    const mockLog = Mock.ofInstance<Crdp.LogApi>(<any>getLogStubs());
+    mockLog.callBase = true;
 
-    const edgeConnectionAPI: Crdp.ProtocolApi = <any>{
+    const chromeConnectionAPI: Crdp.ProtocolApi = <any>{
         Browser: mockBrowser.object,
         Console: mockConsole.object,
         Debugger: mockDebugger.object,
@@ -143,12 +132,11 @@ export function getMockEdgeConnectionApi(): IMockEdgeConnectionAPI {
         Inspector: mockInspector.object,
         Network: mockNetwork.object,
         Page: mockPage.object,
-        Log: mockLog.object,
-        Schema: mockSchema.object
+        Log: mockLog.object
     };
 
     return {
-        apiObjects: edgeConnectionAPI,
+        apiObjects: chromeConnectionAPI,
 
         Browser: mockBrowser,
         Console: mockConsole,
@@ -158,7 +146,6 @@ export function getMockEdgeConnectionApi(): IMockEdgeConnectionAPI {
         Network: mockNetwork,
         Page: mockPage,
         Log: mockLog,
-        Schema: mockSchema,
 
         mockEventEmitter
     };

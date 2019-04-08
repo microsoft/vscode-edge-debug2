@@ -1,0 +1,21 @@
+{
+  "name": "testapp",
+  "version": "0.0.0",
+  "description": "",
+  "author": {
+    "name": "Microsoft Corporation, Visual Studio Code Team"
+  },
+  "license": "",
+  "dependencies": {},
+  "devDependencies": {
+    "mime": "^2.0.3",
+    "browser-sync": "^2.26.3",
+    "gulp": "^3.9.0",
+    "gulp-concat": "^2.6.1",
+    "gulp-filter": "^5.1.0",
+    "gulp-sourcemaps": "^2.6.4",
+    "gulp-typescript": "^4.0.1",
+    "gulp-util": "^3.0.5",
+    "typescript": "^1.6.2"
+  }
+}

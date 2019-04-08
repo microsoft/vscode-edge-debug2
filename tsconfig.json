@@ -11,6 +11,8 @@
     "exclude": [
         "node_modules/",
         "testapp/",
-        "testdata/"
+        "testdata/",
+        "test/legacyEdge/testapp/",
+        "test/legacyEdge/testdata/"
     ]
 }

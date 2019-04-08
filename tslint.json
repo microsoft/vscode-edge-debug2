@@ -1,4 +1,5 @@
 {
+  "defaultSeverity": "warn",
   "rules": {
     "align": [
       true,
@@ -62,7 +63,13 @@
       "check-else",
       "check-whitespace"
     ],
+    "quotemark": [
+      true,
+      "single",
+      "avoid-escape"
+    ],
     "radix": true,
+    "semicolon": true,
     "switch-default": true,
     "trailing-comma": [
       false,
@@ -92,7 +99,9 @@
       "check-decl",
       "check-operator",
       "check-separator",
+      "check-module",
       "check-type"
     ]
   }
 }
+

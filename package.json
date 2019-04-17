@@ -26,7 +26,7 @@
   "dependencies": {
     "natives": "^1.1.6",
     "portscanner": "^2.2.0",
-    "vscode-chrome-debug-core": "^6.7.40",
+    "vscode-chrome-debug-core": "^6.7.47",
     "vscode-debugadapter": "^1.33.0",
     "vscode-nls": "3.2.4"
   },

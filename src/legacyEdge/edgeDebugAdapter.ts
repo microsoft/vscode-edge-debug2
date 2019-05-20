@@ -48,7 +48,7 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
     private _scriptParsedEventBookKeeping = {};
     private _navigatingToUserRequestedUrl = false;
     private _navigationInProgress = false;
-    private _unsentLoadedSourceEvents: Crdp.Debugger.ScriptParsedEvent[] = [];
+    private _unsentLoadedSourceEvents: [Crdp.Debugger.ScriptParsedEvent, LoadedSourceEventReason][] = [];
     private _edgeProtocolVersion: Version;
 
     public initialize(args: DebugProtocol.InitializeRequestArguments): DebugProtocol.Capabilities {
@@ -347,7 +347,7 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
     }
 
     private async sendBackloggedLoadedSourceEvents(): Promise<void> {
-        await Promise.all(this._unsentLoadedSourceEvents.map(script => this.sendLoadedSourceEvent(script)));
+        await Promise.all(this._unsentLoadedSourceEvents.map(event => this.sendLoadedSourceEvent(event[0], event[1])));
         this._unsentLoadedSourceEvents = [];
     }
 
@@ -364,22 +364,23 @@ export class EdgeDebugAdapter extends CoreDebugAdapter {
         this._scriptParsedEventBookKeeping = {};
     }
 
-    protected async sendLoadedSourceEvent(script: Crdp.Debugger.ScriptParsedEvent): Promise<void> {
+    protected async sendLoadedSourceEvent(script: Crdp.Debugger.ScriptParsedEvent, reason: LoadedSourceEventReason = null): Promise<void> {
         // If navigation is in progress, we wait for it to complete before sending any new script loaded events
         // This is done because in case of quick refreshes, we end up sending 'changed' events for new scripts because
         // scriptParsedEventBookKeeping hasn't been refreshed yet
         if (!this._navigationInProgress) {
-            let loadedSourceReason: LoadedSourceEventReason;
-            if (!this._scriptParsedEventBookKeeping[script.scriptId]) {
-                this._scriptParsedEventBookKeeping[script.scriptId] = true;
-                loadedSourceReason = 'new';
-            } else {
-                loadedSourceReason = 'changed';
+            if (!reason) {
+                if (!this._scriptParsedEventBookKeeping[script.scriptId]) {
+                    this._scriptParsedEventBookKeeping[script.scriptId] = true;
+                    reason = 'new';
+                } else {
+                    reason = 'changed';
+                }
             }
-            return super.sendLoadedSourceEvent(script, loadedSourceReason);
+            return super.sendLoadedSourceEvent(script, reason);
         } else {
             // If navigation is in progress, create an array for unsent loaded source events and send them once navigation is done
-            this._unsentLoadedSourceEvents.push(script);
+            this._unsentLoadedSourceEvents.push([script, reason]);
         }
 
     }

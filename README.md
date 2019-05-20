@@ -3,7 +3,7 @@
   VS Code - Debugger for Microsoft Edge
   <br>
 </h1>
-
+  
 <h4 align="center">Debug your JavaScript code running in Microsoft Edge from VS Code and Visual Studio.</h4>
 
 A VS Code extension to debug your JavaScript code in the Microsoft Edge browser. This is also used to enable JavaScript debugging inside the Microsoft Edge browser when launched from ASP.Net Projects in Visual Studio.

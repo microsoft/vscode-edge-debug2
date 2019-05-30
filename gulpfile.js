@@ -31,7 +31,7 @@ const defaultLanguages = [
     { id: 'it', folderName: 'ita' },
     { id: 'cs', folderName: 'csy' },
     { id: 'tr', folderName: 'trk' },
-    { id: 'pt-br', folderName: 'ptb', transifexId: 'pt_BR' },
+    { id: 'pt-br', folderName: 'ptb', transifexId: 'pt-BR' },
     { id: 'pl', folderName: 'plk' }
 ];
 
@@ -177,19 +177,19 @@ gulp.task('translations-export', gulp.series(['build'], function () {
         .pipe(gulp.dest(path.join('..', 'vscode-translations-export')));
 }));
 
-gulp.task('translations-import', function() {
-    var options = minimist(process.argv.slice(2), {
-        string: 'location',
-        default: {
-            location: '../vscode-translations-import'
-        }
-    });
-    return es.merge(defaultLanguages.map(function(language) {
+gulp.task('translations-import', (done) => {
+	const options = minimist(process.argv.slice(2), {
+			string: 'location',
+			default: {
+					location: '../vscode-translations-import'
+			}
+	});
+	return es.merge(defaultLanguages.map(language => {
         let id = language.transifexId || language.id;
-
         console.log(path.join(options.location, id, 'vscode-extensions', `${translationExtensionName}.xlf`));
         return gulp.src(path.join(options.location, id, 'vscode-extensions', `${translationExtensionName}.xlf`))
-            .pipe(nls.prepareJsonFiles())
-            .pipe(gulp.dest(path.join('./i18n', language.folderName)));
-    }));
+        .pipe(nls.prepareJsonFiles())
+                .pipe(gulp.dest(path.join('./i18n', language.folderName)));
+
+	})).on('end', () => done());
 });

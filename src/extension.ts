@@ -6,7 +6,8 @@ import * as vscode from 'vscode';
 import * as Core from 'vscode-chrome-debug-core';
 import * as nls from 'vscode-nls';
 
-import { defaultTargetFilter, getTargetFilter } from './utils';
+import { defaultTargetFilter, getTargetFilter, getBrowserPath } from './utils';
+import { isEdgeDebuggingSupported } from './legacyEdge/utils';
 import * as errors from './errors';
 import { ProtocolDetection } from './protocolDetection';
 
@@ -61,9 +62,15 @@ export class EdgeConfigurationProvider implements vscode.DebugConfigurationProvi
             return null;
         }
 
-        // if there is a version flag, switch to using the new msedge
-        if (config['version'] || config['runtimeExecutable']) {
+        if (msedgeIsOnMachine() || config['version'] || config['runtimeExecutable']) {
             config.type = 'msedge';
+        }
+
+        if (config.type == 'edge' && !isEdgeDebuggingSupported()) {
+            const errorMessage = localize('edge.debug.error.versionNotSupported', 'Your version of Microsoft Edge does not support debugging via the Edge DevTools Protocol. You can read more about supported versions here (https://aka.ms/edp-docs).');
+            return vscode.window.showErrorMessage(errorMessage).then(_ => {
+                return undefined;
+            });
         }
 
         if (config.request === 'attach') {
@@ -147,4 +154,11 @@ function unescapeTargetTitle(title: string): string {
         .replace(/&gt;/g, '>')
         .replace(/&#39;/g, `'`)
         .replace(/&quot;/g, '"');
+}
+
+function msedgeIsOnMachine(): boolean {
+    if (getBrowserPath('stable') != null) {
+        return true;
+    }
+    return false;
 }

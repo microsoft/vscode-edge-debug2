@@ -79,12 +79,12 @@ export class ChromeDebugAdapter extends CoreDebugAdapter {
                 if (!re) {
                     return errors.getNotExistErrorResponse('runtimeExecutable', args.runtimeExecutable);
                 }
-
                 runtimeExecutable = re;
+            } else if (args['version']){
+                runtimeExecutable = utils.getBrowserPath(args['version']);
             }
 
-            // Use runtimeExecutable if it is set; if not, check for version flag; else launch stable version of Microsoft Edge Chromium
-            runtimeExecutable = runtimeExecutable || utils.getBrowserPath(args['version']) || utils.getBrowserPath('stable');
+            runtimeExecutable = runtimeExecutable || utils.getBrowserPath('stable');
             if (!runtimeExecutable) {
                 return coreUtils.errP(localize('attribute.edge.missing', "Can't find Microsoft Edge - install it or set the \"runtimeExecutable\" field in the launch config."));
             }

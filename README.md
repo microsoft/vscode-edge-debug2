@@ -45,21 +45,20 @@ You can configure these modes with a `.vscode/launch.json` file in the root dire
 
 ### Launch
 
-#### Microsoft Edge (EdgeHTML)
-Below are two example `launch.json` configs with `"request": "launch"`. You must specify either `file` or `url` to launch Microsoft Edge (EdgeHTML) against a local file or a url. If you use a url, set `webRoot` to the directory that files are served from. This can be either an absolute path or a path using `${workspaceFolder}` (the folder open in Code). `webRoot` is used to resolve urls (like "http://localhost/app.js") to a file on disk (like `/Users/me/project/app.js`), so be careful that it's set correctly.
+Below are two example `launch.json` configs with `"request": "launch"`. You must specify either `file` or `url` to launch Microsoft Edge against a local file or a url. If you use a url, set `webRoot` to the directory that files are served from. This can be either an absolute path or a path using `${workspaceFolder}` (the folder open in Code). Note that `webRoot` is used to resolve urls (like "http://localhost/app.js") to a file on disk (like `/Users/me/project/app.js`), so be careful that it's set correctly.
 ```json
 {
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch localhost in Microsoft Edge (EdgeHTML)",
+            "name": "Launch localhost in Microsoft Edge",
             "type": "edge",
             "request": "launch",
             "url": "http://localhost/mypage.html",
             "webRoot": "${workspaceFolder}/wwwroot"
         },
         {
-            "name": "Launch index.html in Microsoft Edge (EdgeHTML)",
+            "name": "Launch index.html in Microsoft Edge",
             "type": "edge",
             "request": "launch",
             "file": "${workspaceFolder}/index.html"
@@ -69,7 +68,7 @@ Below are two example `launch.json` configs with `"request": "launch"`. You must
 ```
 
 #### Microsoft Edge (Chromium)
-If you are trying to launch Microsoft Edge (Chromium), the next version of Microsoft Edge, simply add a `version` attribute to your existing configuration with the version of Microsoft Edge (Chromium) you want to launch (`dev`, `beta`, or `canary`). The example configuration below will launch the Canary version of Microsoft Edge (Chromium):
+If the stable release of Microsoft Edge (Chromium) is on your machine, this debug adapter will launch it by default. If you'd like to launch a different channel of Microsoft Edge (Chromium), simply add a `version` attribute to your existing configuration with the version you want to launch (`dev`, `beta`, or `canary`). The example configuration below will launch the Canary version of Microsoft Edge (Chromium):
 ```json
 {
     "name": "Launch localhost in Microsoft Edge (Chromium) Canary",
@@ -81,7 +80,10 @@ If you are trying to launch Microsoft Edge (Chromium), the next version of Micro
 }
 ```
 
-If you want to use a different installation of a Chromium-based browser, you can also set the `runtimeExecutable` field with a path to the browser executable.
+If you want to use a different installation of a Chromium-based browser, you can also set the `runtimeExecutable` field with a path to the browser executable. Note that if you are using the `runtimeExecutable` flag, you should **not** be using `version`.
+
+#### Microsoft Edge (EdgeHTML)
+If you do **not** have the stable release of Microsoft Edge (Chromium) on your machine, the debug adapter will launch Microsoft Edge (EdgeHTML) by default. You will have the same default configuration as above.
 
 ### Attach
 With `"request": "attach"`, you must launch Microsoft Edge with remote debugging enabled in order for the extension to attach to it. Here's how you can do that:

@@ -71,15 +71,20 @@ export class ChromeDebugAdapter extends CoreDebugAdapter {
                 telemetryPropertyCollector.addTelemetryProperty('doesHostSupportLaunchUnelevated', 'true');
             }
             if (args.runtimeExecutable) {
+                // users should not be setting version flag if they are using runtimeExecutable
+                if (args['version']) {
+                    return errors.incorrectFlagMessage('version', 'Not to be used with \'runtimeExecutable\'');
+                }
                 const re = findExecutable(args.runtimeExecutable);
                 if (!re) {
                     return errors.getNotExistErrorResponse('runtimeExecutable', args.runtimeExecutable);
                 }
-
                 runtimeExecutable = re;
+            } else if (args['version']){
+                runtimeExecutable = utils.getBrowserPath(args['version']);
             }
 
-            runtimeExecutable = runtimeExecutable || utils.getBrowserPath(args['version']);
+            runtimeExecutable = runtimeExecutable || utils.getBrowserPath('stable');
             if (!runtimeExecutable) {
                 return coreUtils.errP(localize('attribute.edge.missing', "Can't find Microsoft Edge - install it or set the \"runtimeExecutable\" field in the launch config."));
             }

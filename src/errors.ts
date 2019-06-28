@@ -19,4 +19,12 @@ export function getNotExistErrorResponse(attribute: string, path: string): Promi
         }));
 }
 
+export function incorrectFlagMessage(incorrectFlag: string, message: string): Promise <void> {
+    return Promise.reject(new ErrorWithMessage(<DebugProtocol.Message>{
+        id: 2007,
+        format: localize('incorrect.flag.usage', "Flag '{0}' used incorrectly. {1}.", incorrectFlag, message),
+        variables: { incorrectFlag }
+    }));
+}
+
 export { runtimeConnectionTimeout } from 'vscode-chrome-debug-core/out/src/errors';

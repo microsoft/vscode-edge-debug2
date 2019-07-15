@@ -25,6 +25,7 @@
   ],
   "license": "SEE LICENSE IN LICENSE.txt",
   "dependencies": {
+    "lodash": "^4.17.13",
     "natives": "^1.1.6",
     "portscanner": "^2.2.0",
     "vscode-chrome-debug-core": "^6.7.48",

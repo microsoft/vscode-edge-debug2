@@ -5,7 +5,7 @@
         "removeComments": false,
         "target": "ES6",
         "sourceMap": true,
-        "rootDir": "src",
+        "rootDir": ".",
         "outDir": "out",
         "noImplicitThis": true
     },

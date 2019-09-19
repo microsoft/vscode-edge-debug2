@@ -81,6 +81,9 @@ export class ChromeDebugAdapter extends CoreDebugAdapter {
                     return errors.getNotExistErrorResponse('runtimeExecutable', args.runtimeExecutable);
                 }
                 runtimeExecutable = re;
+            } else if (args.useWebView) {
+                // Users must specify the host application via runtimeExecutable when using webview
+                return errors.incorrectFlagMessage('runtimeExecutable', 'Must be set when using \'useWebView\'');
             } else if (args['version']){
                 runtimeExecutable = utils.getBrowserPath(args['version']);
             }

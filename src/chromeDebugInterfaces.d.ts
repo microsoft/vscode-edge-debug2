@@ -27,6 +27,7 @@ export interface ILaunchRequestArgs extends Core.ILaunchRequestArgs, ICommonRequ
     breakOnLoad?: boolean;
     _clientOverlayPausedMessage?: string;
     shouldLaunchEdgeUnelevated?: boolean;
+    useWebView?: boolean;
 }
 
 export interface IAttachRequestArgs extends Core.IAttachRequestArgs, ICommonRequestArgs {

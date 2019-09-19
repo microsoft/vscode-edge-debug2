@@ -327,6 +327,13 @@
                 "default": [
                   "page"
                 ]
+              },
+              "useWebView": {
+                "type": [
+                  "boolean"
+                ],
+                "description": "%edge.useWebView.description%",
+                "default": false
               }
             }
           },
@@ -438,6 +445,13 @@
                 "type": "boolean",
                 "description": "%edge.logTimestamps.description%",
                 "default": true
+              },
+              "useWebView": {
+                "type": [
+                  "boolean"
+                ],
+                "description": "%edge.useWebView.description%",
+                "default": false
               }
             }
           }

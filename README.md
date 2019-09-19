@@ -110,7 +110,7 @@ The example `launch.json` config below will attach to either Microsoft Edge (Chr
 
 ### Other optional launch config fields
 * `trace`: When true, the adapter logs its own diagnostic info to a file. The file path will be printed in the Debug Console. This is often useful info to include when filing an issue on GitHub. If you set it to "verbose", it will log to a file and also log to the console.
-* `version`: When set to `canary`, `dev`, or `beta`, it will launch the matching version of Microsoft Edge (Chromium). If not specificed, Microsoft Edge (EdgeHTML) will be launched.
+* `version`: When set to `canary`, `dev`, or `beta`, it will launch the matching version of Microsoft Edge (Chromium). If not specified, Microsoft Edge (EdgeHTML) will be launched.
 * `runtimeExecutable`: Workspace relative or absolute path to the runtime executable to be used. If not specified, Microsoft Edge (EdgeHTML) will be used from the default install location.
 * `runtimeArgs`: Optional arguments passed to the runtime executable.
 * `env`: Optional dictionary of environment key/value pairs.
@@ -124,6 +124,14 @@ The example `launch.json` config below will attach to either Microsoft Edge (Chr
 * `smartStep`: Automatically steps over code that doesn't map to source files. Especially useful for debugging with async/await.
 * `disableNetworkCache`: If true, the network cache will be disabled.
 * `showAsyncStacks`: If true, callstacks across async calls (like `setTimeout`, `fetch`, resolved Promises, etc) will be shown.
+* `useWebView`: If true, the debugger will treat the `runtimeExecutable` as an application hosting a WebView. See: [Microsoft Edge (Chromium) WebView applications](#Microsoft-Edge-(Chromium)-WebView-applications)
+
+### Microsoft Edge (Chromium) WebView applications
+You can also use the debugger to launch applications that are using an embedded [Microsoft Edge (Chromium) WebView](https://docs.microsoft.com/en-us/microsoft-edge/hosting/webview2). With the correct `launch.json` properties, the debugger will launch your host application and attach to the WebView allowing you to debug the running script content.
+
+To use the debugger against a WebView application use the following properties in your launch config:
+* `runtimeExecutable`: Set this to the full path to your host application.
+* `useWebView`: Set this to be `true`
 
 ### Other targets
 You can also theoretically attach to other targets that support the same [Chrome DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/tot) as the Microsoft Edge (Chromium) browser, such as Electron or Cordova. These aren't officially supported, but should work with basically the same steps. You can use a launch config by setting `"runtimeExecutable"` to a program or script to launch, or an attach config to attach to a process that's already running. If Code can't find the target, you can always verify that it is actually available by navigating to `http://localhost:<port>/json` in a browser. If you get a response with a bunch of JSON, and can find your target page in that JSON, then the target should be available to this extension.

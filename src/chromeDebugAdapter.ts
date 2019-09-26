@@ -40,7 +40,6 @@ export class ChromeDebugAdapter extends CoreDebugAdapter {
     private _chromePID: number;
     private _userRequestedUrl: string;
     private _doesHostSupportLaunchUnelevatedProcessRequest: boolean;
-    private _isDebuggerUsingWebView: boolean;
 
     public initialize(args: IExtendedInitializeRequestArguments): VSDebugProtocolCapabilities {
         this._overlayHelper = new utils.DebounceHelper(/*timeoutMs=*/200);
@@ -81,9 +80,6 @@ export class ChromeDebugAdapter extends CoreDebugAdapter {
                     return errors.getNotExistErrorResponse('runtimeExecutable', args.runtimeExecutable);
                 }
                 runtimeExecutable = re;
-            } else if (args.useWebView) {
-                // Users must specify the host application via runtimeExecutable when using webview
-                return errors.incorrectFlagMessage('runtimeExecutable', 'Must be set when using \'useWebView\'');
             } else if (args['version']){
                 runtimeExecutable = utils.getBrowserPath(args['version']);
             }
@@ -136,29 +132,15 @@ export class ChromeDebugAdapter extends CoreDebugAdapter {
                 launchUrl = args.url;
             }
 
-            if (launchUrl && !args.noDebug && !args.useWebView) {
+            if (launchUrl && !args.noDebug) {
                 // We store the launch file/url provided and temporarily launch and attach to about:blank page. Once we receive configurationDone() event, we redirect the page to this file/url
-                // This is done to facilitate hitting breakpoints on load.
-                // We only do this for the browser. WebView applications will instead auto issue an internal Page.waitForDebugger command when launched for debugging so we have time to bind bps.
+                // This is done to facilitate hitting breakpoints on load
                 this._userRequestedUrl = launchUrl;
                 launchUrl = 'about:blank';
             }
 
             if (launchUrl) {
                 chromeArgs.push(launchUrl);
-            }
-
-            this._isDebuggerUsingWebView = args.useWebView;
-            if (args.useWebView) {
-                telemetryPropertyCollector.addTelemetryProperty('useWebView', 'true');
-
-                // Initialize WebView debugging environment variables
-                if (!args.userDataDir) {
-                    args.userDataDir = path.join(os.tmpdir(), `vscode-edge-debug-userdatadir_${port}`);
-                }
-                chromeEnv['WEBVIEW2_USER_DATA_FOLDER'] = args.userDataDir.toString();
-                chromeEnv['WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS'] = `--remote-debugging-port=${port}`;
-                chromeEnv['WEBVIEW2_WAIT_FOR_SCRIPT_DEBUGGER'] = `true`;
             }
 
             this._chromeProc = await this.spawnChrome(runtimeExecutable, chromeArgs, chromeEnv, chromeWorkingDir, !!args.runtimeExecutable,
@@ -172,7 +154,7 @@ export class ChromeDebugAdapter extends CoreDebugAdapter {
             }
 
             return args.noDebug ? undefined :
-                this.doAttach(port, launchUrl || args.urlFilter, args.address, args.timeout, undefined, args.extraCRDPChannelPort, args.useWebView);
+                this.doAttach(port, launchUrl || args.urlFilter, args.address, args.timeout, undefined, args.extraCRDPChannelPort);
         });
     }
 
@@ -243,7 +225,7 @@ export class ChromeDebugAdapter extends CoreDebugAdapter {
         super.commonArgs(args);
     }
 
-    protected doAttach(port: number, targetUrl?: string, address?: string, timeout?: number, websocketUrl?: string, extraCRDPChannelPort?: number, useWebView?: boolean): Promise<void> {
+    protected doAttach(port: number, targetUrl?: string, address?: string, timeout?: number, websocketUrl?: string, extraCRDPChannelPort?: number): Promise<void> {
         return super.doAttach(port, targetUrl, address, timeout, websocketUrl, extraCRDPChannelPort).then(async () => {
             // Don't return this promise, a failure shouldn't fail attach
             this.globalEvaluate({ expression: 'navigator.userAgent', silent: true })
@@ -325,11 +307,6 @@ export class ChromeDebugAdapter extends CoreDebugAdapter {
                 telemetry.telemetry.reportEvent('break-on-load-target-version-workaround-failed', exception);
             }
 
-            if (useWebView) {
-                // For WebViews we must issue the runIfWaitingForDebugger command once we are attached, to resume script execution
-                this.chrome.Runtime.runIfWaitingForDebugger();
-            }
-
             /* __GDPR__FRAGMENT__
                 "DebugCommonProperties" : {
                     "${include}": [ "${VersionInformation}" ]
@@ -340,26 +317,11 @@ export class ChromeDebugAdapter extends CoreDebugAdapter {
     }
 
     protected runConnection(): Promise<void>[] {
-        if (!this._isDebuggerUsingWebView) {
-            return [
-                ...super.runConnection(),
-                this.chrome.Page.enable(),
-                this.chrome.Network.enable({})
-            ];
-        } else {
-            // For WebView we must no call super.runConnection() since that will cause the execution to resume before we are ready.
-            // Instead we strip out the call to _chromeConnection.run() and call runIfWaitingForDebugger() once attach is complete.
-            return [
-                this.chrome.Console.enable()
-                    .catch(e => { }),
-                this.chrome.Debugger.enable() as any,
-                this.chrome.Runtime.enable(),
-                this.chrome.Log.enable()
-                    .catch(e => { }),
-                this.chrome.Page.enable(),
-                this.chrome.Network.enable({}),
-            ];
-        }
+        return [
+            ...super.runConnection(),
+            this.chrome.Page.enable(),
+            this.chrome.Network.enable({})
+        ];
     }
 
     protected async onPaused(notification: Crdp.Debugger.PausedEvent, expectingStopReason = this._expectingStopReason): Promise<IOnPausedResult> {

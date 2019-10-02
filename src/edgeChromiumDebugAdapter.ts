@@ -68,7 +68,7 @@ export class EdgeChromiumDebugAdapter extends ChromeDebugAdapter {
 
     protected runConnection(): Promise<void>[] {
         if (!this._isDebuggerUsingWebView) {
-            super.runConnection();
+            return super.runConnection();
         } else {
             // For WebView we must no call super.runConnection() since that will cause the execution to resume before we are ready.
             // Instead we strip out the call to _chromeConnection.run() and call runIfWaitingForDebugger() once attach is complete.

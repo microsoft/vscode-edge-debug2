@@ -31,7 +31,8 @@ export class EdgeChromiumDebugAdapter extends ChromeDebugAdapter {
                 return errors.incorrectFlagMessage('runtimeExecutable', 'Must be set when using \'useWebView\'');
             }
 
-            telemetryPropertyCollector.addTelemetryProperty('useWebView', 'true');
+            const webViewTelemetry = (args.useWebView === 'advanced' ? 'advanced' : 'true');
+            telemetryPropertyCollector.addTelemetryProperty('useWebView', webViewTelemetry);
             this._isDebuggerUsingWebView = true;
 
             if (!args.noDebug) {

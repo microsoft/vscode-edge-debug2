@@ -124,14 +124,18 @@ The example `launch.json` config below will attach to either Microsoft Edge (Chr
 * `smartStep`: Automatically steps over code that doesn't map to source files. Especially useful for debugging with async/await.
 * `disableNetworkCache`: If true, the network cache will be disabled.
 * `showAsyncStacks`: If true, callstacks across async calls (like `setTimeout`, `fetch`, resolved Promises, etc) will be shown.
-* `useWebView`: If true, the debugger will treat the `runtimeExecutable` as an application hosting a WebView. See: [Microsoft Edge (Chromium) WebView applications](#Microsoft-Edge-(Chromium)-WebView-applications)
+* `useWebView`: If true or `advanced`, the debugger will treat the `runtimeExecutable` as an application hosting a WebView. See: [Microsoft Edge (Chromium) WebView applications](#Microsoft-Edge-(Chromium)-WebView-applications)
 
 ### Microsoft Edge (Chromium) WebView applications
 You can also use the debugger to launch applications that are using an embedded [Microsoft Edge (Chromium) WebView](https://docs.microsoft.com/en-us/microsoft-edge/hosting/webview2). With the correct `launch.json` properties, the debugger will launch your host application and attach to the WebView allowing you to debug the running script content.
 
 To use the debugger against a WebView application use the following properties in your launch config:
 * `runtimeExecutable`: Set this to the full path to your host application.
-* `useWebView`: Set this to be `true`
+* `useWebView`: Set this to be `true` or `advanced` depending on how your host application is using WebViews
+
+In basic scenarios, your host application is using a single WebView that is loaded on launch of your application. If this is the case, you should set `useWebView` to be `true`. This will treat the host application just like it was another browser, attaching to the WebView on launch and failing with a timeout if it cannot find a matching `url` or `urlFilter` within the timeout.
+
+In more advanced scenarios, your host appliation may be using a single WebView that doesn't load until later in your workflow. It may also be using multiple WebViews within the same application, or have a dependency on a specific `userDataDir` setting. In these cases you should set `useWebView` to be `advanced`. This will cause the debugger to treat your host application differently. When launching, the debugger will wait until it gets notified of a WebView that matches the `urlFilter` value without timing out. It will also not override the `userDataDir` internally and may attach on a different `port` value than what is specified in the config if several WebViews created in the host application.
 
 ### Other targets
 You can also theoretically attach to other targets that support the same [Chrome DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/tot) as the Microsoft Edge (Chromium) browser, such as Electron or Cordova. These aren't officially supported, but should work with basically the same steps. You can use a launch config by setting `"runtimeExecutable"` to a program or script to launch, or an attach config to attach to a process that's already running. If Code can't find the target, you can always verify that it is actually available by navigating to `http://localhost:<port>/json` in a browser. If you get a response with a bunch of JSON, and can find your target page in that JSON, then the target should be available to this extension.

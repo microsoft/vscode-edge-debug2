@@ -6,6 +6,7 @@
 import * as net from 'net';
 import * as os from 'os';
 import * as path from 'path';
+import * as crypto from 'crypto';
 import * as errors from './errors';
 
 import { ChromeDebugAdapter } from './chromeDebugAdapter';
@@ -29,20 +30,33 @@ export class EdgeChromiumDebugAdapter extends ChromeDebugAdapter {
                 // Users must specify the host application via runtimeExecutable when using webview
                 return errors.incorrectFlagMessage('runtimeExecutable', 'Must be set when using \'useWebView\'');
             }
-            if (args.port === 2015) {
-                // WebView should use port 0 by default since we expect the callback to inform us of the correct port
-                args.port = 0;
-            }
 
             telemetryPropertyCollector.addTelemetryProperty('useWebView', 'true');
             this._isDebuggerUsingWebView = true;
 
             if (!args.noDebug) {
-                // Create the webview server that will inform us of webview creation events
-                const pipeName = this.createWebViewServer(args, webViewCreatedCallback);
-
                 // Initialize WebView debugging environment variables
                 args.env = args.env || {};
+
+                if (args.useWebView === 'advanced') {
+                    // Advanced scenarios should use port 0 by default since we expect the callback to inform us of the correct port
+                    if (args.port === 2015) {
+                        args.port = 0;
+                    }
+
+                    // Create the webview server that will inform us of webview creation events
+                    const pipeName = await this.createWebViewServer(args, webViewCreatedCallback);
+                    args.env['WEBVIEW2_PIPE_FOR_SCRIPT_DEBUGGER'] = pipeName;
+                } else {
+                    // For normal scenarios use the port specified or 2015 by default
+                    args.port = args.port || 2015;
+                    if (!args.userDataDir) {
+                        // Also override the userDataDir to force remote debugging to be enabled
+                        args.userDataDir = path.join(os.tmpdir(), `vscode-edge-debug-userdatadir_${args.port}`);
+                    }
+                    webViewCreatedCallback(args.port);
+                }
+
                 if (args.userDataDir) {
                     // WebView should not force a userDataDir (unless user specified one) so that we don't disrupt
                     // the expected behavior of the host application.
@@ -50,7 +64,6 @@ export class EdgeChromiumDebugAdapter extends ChromeDebugAdapter {
                 }
                 args.env['WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS'] = `--remote-debugging-port=${args.port}`;
                 args.env['WEBVIEW2_WAIT_FOR_SCRIPT_DEBUGGER'] = 'true';
-                args.env['WEBVIEW2_PIPE_FOR_SCRIPT_DEBUGGER'] = pipeName;
             }
 
             // To ensure the ChromeDebugAdapter does not override the launchUrl for WebView we force noDebug=true.
@@ -66,6 +79,15 @@ export class EdgeChromiumDebugAdapter extends ChromeDebugAdapter {
             // Since the ChromeDebugAdapter will have been called with noDebug=true,
             // it will not have auto attached during the super.launch() call.
             this.doAttach(port, this.getWebViewLaunchUrl(args), args.address, args.timeout, undefined, args.extraCRDPChannelPort);
+        }
+    }
+
+    public shutdown() {
+        super.shutdown();
+
+        // Clean up the pipe server
+        if (this._webviewPipeServer) {
+            this._webviewPipeServer.close();
         }
     }
 
@@ -129,12 +151,23 @@ export class EdgeChromiumDebugAdapter extends ChromeDebugAdapter {
         return (targets && targets.length > 0);
     }
 
-    private createWebViewServer(args: ILaunchRequestArgs, webViewCreatedCallback: (port: number) => void) {
+    private async createWebViewServer(args: ILaunchRequestArgs, webViewCreatedCallback: (port: number) => void) {
         // Create the named pipe used to subscribe to new webview creation events
         const exeName = args.runtimeExecutable.split(/\\|\//).pop();
-        const pipeName = 'VSCode';
+        const pipeName = `VSCode_${crypto.randomBytes(12).toString('base64')}`;
         const serverName = `\\\\.\\pipe\\WebView2\\Debugger\\${exeName}\\${pipeName}`;
         const targetUrl = this.getWebViewLaunchUrl(args);
+
+        // Clean up any previous pipe
+        await new Promise((resolve) => {
+            if (this._webviewPipeServer) {
+                this._webviewPipeServer.close(() => {
+                    resolve();
+                });
+            } else {
+                resolve();
+            }
+        });
 
         this._webviewPipeServer = net.createServer((stream) => {
             stream.on('data', async (data) => {

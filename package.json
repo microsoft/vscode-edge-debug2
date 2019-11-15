@@ -330,7 +330,13 @@
               },
               "useWebView": {
                 "type": [
-                  "boolean"
+                  "boolean",
+                  "string"
+                ],
+                "enum": [
+                  "advanced",
+                  true,
+                  false
                 ],
                 "description": "%edge.useWebView.description%",
                 "default": false
@@ -448,7 +454,13 @@
               },
               "useWebView": {
                 "type": [
-                  "boolean"
+                  "boolean",
+                  "string"
+                ],
+                "enum": [
+                  "advanced",
+                  true,
+                  false
                 ],
                 "description": "%edge.useWebView.description%",
                 "default": false

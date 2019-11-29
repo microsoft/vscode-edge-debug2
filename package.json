@@ -4,7 +4,7 @@
   "version": "1.0.12",
   "icon": "images/icon.png",
   "description": "%extension.description%",
-  "extensionKind": "ui",
+  "extensionKind": ["ui"],
   "author": {
     "name": "Microsoft Corporation"
   },

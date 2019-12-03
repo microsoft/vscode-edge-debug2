@@ -1,6 +1,6 @@
 {
   "name": "debugger-for-edge",
-  "displayName": "Debugger for Edge",
+  "displayName": "Debugger for Microsoft Edge",
   "version": "1.0.12",
   "icon": "images/icon.png",
   "description": "%extension.description%",

@@ -29,7 +29,7 @@ A VS Code extension to debug your JavaScript code in the Microsoft Edge browser.
 
 ### For debugging Microsoft Edge (EdgeHTML or Chromium) inside Visual Studio
 1. Install a supported version of Windows.
-2. Install the latest version of Visual Studio. Debugging Microsoft Edge (EdgeHTML) is supported for VS versions >= 15.7. Debugging Microsoft Edge (Chromium) is supported for VS versions >= 15.9.
+2. Install the latest version of Visual Studio. Debugging Microsoft Edge (EdgeHTML) is supported for VS versions >= 15.7. Debugging Microsoft Edge (Chromium) is supported for VS versions >= 15.9.19.
 3. Create an ASP.Net/ASP.Net Core Web Application.
 4. Set a breakpoint in your JavaScript/TypeScript file.
 5. Select 'Microsoft Edge' from the 'Web Browser' submenu in the debug target dropdown, and then press F5.

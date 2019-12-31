@@ -41,8 +41,8 @@ By default, installing Microsoft Edge (Chromium) will overwrite Microsoft Edge (
 
 Source | Destination
 --- | ---
-`<zip extract location>`\MicrosoftEdgePolicyTemplates\windows\admx\\*.admx | C:\Windows\PolicyDefinitions
-`<zip extract location>`\MicrosoftEdgePolicyTemplates\windows\admx\\`<your-locale>`\\*.adml | C:\Windows\PolicyDefinitions\\`<your-locale>`
+`<zip-extract-location>`\MicrosoftEdgePolicyTemplates\windows\admx\\*.admx | C:\Windows\PolicyDefinitions
+`<zip-extract-location>`\MicrosoftEdgePolicyTemplates\windows\admx\\`<your-locale>`\\*.adml | C:\Windows\PolicyDefinitions\\`<your-locale>`
 
 3. Follow [these instructions](https://docs.microsoft.com/en-us/deployedge/microsoft-edge-sysupdate-access-old-edge) to enable side by side installations.
 

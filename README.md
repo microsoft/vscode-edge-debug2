@@ -22,18 +22,29 @@ A VS Code extension to debug your JavaScript code in the Microsoft Edge browser.
 * Any features that aren't script debugging.
 
 ## Getting Started
-For debugging inside VS Code:
-1. [Install the extension](https://marketplace.visualstudio.com/items?itemName=msjsdiag.debugger-for-edge)
+
+### For debugging inside VS Code**
+1. [Install the extension.](https://marketplace.visualstudio.com/items?itemName=msjsdiag.debugger-for-edge)
 2. Open the folder containing the project you want to work on.
 
-For debugging Microsoft Edge (EdgeHTML) inside Visual Studio:
+### For debugging Microsoft Edge (EdgeHTML or Chromium) inside Visual Studio**
 1. Install a supported version of Windows.
-2. Install the latest version of Visual Studio. Debugging Microsoft Edge (EdgeHTML) is supported for VS versions >= 15.7
+2. Install the latest version of Visual Studio. Debugging Microsoft Edge (EdgeHTML) is supported for VS versions >= 15.7. Debugging Microsoft Edge (Chromium) is supported for VS versions >= 15.9.
 3. Create an ASP.Net/ASP.Net Core Web Application.
 4. Set a breakpoint in your JavaScript/TypeScript file.
 5. Select 'Microsoft Edge' from the 'Web Browser' submenu in the debug target dropdown, and then press F5.
 
-We are actively working to add support for debugging Microsoft Edge (Chromium) to Visual Studio. Sign up [here](https://visualstudio.microsoft.com/vs/preview/) to stay updated!
+### For enabling both Microsoft Edge (EdgeHTML) and Microsoft Edge (Chromium) in Visual Studio**
+By default, installing Microsoft Edge (Chromium) will overwrite Microsoft Edge (EdgeHTML). To enable both browsers:
+1. [Download Microsoft Edge group policy templates.](https://www.microsoftedgeinsider.com/en-us/enterprise)
+2. After extracting the template files above, copy the files as shown below:
+
+Source | Destination
+--- | ---
+`<zip extract location>`\MicrosoftEdgePolicyTemplates\windows\admx\\*.admx | C:\Windows\PolicyDefinitions
+`<zip extract location>`\MicrosoftEdgePolicyTemplates\windows\admx\\`<your-locale>`\\*.adml | C:\Windows\PolicyDefinitions\\`<your-locale>`
+
+3. Follow [these instructions](https://docs.microsoft.com/en-us/deployedge/microsoft-edge-sysupdate-access-old-edge) to enable side by side installations.
 
 ## Using the debugger
 When your launch config is set up, you can debug your project. Pick a launch config from the dropdown on the Debug pane in Code. Press the play button or F5 to start.

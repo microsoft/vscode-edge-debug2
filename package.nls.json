@@ -31,5 +31,6 @@
 	"edge.breakOnLoadStrategy.instrument.description": "Tell Microsoft Edge to pause as each script is loaded, resolving sourcemaps and setting breakpoints",
 	"edge.breakOnLoadStrategy.regex.description": "Sets breakpoints optimistically in files with the same name as the file in which the breakpoint is set.",
 	"edge.breakOnLoadStrategy.off.description": "Turns off breakOnLoad.",
-	"edge.targetTypes.description": "An array of acceptable target types. The default is `[\"page\"]`."
+	"edge.targetTypes.description": "An array of acceptable target types. The default is `[\"page\"]`.",
+	"edge.useWebView.description": "When 'true', the debugger will treat the runtime executable as a host application that contains a WebView allowing you to debug the WebView script content. When set to 'advanced', the debugger will wait to connect to a WebView matching the urlFilter."
 }

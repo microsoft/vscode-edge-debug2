@@ -1,7 +1,7 @@
 {
   "name": "debugger-for-edge",
-  "displayName": "Debugger for Edge",
-  "version": "1.0.10",
+  "displayName": "Debugger for Microsoft Edge",
+  "version": "1.0.14",
   "icon": "images/icon.png",
   "description": "%extension.description%",
   "extensionKind": "ui",
@@ -27,7 +27,7 @@
   "dependencies": {
     "natives": "^1.1.6",
     "portscanner": "^2.2.0",
-    "vscode-chrome-debug-core": "^6.7.48",
+    "vscode-chrome-debug-core": "6.7.50",
     "vscode-debugadapter": "^1.33.0",
     "vscode-nls": "3.2.4"
   },
@@ -75,7 +75,7 @@
   "scripts": {
     "build": "gulp build",
     "watch": "gulp watch",
-    "start": "node out/src/chromeDebug.js --server=4712",
+    "start": "node out/src/edgeChromiumDebug.js --server=4712",
     "test:legacy-edge": "mocha --exit --timeout 20000 -s 2000 -u tdd --colors \"./out/test/legacyEdge/test/*.test.js\"",
     "test:msedge": "mocha --exit --timeout 20000 -s 2000 -u tdd --colors \"./out/test/*.test.js\"",
     "test": "npm run test:legacy-edge && npm run test:msedge",
@@ -107,7 +107,7 @@
       {
         "type": "msedge",
         "label": "MsEdge",
-        "program": "./out/src/chromeDebug.js",
+        "program": "./out/src/edgeChromiumDebug.js",
         "runtime": "node",
         "aiKey": "AIF-d9b70cd4-b9f9-4d70-929b-a071c400b217",
         "languages": [
@@ -327,6 +327,19 @@
                 "default": [
                   "page"
                 ]
+              },
+              "useWebView": {
+                "type": [
+                  "boolean",
+                  "string"
+                ],
+                "enum": [
+                  "advanced",
+                  true,
+                  false
+                ],
+                "description": "%edge.useWebView.description%",
+                "default": false
               }
             }
           },
@@ -438,6 +451,19 @@
                 "type": "boolean",
                 "description": "%edge.logTimestamps.description%",
                 "default": true
+              },
+              "useWebView": {
+                "type": [
+                  "boolean",
+                  "string"
+                ],
+                "enum": [
+                  "advanced",
+                  true,
+                  false
+                ],
+                "description": "%edge.useWebView.description%",
+                "default": false
               }
             }
           }

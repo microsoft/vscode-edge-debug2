@@ -22,18 +22,29 @@ A VS Code extension to debug your JavaScript code in the Microsoft Edge browser.
 * Any features that aren't script debugging.
 
 ## Getting Started
-For debugging inside VS Code:
-1. [Install the extension](https://marketplace.visualstudio.com/items?itemName=msjsdiag.debugger-for-edge)
+
+### For debugging inside VS Code
+1. [Install the extension.](https://marketplace.visualstudio.com/items?itemName=msjsdiag.debugger-for-edge)
 2. Open the folder containing the project you want to work on.
 
-For debugging Microsoft Edge (EdgeHTML) inside Visual Studio:
+### For debugging Microsoft Edge (EdgeHTML or Chromium) inside Visual Studio
 1. Install a supported version of Windows.
-2. Install the latest version of Visual Studio. Debugging Microsoft Edge (EdgeHTML) is supported for VS versions >= 15.7
+2. Install the latest version of Visual Studio. Debugging Microsoft Edge (EdgeHTML) is supported for VS versions >= 15.7. Debugging Microsoft Edge (Chromium) is supported for VS versions >= 15.9.19.
 3. Create an ASP.Net/ASP.Net Core Web Application.
 4. Set a breakpoint in your JavaScript/TypeScript file.
 5. Select 'Microsoft Edge' from the 'Web Browser' submenu in the debug target dropdown, and then press F5.
 
-We are actively working to add support for debugging Microsoft Edge (Chromium) to Visual Studio. Sign up [here](https://visualstudio.microsoft.com/vs/preview/) to stay updated!
+### For enabling both Microsoft Edge (EdgeHTML) and Microsoft Edge (Chromium) in Visual Studio
+By default, installing Microsoft Edge (Chromium) will overwrite Microsoft Edge (EdgeHTML). To enable both browsers:
+1. [Download Microsoft Edge group policy templates.](https://www.microsoftedgeinsider.com/en-us/enterprise)
+2. After extracting the template files above, copy the files as shown below:
+
+Source | Destination
+--- | ---
+<zip&#x2011;extract&#x2011;location>\MicrosoftEdgePolicyTemplates\windows\admx\\*.admx | C:\Windows\PolicyDefinitions
+<zip&#x2011;extract&#x2011;location>\MicrosoftEdgePolicyTemplates\windows\admx\\<your-locale\>\\*.adml | C:\Windows\PolicyDefinitions\\<your-locale\>
+
+3. Follow [these instructions](https://docs.microsoft.com/en-us/deployedge/microsoft-edge-sysupdate-access-old-edge) to enable side by side installations.
 
 ## Using the debugger
 When your launch config is set up, you can debug your project. Pick a launch config from the dropdown on the Debug pane in Code. Press the play button or F5 to start.
@@ -110,7 +121,7 @@ The example `launch.json` config below will attach to either Microsoft Edge (Chr
 
 ### Other optional launch config fields
 * `trace`: When true, the adapter logs its own diagnostic info to a file. The file path will be printed in the Debug Console. This is often useful info to include when filing an issue on GitHub. If you set it to "verbose", it will log to a file and also log to the console.
-* `version`: When set to `canary`, `dev`, or `beta`, it will launch the matching version of Microsoft Edge (Chromium). If not specificed, Microsoft Edge (EdgeHTML) will be launched.
+* `version`: When set to `canary`, `dev`, or `beta`, it will launch the matching version of Microsoft Edge (Chromium). If not specified, Microsoft Edge (EdgeHTML) will be launched.
 * `runtimeExecutable`: Workspace relative or absolute path to the runtime executable to be used. If not specified, Microsoft Edge (EdgeHTML) will be used from the default install location.
 * `runtimeArgs`: Optional arguments passed to the runtime executable.
 * `env`: Optional dictionary of environment key/value pairs.
@@ -124,6 +135,18 @@ The example `launch.json` config below will attach to either Microsoft Edge (Chr
 * `smartStep`: Automatically steps over code that doesn't map to source files. Especially useful for debugging with async/await.
 * `disableNetworkCache`: If true, the network cache will be disabled.
 * `showAsyncStacks`: If true, callstacks across async calls (like `setTimeout`, `fetch`, resolved Promises, etc) will be shown.
+* `useWebView`: If true or `advanced`, the debugger will treat the `runtimeExecutable` as an application hosting a WebView. See: [Microsoft Edge (Chromium) WebView applications](#Microsoft-Edge-(Chromium)-WebView-applications)
+
+### Microsoft Edge (Chromium) WebView applications
+You can also use the debugger to launch applications that are using an embedded [Microsoft Edge (Chromium) WebView](https://docs.microsoft.com/en-us/microsoft-edge/hosting/webview2). With the correct `launch.json` properties, the debugger will launch your host application and attach to the WebView allowing you to debug the running script content.
+
+To use the debugger against a WebView application use the following properties in your launch config:
+* `runtimeExecutable`: Set this to the full path to your host application.
+* `useWebView`: Set this to be `true` or `advanced` depending on how your host application is using WebViews
+
+In basic scenarios, your host application is using a single WebView that is loaded on launch of your application. If this is the case, you should set `useWebView` to be `true`. This will treat the host application just like it was another browser, attaching to the WebView on launch and failing with a timeout if it cannot find a matching `url` or `urlFilter` within the timeout.
+
+In more advanced scenarios, your host appliation may be using a single WebView that doesn't load until later in your workflow. It may also be using multiple WebViews within the same application, or have a dependency on a specific `userDataDir` setting. In these cases you should set `useWebView` to be `advanced`. This will cause the debugger to treat your host application differently. When launching, the debugger will wait until it gets notified of a WebView that matches the `urlFilter` value without timing out. It will also not override the `userDataDir` internally and may attach on a different `port` value than what is specified in the config if several WebViews created in the host application.
 
 ### Other targets
 You can also theoretically attach to other targets that support the same [Chrome DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/tot) as the Microsoft Edge (Chromium) browser, such as Electron or Cordova. These aren't officially supported, but should work with basically the same steps. You can use a launch config by setting `"runtimeExecutable"` to a program or script to launch, or an attach config to attach to a process that's already running. If Code can't find the target, you can always verify that it is actually available by navigating to `http://localhost:<port>/json` in a browser. If you get a response with a bunch of JSON, and can find your target page in that JSON, then the target should be available to this extension.

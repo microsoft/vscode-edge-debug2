@@ -28,5 +28,6 @@
 	"edge.breakOnLoad.description": "Experimental feature -  If true, the debug adapter will attempt to set breakpoints in scripts before they are loaded, so it can hit breakpoints at the beginnings of those scripts. Has a perf impact.",
 	"edge.breakOnLoadStrategy.description": "The strategy to use for breakOnLoad.",
 	"edge.breakOnLoadStrategy.instrument.description": "Tell Edge to pause as each script is loaded, resolving sourcemaps and setting breakpoints",
-	"edge.breakOnLoadStrategy.regex.description": "Sets breakpoints optimistically in files with the same name as the file in which the breakpoint is set."
+	"edge.breakOnLoadStrategy.regex.description": "Sets breakpoints optimistically in files with the same name as the file in which the breakpoint is set.",
+	"edge.useWebView.description": "When 'true', the debugger will treat the runtime executable as a host application that contains a WebView allowing you to debug the WebView script content. When set to 'advanced', the debugger will wait to connect to a WebView matching the urlFilter."
 }

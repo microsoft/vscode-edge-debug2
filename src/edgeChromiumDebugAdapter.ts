@@ -158,6 +158,7 @@ export class EdgeChromiumDebugAdapter extends ChromeDebugAdapter {
         const pipeName = `VSCode_${crypto.randomBytes(12).toString('base64')}`;
         const serverName = `\\\\.\\pipe\\WebView2\\Debugger\\${exeName}\\${pipeName}`;
         const targetUrl = this.getWebViewLaunchUrl(args);
+        const isAttached = false;
 
         // Clean up any previous pipe
         await new Promise((resolve) => {
@@ -174,8 +175,9 @@ export class EdgeChromiumDebugAdapter extends ChromeDebugAdapter {
             stream.on('data', async (data) => {
                 const connectionInfo: IWebViewConnectionInfo = JSON.parse(data.toString());
                 const port = this.getWebViewPort(args, connectionInfo);
-                if (this.isMatchingWebViewTarget(connectionInfo, targetUrl)) {
+                if (!isAttached && this.isMatchingWebViewTarget(connectionInfo, targetUrl)) {
                     webViewCreatedCallback(port);
+                    isAttached = true;
                 } else {
                     const address = args.address || '127.0.0.1';
                     const webSocketUrl = `ws://${address}:${port}/devtools/${connectionInfo.type}/${connectionInfo.id}`
@@ -191,6 +193,7 @@ export class EdgeChromiumDebugAdapter extends ChromeDebugAdapter {
         this._webviewPipeServer.on('close', () => {
             this._webviewPipeServer = undefined;
             webViewCreatedCallback(0);
+            isAttached = true;
         });
 
         this._webviewPipeServer.listen(serverName);

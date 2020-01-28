@@ -158,7 +158,7 @@ export class EdgeChromiumDebugAdapter extends ChromeDebugAdapter {
         const pipeName = `VSCode_${crypto.randomBytes(12).toString('base64')}`;
         const serverName = `\\\\.\\pipe\\WebView2\\Debugger\\${exeName}\\${pipeName}`;
         const targetUrl = this.getWebViewLaunchUrl(args);
-        const isAttached = false;
+        let isAttached = false;
 
         // Clean up any previous pipe
         await new Promise((resolve) => {

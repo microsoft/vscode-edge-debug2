@@ -83,7 +83,7 @@ If the stable release of Microsoft Edge (Chromium) is on your machine, this debu
 ```json
 {
     "name": "Launch localhost in Microsoft Edge (Chromium) Canary",
-    "type": "edge",
+    "type": "msedge",
     "request": "launch",
     "version": "canary",
     "url": "http://localhost/mypage.html",

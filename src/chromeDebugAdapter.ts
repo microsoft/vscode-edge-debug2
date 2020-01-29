@@ -95,12 +95,15 @@ export class ChromeDebugAdapter extends CoreDebugAdapter {
             const chromeEnv: coreUtils.IStringDictionary<string> = args.env || null;
             const chromeWorkingDir: string = args.cwd || null;
 
-            if (!args.noDebug) {
+            if (!args.useWebView && !args.noDebug) {
                 chromeArgs.push('--remote-debugging-port=' + port);
             }
 
             // Also start with extra stuff disabled
-            chromeArgs.push(...['--no-first-run', '--no-default-browser-check']);
+            if (!args.useWebView) {
+                chromeArgs.push(...['--no-first-run', '--no-default-browser-check']);
+            }
+
             if (args.runtimeArgs) {
                 telemetryPropertyCollector.addTelemetryProperty('numberOfEdgeCmdLineSwitchesBeingUsed', String(args.runtimeArgs.length));
                 chromeArgs.push(...args.runtimeArgs);
@@ -117,7 +120,7 @@ export class ChromeDebugAdapter extends CoreDebugAdapter {
                 args.userDataDir = path.join(os.tmpdir(), `vscode-edge-debug-userdatadir_${port}`);
             }
 
-            if (args.userDataDir) {
+            if (!args.useWebView && args.userDataDir) {
                 chromeArgs.push('--user-data-dir=' + args.userDataDir);
             }
 
@@ -139,7 +142,7 @@ export class ChromeDebugAdapter extends CoreDebugAdapter {
                 launchUrl = 'about:blank';
             }
 
-            if (launchUrl) {
+            if (!args.useWebView && launchUrl) {
                 chromeArgs.push(launchUrl);
             }
 

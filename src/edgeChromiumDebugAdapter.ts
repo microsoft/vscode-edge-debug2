@@ -41,7 +41,7 @@ export class EdgeChromiumDebugAdapter extends ChromeDebugAdapter {
 
                 if (args.useWebView === 'advanced') {
                     // Advanced scenarios should use port 0 by default since we expect the callback to inform us of the correct port
-                    if (args.port === 2015) {
+                    if (!args.port || args.port === 2015) {
                         args.port = 0;
                     }
 

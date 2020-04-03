@@ -9,14 +9,23 @@ import * as path from 'path';
 import * as crypto from 'crypto';
 import * as errors from './errors';
 
+import * as events from 'events';
+
 import { ChromeDebugAdapter } from './chromeDebugAdapter';
 import { ILaunchRequestArgs } from './chromeDebugInterfaces';
 import { IWebViewConnectionInfo } from './edgeChromiumDebugInterfaces';
+
 import { ITelemetryPropertyCollector, utils as coreUtils, utils, chromeUtils, chromeConnection } from 'vscode-chrome-debug-core';
+import { assert } from 'console';
+import { ChromeConnection } from 'vscode-chrome-debug-core/lib/src/chrome/chromeConnection';
+import { Url } from 'url';
 
 export class EdgeChromiumDebugAdapter extends ChromeDebugAdapter {
     private _isDebuggerUsingWebView: boolean;
     private _webviewPipeServer: net.Server;
+
+    private _targetUrl: string;
+
 
     public async launch(args: ILaunchRequestArgs, telemetryPropertyCollector: ITelemetryPropertyCollector, seq?: number) {
         let attachToWebView = false;
@@ -105,7 +114,7 @@ export class EdgeChromiumDebugAdapter extends ChromeDebugAdapter {
         if (!this._isDebuggerUsingWebView) {
             return super.runConnection();
         } else {
-            // For WebView we must no call super.runConnection() since that will cause the execution to resume before we are ready.
+            // For WebView we must not call super.runConnection() since that will cause the execution to resume before we are ready.
             // Instead we strip out the call to _chromeConnection.run() and call runIfWaitingForDebugger() once attach is complete.
             return [
                 this.chrome.Console.enable()
@@ -158,6 +167,7 @@ export class EdgeChromiumDebugAdapter extends ChromeDebugAdapter {
         const pipeName = `VSCode_${crypto.randomBytes(12).toString('base64')}`;
         const serverName = `\\\\.\\pipe\\WebView2\\Debugger\\${exeName}\\${pipeName}`;
         const targetUrl = this.getWebViewLaunchUrl(args);
+        this._targetUrl = targetUrl;
         let isAttached = false;
 
         // Clean up any previous pipe
@@ -175,18 +185,27 @@ export class EdgeChromiumDebugAdapter extends ChromeDebugAdapter {
             stream.on('data', async (data) => {
                 const connectionInfo: IWebViewConnectionInfo = JSON.parse(data.toString());
                 const port = this.getWebViewPort(args, connectionInfo);
-                if (!isAttached && this.isMatchingWebViewTarget(connectionInfo, targetUrl)) {
+
+                const url = connectionInfo.url;
+
+                // if (!isAttached && this.isMatchingWebViewTarget(connectionInfo, targetUrl)) {
+                //     webViewCreatedCallback(port);
+                //     isAttached = true;
+                // } else {
                     webViewCreatedCallback(port);
-                    isAttached = true;
-                } else {
+
                     const address = args.address || '127.0.0.1';
                     const webSocketUrl = `ws://${address}:${port}/devtools/${connectionInfo.type}/${connectionInfo.id}`
 
-                    const webview = new chromeConnection.ChromeConnection();
-                    await webview.attachToWebsocketUrl(webSocketUrl);
-                    await webview.api.Runtime.runIfWaitingForDebugger();
-                    webview.close();
-                }
+                    const webViewConnection = new chromeConnection.ChromeConnection();
+                    await webViewConnection.attachToWebsocketUrl(webSocketUrl);
+
+                    webViewConnection.api.Page.on('frameNavigated', event => this._onFrameNavigated(event));
+                    webViewConnection.api.Page.enable(); // if you don't enable you won't get the frameNavigated events
+
+                    await webViewConnection.api.Runtime.runIfWaitingForDebugger();
+                    //webViewConnection.close();
+                // }
             });
         });
 
@@ -200,4 +219,42 @@ export class EdgeChromiumDebugAdapter extends ChromeDebugAdapter {
 
         return pipeName;
     }
+
+
+    private async _onFrameNavigated(framePayload) {
+        console.debug('_onFrameNavigated');
+        var x = framePayload;
+
+        const frame = framePayload.frame;
+
+        if (frame != undefined)
+        {
+            const url = frame.url;
+            console.debug("_onFrameNavigated: " + url)
+
+
+            const webViewTarget = [{url: frame.url} as chromeConnection.ITarget];
+            console.debug("checking for matching target: " + webViewTarget + " <=> " + this._targetUrl);
+
+            const targets = chromeUtils.getMatchingTargets(webViewTarget, this._targetUrl);
+            if (targets && targets.length > 0)
+            {
+                console.debug("found web target matching filter");
+
+                // How do we finish the connection?
+            }
+            else
+            {
+                console.debug("Non match web target ");
+
+            }
+
+        }
+        else
+        {
+            console.debug("framePlayload.Frame undefined");
+        }
+
+    }
+
 }

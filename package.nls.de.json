@@ -31,6 +31,5 @@
 	"edge.breakOnLoadStrategy.instrument.description": "Geben Sie an, dass Microsoft Edge jeweils beim Laden eines Skripts anhalten soll, um Quellzuordnungsdateien aufzulösen und Breakpoints festzulegen",
 	"edge.breakOnLoadStrategy.regex.description": "Legt Haltepunkte optimistisch in Dateien fest, die denselben Namen wie die Datei aufweisen, in der der Haltepunkt festgelegt ist.",
 	"edge.breakOnLoadStrategy.off.description": "Deaktiviert BreakOnLoad.",
-	"edge.targetTypes.description": "Ein Array von zulässigen Zieltypen. Der Standardwert ist \"[\"page\"]\".",
-	"edge.useWebView.description": "When 'true', the debugger will treat the runtime executable as a host application that contains a WebView allowing you to debug the WebView script content. When set to 'advanced', the debugger will wait to connect to a WebView matching the urlFilter."
+	"edge.targetTypes.description": "Ein Array von zulässigen Zieltypen. Der Standardwert ist \"[\"page\"]\"."
 }

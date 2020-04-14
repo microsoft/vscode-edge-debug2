@@ -31,6 +31,5 @@
 	"edge.breakOnLoadStrategy.instrument.description": "Poinformuj przeglądarkę Microsoft Edge, że ma wstrzymywać działanie podczas ładowania poszczególnych skryptów w celu rozpoznania map źródłowych i ustawienia punktów przerwania",
 	"edge.breakOnLoadStrategy.regex.description": "Optymistycznie ustawia punkty przerwania w plikach o takiej samej nazwie co plik, w którym punkt przerwania jest ustawiony.",
 	"edge.breakOnLoadStrategy.off.description": "Wyłącza ustawienie breakOnLoad.",
-	"edge.targetTypes.description": "Tablica dozwolonych typów docelowych. Wartość domyślna to „[\"page\"]”.",
-	"edge.useWebView.description": "When 'true', the debugger will treat the runtime executable as a host application that contains a WebView allowing you to debug the WebView script content. When set to 'advanced', the debugger will wait to connect to a WebView matching the urlFilter."
+	"edge.targetTypes.description": "Tablica dozwolonych typów docelowych. Wartość domyślna to „[\"page\"]”."
 }

@@ -31,6 +31,5 @@
 	"edge.breakOnLoadStrategy.instrument.description": "請告知 Microsoft Edge 在每個指令碼載入、解析 sourcemap 及設定中斷點時暫停",
 	"edge.breakOnLoadStrategy.regex.description": "在與中斷點設定所在檔案同名的檔案中，以開放模式設定中斷點。",
 	"edge.breakOnLoadStrategy.off.description": "關閉 breakOnLoad。",
-	"edge.targetTypes.description": "可接受之目標類型的陣列。預設為 `[\"page\"]`。",
-	"edge.useWebView.description": "When 'true', the debugger will treat the runtime executable as a host application that contains a WebView allowing you to debug the WebView script content. When set to 'advanced', the debugger will wait to connect to a WebView matching the urlFilter."
+	"edge.targetTypes.description": "可接受之目標類型的陣列。預設為 `[\"page\"]`。"
 }

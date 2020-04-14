@@ -31,6 +31,5 @@
 	"edge.breakOnLoadStrategy.instrument.description": "Microsoft Edge'e her betik yüklenirken duraklatılmasını ve kaynak eşlemelerinin çözümlenerek kesme noktalarının ayarlanmasını söyleyin",
 	"edge.breakOnLoadStrategy.regex.description": "Kesme noktasının ayarlandığı dosya ile aynı ada sahip dosyalarda kesme noktalarını iyimser bir şekilde ayarlar.",
 	"edge.breakOnLoadStrategy.off.description": "breakOnLoad öğesini kapatır.",
-	"edge.targetTypes.description": "Kabul edilebilir hedef türleri dizisi. `[\"page\"]` varsayılandır.",
-	"edge.useWebView.description": "When 'true', the debugger will treat the runtime executable as a host application that contains a WebView allowing you to debug the WebView script content. When set to 'advanced', the debugger will wait to connect to a WebView matching the urlFilter."
+	"edge.targetTypes.description": "Kabul edilebilir hedef türleri dizisi. `[\"page\"]` varsayılandır."
 }

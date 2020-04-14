@@ -31,6 +31,5 @@
 	"edge.breakOnLoadStrategy.instrument.description": "各スクリプトが読み込まれる際に Microsoft Edge を一時停止し、sourcemap を解決してブレークポイントを設定します",
 	"edge.breakOnLoadStrategy.regex.description": "ブレークポイントが設定されているファイルと同じ名前を持つファイル内に、ブレークポイントをオプティミスティックに設定します。",
 	"edge.breakOnLoadStrategy.off.description": "breakOnLoad を無効にします。",
-	"edge.targetTypes.description": "使用可能なターゲット型の配列です。既定では、`[\"page\"]` です。",
-	"edge.useWebView.description": "When 'true', the debugger will treat the runtime executable as a host application that contains a WebView allowing you to debug the WebView script content. When set to 'advanced', the debugger will wait to connect to a WebView matching the urlFilter."
+	"edge.targetTypes.description": "使用可能なターゲット型の配列です。既定では、`[\"page\"]` です。"
 }

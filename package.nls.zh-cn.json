@@ -31,6 +31,5 @@
 	"edge.breakOnLoadStrategy.instrument.description": "指示 Microsoft Edge 在加载每个脚本时暂停，以便解析源映射并设置断点",
 	"edge.breakOnLoadStrategy.regex.description": "在与设置断点的文件名相同的文件中乐观地设置断点。",
 	"edge.breakOnLoadStrategy.off.description": "禁用 breakOnLoad。",
-	"edge.targetTypes.description": "可接受的目标类型的数组。默认值为 `[\"page\"]`。",
-	"edge.useWebView.description": "When 'true', the debugger will treat the runtime executable as a host application that contains a WebView allowing you to debug the WebView script content. When set to 'advanced', the debugger will wait to connect to a WebView matching the urlFilter."
+	"edge.targetTypes.description": "可接受的目标类型的数组。默认值为 `[\"page\"]`。"
 }

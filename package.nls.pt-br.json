@@ -31,6 +31,5 @@
 	"edge.breakOnLoadStrategy.instrument.description": "Informe ao Microsoft Edge para pausar conforme cada script é carregado, resolvendo sourcemaps e definindo pontos de interrupção",
 	"edge.breakOnLoadStrategy.regex.description": "Define os pontos de interrupção de modo otimista em arquivos com o mesmo nome que o arquivo no qual o ponto de interrupção está definido.",
 	"edge.breakOnLoadStrategy.off.description": "Ativa o breakOnLoad.",
-	"edge.targetTypes.description": "Uma matriz de tipos de destino aceitáveis. O padrão é `[\"page\"]`.",
-	"edge.useWebView.description": "When 'true', the debugger will treat the runtime executable as a host application that contains a WebView allowing you to debug the WebView script content. When set to 'advanced', the debugger will wait to connect to a WebView matching the urlFilter."
+	"edge.targetTypes.description": "Uma matriz de tipos de destino aceitáveis. O padrão é `[\"page\"]`."
 }

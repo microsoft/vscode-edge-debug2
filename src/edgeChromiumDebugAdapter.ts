@@ -35,11 +35,13 @@ export class EdgeChromiumDebugAdapter extends ChromeDebugAdapter {
 
     private _debugActive: boolean = false;
 
+    private _webViewCreatedCallback: (port: number) => void;
+
     public async launch(args: ILaunchRequestArgs, telemetryPropertyCollector: ITelemetryPropertyCollector, seq?: number) {
         let attachToWebView = false;
-        let webViewCreatedCallback: (port: number) => void;
+
         const webViewReadyToAttach = new Promise<number>((resolve, reject) => {
-            webViewCreatedCallback = resolve;
+            this._webViewCreatedCallback = resolve;
         });
 
         if (args.useWebView) {
@@ -63,7 +65,7 @@ export class EdgeChromiumDebugAdapter extends ChromeDebugAdapter {
                     }
 
                     // Create the webview server that will inform us of webview creation events
-                    const pipeName = await this.createWebViewServer(args, webViewCreatedCallback);
+                    const pipeName = await this.createWebViewServer(args);
                     args.env['WEBVIEW2_PIPE_FOR_SCRIPT_DEBUGGER'] = pipeName;
                 } else {
                     // For normal scenarios use the port specified or 2015 by default
@@ -72,7 +74,7 @@ export class EdgeChromiumDebugAdapter extends ChromeDebugAdapter {
                         // Also override the userDataDir to force remote debugging to be enabled
                         args.userDataDir = path.join(os.tmpdir(), `vscode-edge-debug-userdatadir_${args.port}`);
                     }
-                    webViewCreatedCallback(args.port);
+                    this._webViewCreatedCallback(args.port);
                 }
 
                 if (args.userDataDir) {
@@ -164,20 +166,17 @@ export class EdgeChromiumDebugAdapter extends ChromeDebugAdapter {
     }
 
     private isMatchingWebViewTarget(connectionInfo: IWebViewConnectionInfo, targetUrl: string) {
-        const webViewTarget = [{url: connectionInfo.url} as chromeConnection.ITarget];
+        const webViewTarget = [{ url: connectionInfo.url } as chromeConnection.ITarget];
         const targets = chromeUtils.getMatchingTargets(webViewTarget, targetUrl);
         return (targets && targets.length > 0);
     }
 
-    private _webViewCreatedCallback: (port: number) => void;
-
     // Create the named pipe used to subscribe to new webview creation events
-    private async createWebViewServer(args: ILaunchRequestArgs, webViewCreatedCallback: (port: number) => void) {
+    private async createWebViewServer(args: ILaunchRequestArgs) {
 
-        if (this._debugActive)
-        {
+        if (this._debugActive) {
             // can only support one debug channel at a time, so just return
-            console.debug('createWebViewServer: Called when debug already active');
+            console.log('createWebViewServer: Called when debug already active');
 
             return;
         }
@@ -188,21 +187,19 @@ export class EdgeChromiumDebugAdapter extends ChromeDebugAdapter {
         const targetUrl = this.getWebViewLaunchUrl(args);
         this._targetUrl = targetUrl;
 
-        this._webViewCreatedCallback = webViewCreatedCallback;
-
         // Clean up any previous pipe
         this.closePipeServer();
 
         this._webviewPipeServer = net.createServer((stream) => {
             stream.on('data', async (data) => {
-                console.debug("new webview");
+                console.log('new webview');
                 const connectionInfo: IWebViewConnectionInfo = JSON.parse(data.toString());
                 const port = this.getWebViewPort(args, connectionInfo);
 
                 // Setup the navigation events on the new webview so we can use it to filter for our target URL
                 const address = args.address || '127.0.0.1';
-                const webSocketUrl = `ws://${address}:${port}/devtools/${connectionInfo.type}/${connectionInfo.id}`
-                console.debug("new webview: " + webSocketUrl);
+                const webSocketUrl = `ws://${address}:${port}/devtools/${connectionInfo.type}/${connectionInfo.id}`;
+                console.log('new webview: ' + webSocketUrl);
 
                 // keep the list of connections so we can lookup the port to debug on and clean up later
                 const webViewConnection = new chromeConnection.ChromeConnection();
@@ -228,11 +225,10 @@ export class EdgeChromiumDebugAdapter extends ChromeDebugAdapter {
             this._webviewPipeServer = undefined;
 
             // stop the debugging
-            webViewCreatedCallback(0);
+            this._webViewCreatedCallback(0);
 
             // close the navigation event connection as we don't need them any more.
-            for (var key in this._connections)
-            {
+            for (const key in this._connections) {
                 this._connections[key].connection.close();
             }
 
@@ -248,28 +244,24 @@ export class EdgeChromiumDebugAdapter extends ChromeDebugAdapter {
         return pipeName;
     }
 
-   private async _onFrameNavigated(framePayload: Crdp.Page.FrameNavigatedEvent) {
-        console.debug('onFrameNavigated');
+    private async _onFrameNavigated(framePayload: Crdp.Page.FrameNavigatedEvent) {
+        console.log('onFrameNavigated');
 
-        if (framePayload != undefined)
-        {
+        if (framePayload !== undefined) {
             const url = framePayload.frame.url;
             const id = framePayload.frame.id;
-            console.debug("onFrameNavigated: " + url)
+            console.log('onFrameNavigated: ' + url);
 
-            const webViewTarget = [{url: url} as chromeConnection.ITarget];
-            console.debug("checking for matching target: " + webViewTarget[0].url + " <=> " + this._targetUrl);
+            const webViewTarget = [{ url: url } as chromeConnection.ITarget];
+            console.log('checking for matching target: ' + webViewTarget[0].url + ' <=> ' + this._targetUrl);
 
             const targets = chromeUtils.getMatchingTargets(webViewTarget, this._targetUrl);
-            if (targets && targets.length > 0)
-            {
-                console.debug("found web target matching filter");
+            if (targets && targets.length > 0) {
+                console.log('found web target matching filter');
 
                 // Lookup the port number of the matching connection and close the navigation events as we are done with them
-                for (var key in this._connections)
-                {
-                    if (this._connections[key].id == id)
-                    {
+                for (const key in this._connections) {
+                    if (this._connections[key].id === id) {
                         // Found it
                         // Let the webview created callback know what port to start debugging on
                         this._webViewCreatedCallback(this._connections[key].port);
@@ -284,23 +276,15 @@ export class EdgeChromiumDebugAdapter extends ChromeDebugAdapter {
 
                 // And we can close the main pipe as we can't reconnect
                 await this.closePipeServer();
-
+            } else {
+                console.log('Non matching web target');
             }
-            else
-            {
-                console.debug("Non matching web target ");
-            }
-
+        } else {
+            console.log('framePlayload.Frame undefined');
         }
-        else
-        {
-            console.debug("framePlayload.Frame undefined");
-        }
-
     }
 
-    private async closePipeServer()
-    {
+    private async closePipeServer() {
         await new Promise((resolve) => {
             if (this._webviewPipeServer) {
                 this._webviewPipeServer.close(() => {
@@ -311,5 +295,4 @@ export class EdgeChromiumDebugAdapter extends ChromeDebugAdapter {
             }
         });
     }
-
 }

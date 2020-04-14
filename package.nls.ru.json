@@ -31,6 +31,5 @@
 	"edge.breakOnLoadStrategy.instrument.description": "Сообщает Microsoft Edge о том, что необходимо приостановить работу после загрузки каждого скрипта для разрешения сопоставителей с исходным кодом и установки точек останова.",
 	"edge.breakOnLoadStrategy.regex.description": "Оптимистично устанавливает точки останова в файлах с таким же именем, как у файла, в котором установлена точка останова.",
 	"edge.breakOnLoadStrategy.off.description": "Отключает breakOnLoad.",
-	"edge.targetTypes.description": "Массив допустимых типов целевых объектов. Значение по умолчанию — '[\"page\"]'.",
-	"edge.useWebView.description": "When 'true', the debugger will treat the runtime executable as a host application that contains a WebView allowing you to debug the WebView script content. When set to 'advanced', the debugger will wait to connect to a WebView matching the urlFilter."
+	"edge.targetTypes.description": "Массив допустимых типов целевых объектов. Значение по умолчанию — '[\"page\"]'."
 }

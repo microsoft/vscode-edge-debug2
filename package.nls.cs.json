@@ -31,6 +31,5 @@
 	"edge.breakOnLoadStrategy.instrument.description": "Nastaví pozastavení Microsoft Edge při načítání každého skriptu za účelem překladu zdrojového mapování a nastavení zarážek.",
 	"edge.breakOnLoadStrategy.regex.description": "Nastaví zarážky optimisticky do souborů se stejným názvem, jaký má soubor, ve kterém je zarážka nastavena.",
 	"edge.breakOnLoadStrategy.off.description": "Vypne funkci breakOnLoad.",
-	"edge.targetTypes.description": "Pole obsahující přípustné typy cílů. Výchozí nastavení je [\"page\"].",
-	"edge.useWebView.description": "When 'true', the debugger will treat the runtime executable as a host application that contains a WebView allowing you to debug the WebView script content. When set to 'advanced', the debugger will wait to connect to a WebView matching the urlFilter."
+	"edge.targetTypes.description": "Pole obsahující přípustné typy cílů. Výchozí nastavení je [\"page\"]."
 }

@@ -31,6 +31,5 @@
 	"edge.breakOnLoadStrategy.instrument.description": "각 스크립트가 로드되면 Microsoft Edge에서 일시 중지한 후 sourcemap을 확인하고 중단점을 설정하도록 알려줍니다.",
 	"edge.breakOnLoadStrategy.regex.description": "중단점이 설정된 파일과 이름이 같은 파일에서 중단점을 최적으로 설정합니다.",
 	"edge.breakOnLoadStrategy.off.description": "breakOnLoad를 끕니다.",
-	"edge.targetTypes.description": "허용되는 대상 유형의 배열입니다. 기본값은 '[\"page\"]'입니다.",
-	"edge.useWebView.description": "When 'true', the debugger will treat the runtime executable as a host application that contains a WebView allowing you to debug the WebView script content. When set to 'advanced', the debugger will wait to connect to a WebView matching the urlFilter."
+	"edge.targetTypes.description": "허용되는 대상 유형의 배열입니다. 기본값은 '[\"page\"]'입니다."
 }

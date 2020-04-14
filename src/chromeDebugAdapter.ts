@@ -6,7 +6,7 @@ import * as os from 'os';
 import * as fs from 'fs';
 import * as path from 'path';
 
-import {ChromeDebugAdapter as CoreDebugAdapter, logger, utils as coreUtils, ISourceMapPathOverrides, ChromeDebugSession, telemetry, ITelemetryPropertyCollector, IOnPausedResult, Version } from 'vscode-chrome-debug-core';
+import { ChromeDebugAdapter as CoreDebugAdapter, logger, utils as coreUtils, ISourceMapPathOverrides, ChromeDebugSession, telemetry, ITelemetryPropertyCollector, IOnPausedResult, Version } from 'vscode-chrome-debug-core';
 import { spawn, ChildProcess, fork, execSync } from 'child_process';
 import { Crdp } from 'vscode-chrome-debug-core';
 import { DebugProtocol } from 'vscode-debugprotocol';
@@ -80,7 +80,7 @@ export class ChromeDebugAdapter extends CoreDebugAdapter {
                     return errors.getNotExistErrorResponse('runtimeExecutable', args.runtimeExecutable);
                 }
                 runtimeExecutable = re;
-            } else if (args['version']){
+            } else if (args['version']) {
                 runtimeExecutable = utils.getBrowserPath(args['version']);
             }
 

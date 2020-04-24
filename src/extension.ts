@@ -66,7 +66,7 @@ export class EdgeConfigurationProvider implements vscode.DebugConfigurationProvi
             config.type = 'msedge';
         }
 
-        if (config.type == 'edge' && !isEdgeDebuggingSupported()) {
+        if (config.type === 'edge' && !isEdgeDebuggingSupported()) {
             const errorMessage = localize('edge.debug.error.versionNotSupported', 'Your version of Microsoft Edge does not support debugging via the Edge DevTools Protocol. You can read more about supported versions here (https://aka.ms/edp-docs).');
             // since we're not passing any user options, we want to return an undefined debug configuration
             return <Thenable<undefined>>vscode.window.showErrorMessage(errorMessage);

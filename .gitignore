@@ -10,3 +10,4 @@ node_modules/
 typings/
 testapp/.vscode/chrome
 testapp/**/out/
+msbuild/

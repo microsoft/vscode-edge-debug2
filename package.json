@@ -1,10 +1,12 @@
 {
   "name": "debugger-for-edge",
   "displayName": "Debugger for Microsoft Edge",
-  "version": "1.0.14",
+  "version": "1.0.15",
   "icon": "images/icon.png",
   "description": "%extension.description%",
-  "extensionKind": ["ui"],
+  "extensionKind": [
+    "ui"
+  ],
   "author": {
     "name": "Microsoft Corporation"
   },

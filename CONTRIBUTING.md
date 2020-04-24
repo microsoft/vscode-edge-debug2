@@ -9,6 +9,12 @@ Contributions are always welcome! We only ask that you open an issue first so we
     * You may see an error if `bufferutil` or `utf-8-validate` fail to build. These native modules required by `ws` are optional and the adapter should work fine without them.
 * Run `gulp build`
 
+## Generate local package for testing
+After you have done the development setup you can generate a vsix for local install / testing (recommend changing the version number in package.json to simplify verification your using the local add in)
+* Run  'gulp package'
+This will generate a "debugger-for-edge-xx.xx.xx.vsix" file (where xx.xx.xx is the version number of the package).
+You can then use vscode and Install from Vsix... to install the generated package.
+
 ## Developing in the vscode-chrome-debug-core module
 Most of the code is actually in [this repo](https://github.com/Microsoft/vscode-chrome-debug-core) which is published in npm as `vscode-chrome-debug-core`. You can clone that repo separately to any directory and use `npm link` to test the extension with a modified version.
 

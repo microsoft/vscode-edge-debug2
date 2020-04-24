@@ -31,7 +31,7 @@ suite('EdgeChromiumDebugAdapter', () => {
             ChromeDebugAdapter: class ChromeDebugAdapter {
                 protected chrome: any;
                 constructor() {
-                    this.chrome = { Runtime: { runIfWaitingForDebugger: () => { mockRun(); } } }
+                    this.chrome = { Runtime: { runIfWaitingForDebugger: () => { mockRun(); } } };
                 }
                 launch(a) { mockLaunch(a); }
                 doAttach() { mockDoAttach(); }

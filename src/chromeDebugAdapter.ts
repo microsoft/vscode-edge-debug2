@@ -35,7 +35,7 @@ interface IExtendedInitializeRequestArguments extends DebugProtocol.InitializeRe
 export class ChromeDebugAdapter extends CoreDebugAdapter {
     private _pagePauseMessage = 'Paused in Visual Studio Code';
 
-    private _chromeProc: ChildProcess;
+    public _chromeProc: ChildProcess;
     private _overlayHelper: utils.DebounceHelper;
     private _chromePID: number;
     private _userRequestedUrl: string;

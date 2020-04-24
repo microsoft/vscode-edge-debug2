@@ -26,6 +26,7 @@ class ConnectionInfo {
 export class EdgeChromiumDebugAdapter extends ChromeDebugAdapter {
     private _isDebuggerUsingWebView: boolean;
     private _webviewPipeServer: net.Server;
+    // a test comment
 
     private _targetUrl: string;
 
@@ -92,7 +93,9 @@ export class EdgeChromiumDebugAdapter extends ChromeDebugAdapter {
         await super.launch(args, telemetryPropertyCollector, seq);
 
         const chromeKilledCallback = () => this.terminateSession("WebView program ended before the debugger could connect");
-        this._chromeProc.on('exit', chromeKilledCallback);
+        if(this._chromeProc) {
+            this._chromeProc.on('exit', chromeKilledCallback);
+        }
 
         if (attachToWebView) {
             const port = await webViewReadyToAttach;
@@ -102,7 +105,9 @@ export class EdgeChromiumDebugAdapter extends ChromeDebugAdapter {
             // it will not have auto attached during the super.launch() call.
             if(port > 0) {
                 this.doAttach(port, this.getWebViewLaunchUrl(args), args.address, args.timeout, undefined, args.extraCRDPChannelPort);
-                this._chromeProc.removeListener('exit', chromeKilledCallback);
+                if(this._chromeProc) {
+                    this._chromeProc.removeListener('exit', chromeKilledCallback);
+                }
             }
         }
     }

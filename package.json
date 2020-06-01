@@ -711,6 +711,19 @@
                 "default": [
                   "page"
                 ]
+              },
+              "useWebView": {
+                "type": [
+                  "boolean",
+                  "string"
+                ],
+                "enum": [
+                  "advanced",
+                  true,
+                  false
+                ],
+                "description": "%edge.useWebView.description%",
+                "default": false
               }
             }
           },
@@ -826,6 +839,19 @@
                 "default": [
                   "page"
                 ]
+              },
+              "useWebView": {
+                "type": [
+                  "boolean",
+                  "string"
+                ],
+                "enum": [
+                  "advanced",
+                  true,
+                  false
+                ],
+                "description": "%edge.useWebView.description%",
+                "default": false
               }
             }
           }

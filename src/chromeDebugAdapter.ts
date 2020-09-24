@@ -434,7 +434,7 @@ export class ChromeDebugAdapter extends CoreDebugAdapter {
             let chromePid: number;
 
             if (this._doesHostSupportLaunchUnelevatedProcessRequest) {
-                chromePid = await this.spawnChromeUnelevatedWithClient(chromePath, chromeArgs);
+                chromePid = await this.spawnChromeUnelevatedWithClient(chromePath, chromeArgs, env);
             } else {
                 chromePid = await this.spawnChromeUnelevatedWithWindowsScriptHost(chromePath, chromeArgs);
             }
@@ -531,11 +531,12 @@ export class ChromeDebugAdapter extends CoreDebugAdapter {
         return env;
     }
 
-    private async spawnChromeUnelevatedWithClient(chromePath: string, chromeArgs: string[]): Promise<number> {
+    private async spawnChromeUnelevatedWithClient(chromePath: string, chromeArgs: string[], env: coreUtils.IStringDictionary<string>): Promise<number> {
         return new Promise<number>((resolve, reject) => {
             this._session.sendRequest('launchUnelevated', {
                 'process': chromePath,
-                'args': chromeArgs
+                'args': chromeArgs,
+                'env': env
             }, 10000, (response) => {
                 if (!response.success) {
                     reject(new Error(response.message));

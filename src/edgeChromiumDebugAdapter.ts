@@ -249,7 +249,11 @@ export class EdgeChromiumDebugAdapter extends ChromeDebugAdapter {
         });
 
         // Start listening for new webviews
-        this._webviewPipeServer.listen(serverName);
+        this._webviewPipeServer.listen({
+            path: serverName,
+            readableAll: true,
+            writableAll: true
+        });
 
         return pipeName;
     }

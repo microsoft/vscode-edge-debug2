@@ -124,6 +124,12 @@ The example `launch.json` config below will attach to either Microsoft Edge (Chr
 * `version`: When set to `canary`, `dev`, or `beta`, it will launch the matching version of Microsoft Edge (Chromium). If not specified, Microsoft Edge (EdgeHTML) will be launched.
 * `runtimeExecutable`: Workspace relative or absolute path to the runtime executable to be used. If not specified, Microsoft Edge (EdgeHTML) will be used from the default install location.
 * `runtimeArgs`: Optional arguments passed to the runtime executable.
+  ```json
+  // Launch in Private Mode
+  "runtimeArgs": [
+    "--inprivate"
+  ]
+  ```
 * `env`: Optional dictionary of environment key/value pairs.
 * `cwd`: Optional working directory for the runtime executable.
 * `userDataDir`: Normally, if Microsoft Edge is already running when you start debugging with a launch config, then the new instance won't start in remote debugging mode. So by default, the extension launches Microsoft Edge with a separate user profile in a temp folder. Use this option to set a different path to use, or set to false to launch with your default user profile. Note that this is only applicable to Microsoft Edge (Chromium) and will not work with Microsoft Edge (EdgeHTML).

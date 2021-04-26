@@ -60,7 +60,7 @@
     "typemoq": "^2.1.0",
     "typescript": "^2.9.2",
     "vsce": "^1.61.0",
-    "vscode": "^1.1.33",
+    "vscode": "^1.1.37",
     "vscode-chrome-debug-core-testsupport": "^4.0.0",
     "vscode-debugadapter-testsupport": "^1.33.0",
     "vscode-debugprotocol": "^1.32.0",

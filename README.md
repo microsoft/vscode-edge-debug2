@@ -4,6 +4,13 @@
   <br>
 </h1>
 
+## ⚠️ Attention - Deprecation notice:
+
+This extension has been deprecated as Visual Studio Code now has a [bundled JavaScript Debugger](https://github.com/microsoft/vscode-js-debug) that covers the same functionality. It is a debugger that debugs Node.js, Chrome, Edge, WebView2, VS Code extensions, and more. You can safely un-install this extension and you will still be able to have the functionality you need.
+
+Additionally, you can also debug the DOM, CSS, read Console messages and inspect the Network using a new button in the debugger toolbar if you install the [Microsoft Edge DevTools for Visual Studio Code extension](https://marketplace.visualstudio.com/items?itemName=ms-edgedevtools.vscode-edge-devtools).
+
+
 <h4 align="center">Debug your JavaScript code running in Microsoft Edge from VS Code and Visual Studio.</h4>
 
 A VS Code extension to debug your JavaScript code in the Microsoft Edge browser. This is also used to enable JavaScript debugging inside the Microsoft Edge browser when launched from ASP.Net Projects in Visual Studio.

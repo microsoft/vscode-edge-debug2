@@ -1,3 +1,9 @@
+## :rotating_light: Important
+
+This extension has been deprecated as Visual Studio Code now has a [bundled JavaScript Debugger](https://github.com/microsoft/vscode-js-debug) that covers the same functionality. It is a debugger that debugs Node.js, Chrome, Edge (Chromium), WebView2, VS Code extensions, and more. You can safely un-install this extension and you will still be able to have the functionality you need. Note that the new bundled debugger only supports Edge (Chromium), and does not support legacy Microsoft Edge (EdgeHTML). For debugging legacy Edge, you will still need this extension.
+
+Please file any issues you encounter in [that repository](https://github.com/microsoft/vscode-js-debug).
+
 <h1 align="center">
   <br>
   VS Code - Debugger for Microsoft Edge

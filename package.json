@@ -55,7 +55,7 @@
     "randomatic": "3.0.0",
     "run-sequence": "^2.2.0",
     "tmp": "0.0.31",
-    "ts-loader": "^1.0.0",
+    "ts-loader": "^9.4.1",
     "tslint": "^5.16.0",
     "typemoq": "^2.1.0",
     "typescript": "^2.9.2",
